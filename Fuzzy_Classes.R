@@ -3,7 +3,7 @@
 
 library('sf')
 library('tibble')
-
+library('dplyr')
 
 # Component Class 
 
@@ -15,26 +15,53 @@ setClass("Component",
 )
 
 
+create_component <- function(raw_obj, md, type){
+  
+  if(type=="POINT"){
+    # Single Point or MultiPoint
+    if(inherits(raw_obj, "numeric")){
+      obj_component = st_point(raw_obj)
+    }
+    else if(inherits(raw_obj, "matrix")){
+    obj_component = st_multipoint(raw_obj)
+    }
+  }
+  
+  else if(type=="LINE"){
+    if(inherits(raw_obj, "matrix")){
+      obj_component = st_linestring(raw_obj)
+    }
+    else if(inherits(raw_obj, "list")){
+    obj_component = st_multilinestring(raw_obj)
+    }
+  }
+  
+  else if(type=="REGION"){
+    if(inherits(raw_obj[[1]], "matrix")){
+      obj_component = st_polygon(raw_obj)
+    }
+    else if(inherits(raw_obj[1], "list")){
+    obj_component = st_multipolygon(raw_obj)
+    }
+  }
+  
+  component <- new("Component", obj = obj_component,md=md)
+}
+
+
 # SpatialPlateau Class (Super Class)
 
 setClass("SpatialPlateau",
          slots = list(
            component = "list",
-           supp = "XY"
+           supp = "XY",
+           type = "character"
          )
 )
 
 
 
-# Point Class 
-
-setClass("PlateauPoint",
-        contains = "SpatialPlateau"
-        )
-
-
-
-SpatialPlateau <- function(components){
+create_spatial_plateau <- function(components, type){
   
   # Repensar no estilo de Helper 
   # create_ ? ...
@@ -54,6 +81,17 @@ SpatialPlateau <- function(components){
       return(new_components)
     }
     new_list <- ordered_comp(components)
+    
+      create_supp <- function(components){
+        obj_sf = c()
+      for(comp in 1:length(components)){
+        object_sf = components[[comp]]@obj
+        obj_sf[comp] <- object_sf
+      }
+        supp = st_union(st_sfc(obj_sf))
+      return(supp)
+      }
+      supp = create_supp(components)
   }
   
   else if(inherits(components, "data.frame") || inherits(df, "tibble")){
@@ -71,11 +109,16 @@ SpatialPlateau <- function(components){
     supp = st_union(new_df[,2])
     # REPETIR PARA IF LISTA 
   }
+  # CEHCAR OS TIPOS ( POINT, LINE , REGION)
   
-  new("SpatialPlateau", component = new_list, supp = supp[[1]])
+  # 1 CHECAGEM - VERIFICAR TIPOS INPUT USUARIO
+  # TYPES:
+  # plateau_point
+  # plateau_line
+  # plateau_region
   
-  ### CHECAR neste HELPER!
-  # 1. Aceitar apenas MULTIPOINT ou POINT 
+  new("SpatialPlateau", component = new_list, supp = supp[[1]], type = type)
+  
 }
 
 
