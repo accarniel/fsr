@@ -41,7 +41,7 @@ SpatialPlateau <- function(components){
   
   # Checar se é lista ou dataframe 
   
-  if(is.list(components)){
+  if(inherits(components, "list")){
     # Caso LISTA
     ordered_comp <- function(components){
       md_value = c()
@@ -56,7 +56,7 @@ SpatialPlateau <- function(components){
     new_list <- ordered_comp(components)
   }
   
-  else if(is.data.frame(components) || is.tibble(components)){
+  else if(inherits(components, "data.frame") || inherits(df, "tibble")){
     
     new_df <- arrange(components, components[1])
     
