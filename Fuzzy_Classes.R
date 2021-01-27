@@ -63,9 +63,10 @@ setClass("SpatialPlateau",
 
 create_spatial_plateau <- function(components, type){
   
-  # Repensar no estilo de Helper 
-  # create_ ? ...
   
+  #### NO TYPE ###
+  # CHECAR SE O TIPO DE DADO é CORRESPONDETE AOS EXISTENTES (plateau_line, plateau_point, plateau_region)
+
   # Checar se é lista ou dataframe 
   
   if(inherits(components, "list")){
@@ -80,13 +81,16 @@ create_spatial_plateau <- function(components, type){
       new_components <- components[order_comps]
       return(new_components)
     }
-    new_list <- ordered_comp(components)
+      new_list <- ordered_comp(components)
     
       create_supp <- function(components){
-        obj_sf = c()
+        obj_sf = list()
       for(comp in 1:length(components)){
+        ##### INSERIR CHECAGEM DO TIPO DE CADA COMPONETE ####
+        ###### CONSTRUIR A FUNÇÂO
+        #### CASO NEGATIVO, DEVOLVER MENSAGEM DE ERRO EXPLICANDO....
         object_sf = components[[comp]]@obj
-        obj_sf[comp] <- object_sf
+        obj_sf[[comp]] <- object_sf
       }
         supp = st_union(st_sfc(obj_sf))
       return(supp)
@@ -102,6 +106,7 @@ create_spatial_plateau <- function(components, type){
     
     for(i in 1:nrow(new_df)){
       #new_list[[i]] <- row
+      ##### INSERIR CHECAGEM DO TIPO DE CADA COMPONETE ####
       new_list[[i]] <- new("Component", obj = new_df[i,2][[1]], md = new_df[i, 1])
     }
     
@@ -117,6 +122,16 @@ create_spatial_plateau <- function(components, type){
   # plateau_line
   # plateau_region
   
+  if(type=="plateau_point"){
+    # Single Point or MultiPoint
+    if(inherits(raw_obj, "numeric")){
+      obj_component = st_point(raw_obj)
+    }
+    else if(inherits(raw_obj, "matrix")){
+      obj_component = st_multipoint(raw_obj)
+    }
+  }
+  
   new("SpatialPlateau", component = new_list, supp = supp[[1]], type = type)
   
 }
@@ -126,21 +141,9 @@ create_spatial_plateau <- function(components, type){
 
 
 
-
-
-
-
-
-
-
-setClass("PlateauLine",
-         contains = "SpatialPlateau"
-         )
-
-
-setClass("PlateauRegion",
-         contains = "SpatialPlateau"
-         )
+##################################################################################################################################################################
+##################################################################################################################################################################
+##################################################################################################################################################################
 
 
 

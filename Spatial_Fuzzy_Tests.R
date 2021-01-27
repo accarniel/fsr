@@ -56,34 +56,34 @@ list_multi_poli = list(list(p1,p2), list(p3,p4), list(p5))
 
 # Check Component Function 
 # POINTS
-singlePointComponent = Component(s0, 0.4, "POINT")
+singlePointComponent = create_component(s0, 0.4)
 
-multiPointComponent1 = Component(s1, 0.5, "POINT")
-multiPointComponent2 = Component(s2, 0.6, "POINT")
-multiPointComponent3 = Component(p1, 0.7, "POINT")
+multiPointComponent1 = create_component(s1, 0.5, "POINT")
+multiPointComponent2 = create_component(s2, 0.6, "POINT")
+multiPointComponent3 = create_component(p1, 0.7, "POINT")
 
 
 # LINES
-singleLineComponent = Component(s1, 0.6, "LINE")
-multiLineComponent1 = Component(list(s1,s2), 0.7, "LINE")
-multiLineComponent2 = Component(list(s3,s4), 0.7, "LINE")
-multiLineComponent3 = Component(list(s6,s3), 0.7, "LINE")
+singleLineComponent = create_component(s1, 0.6, "LINE")
+multiLineComponent1 = create_component(list(s1,s2), 0.7, "LINE")
+multiLineComponent2 = create_component(list(s3,s4), 0.7, "LINE")
+multiLineComponent3 = create_component(list(s6,s3), 0.7, "LINE")
 
 
 
 # REGION (POLYGON)
-singlePolygonComponent = Component(list_poly, 0.3, "REGION")
-multiPolygonComponent = Component(list_multi_poli, 0.6, "REGION")
+singlePolygonComponent = create_component(list_poly, 0.3, "REGION")
+multiPolygonComponent = create_component(list_multi_poli, 0.6, "REGION")
 
 
 
 # Creating a SpatialPlateau Object
 list_of_components = c(multiPointComponent1,multiPointComponent2,multiPointComponent3)
-SP_1 <- SpatialPlateau(list_of_components)
+SP_1 <- create_spatial_plateau(list_of_components)
 
 # Creating a SpatialPlateau Object - LINE
 list_of_line_componenets = c(multiLineComponent1,multiLineComponent2,multiLineComponent3)
-SP_2 <- SpatialPlateau(list_of_line_componenets)
+SP_2 <- create_spatial_plateau(list_of_line_componenets)
 
 
 # 
@@ -96,7 +96,22 @@ var_sup = supp[[1]]
 # Spatial Plateau 1 - Test 
 
 
-SP_1 <- SpatialPlateau(components)
+SP_1 <- create_spatial_plateau(components)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 plateau_point = new("PlateauPoint", components = c(component1, component2), supp = var_sup)

@@ -7,8 +7,45 @@
 
 
 # For a unique Value (Component)
+
+### RECEBER COMPONENTE E O TIPO DE DADO DE INPUT DO USUARIO ( QUE ELE DESEJA)
+### VALIDAR SE O INPUT é CORRETO.
+
+check_plateau <- function(component, type){
+  if(class(component)[1] == "XY"){
+    component_type = class(component)[2]
+    if(component_type == "POINT" || component_type == "MULTIPOINT"){
+      if(type=="POINT"){
+        TRUE
+      } else{
+        FALSE
+      }
+    }
+    else if(component_type == "LINESTRING" || component_type == "MULTILINE"){
+      if(type=="LINE"){
+        TRUE
+      } else{
+        FALSE
+      }
+    }
+    else if(component_type == "POLYGON" || component_type == "MULTIPOLYGON"){
+      if(type=="POLYGON"){
+        TRUE
+      } else{
+        FALSE
+      }
+    }} else{
+      print("Component is not a sf data type")
+  }     
+}
+
+
+
+
+
+
 is_point <- function(component){
-  if ((class(component)[2] == "POINT") || (class(component)[2] == "MULTIPOINT")){
+  if ((class(component)[2] == "POINT" || class(component)[2] == "MULTIPOINT")){
     TRUE
   }
   else{
@@ -25,8 +62,8 @@ is_point <- function(list_components){
 
 #####################
 #####################
-#### LINE 
-###################
+#### LINE ##########
+####################
 ####################
 
 
