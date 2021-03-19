@@ -79,7 +79,7 @@ multiPolygonComponent = create_component(list_multi_poli, 0.6, "REGION")
 
 # Creating a SpatialPlateau Object
 list_of_components = c(multiPointComponent1,multiPointComponent2,multiPointComponent3)
-SP_1 <- create_spatial_plateau(list_of_components)
+SP_1 <- create_spatial_plateau(list_of_components, "plateau_point")
 
 # Creating a SpatialPlateau Object - LINE
 list_of_line_componenets = c(multiLineComponent1,multiLineComponent2,multiLineComponent3)

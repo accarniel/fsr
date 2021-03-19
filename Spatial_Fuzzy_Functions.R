@@ -10,12 +10,14 @@
 
 ### RECEBER COMPONENTE E O TIPO DE DADO DE INPUT DO USUARIO ( QUE ELE DESEJA)
 ### VALIDAR SE O INPUT é CORRETO.
-
+# 1. Checar na lista, item a item, o tipo de dado (criar a função)
 check_plateau <- function(component, type){
+  #type tolower
+  
   if(class(component)[1] == "XY"){
     component_type = class(component)[2]
     if(component_type == "POINT" || component_type == "MULTIPOINT"){
-      if(type=="POINT"){
+      if(type=="plateau_point"){
         TRUE
       } else{
         FALSE
@@ -35,9 +37,12 @@ check_plateau <- function(component, type){
         FALSE
       }
     }} else{
-      print("Component is not a sf data type")
+      stop("Component is not a sf data type")
   }     
 }
+
+
+
 
 
 
@@ -54,11 +59,6 @@ is_point <- function(component){
 }
 
 
-# For a list of componenents 
-
-is_point <- function(list_components){
-  
-}
 
 #####################
 #####################
@@ -106,6 +106,22 @@ is_region <- function(component){
     FALSE
   }
 }
+
+
+
+
+##########
+
+
+spo_is_empty <- function(spo){
+  
+}
+
+
+
+
+
+
 
 
 
