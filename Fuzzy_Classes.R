@@ -136,13 +136,6 @@ create_empty_spatial_plateau <- function(type){
 
 #### Spatial Plateau Builder 
 
-setClass("Component",
-         slots = list(
-           obj = "XY",
-           md = "numeric"
-         )
-)
-
 
 
 # functions <- checar se SPO é vazio
@@ -228,21 +221,31 @@ md_binary_search_iter <- function(components, low, high, m){
       low = mid + 1
     }
   }
-  
-  mid = floor((low + high)/2)
-  if(mid <= 0){
-    mid = 1
-  }
-  if(m <= components[[mid]]@md){
-    return(c(FALSE, mid))
-  }
-  
-  return(c(FALSE,mid+1))
+  return(c(FALSE, low))
+  # mid = floor((low + high)/2)
+  # if(mid <= 0){
+  #   mid = 1
+  # }
+  # if(m <= components[[mid]]@md){
+  #   return(c(FALSE, mid))
+  # }
+  # 
+  # return(c(FALSE,mid+1))
   }
   
 
 
+#return(c(FALSE, low))
 
+#mid = floor((low + high)/2)
+#if(mid <= 0){
+#  mid = 1
+#}
+#if(m <= components[mid]){
+#  return(c(FALSE, mid))
+#}
+
+#return(c(FALSE,mid+1))
 
 
 
