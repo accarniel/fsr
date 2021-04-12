@@ -27,7 +27,7 @@ pt10 = st_multipoint(rbind(c(4,4), c(4,2), c(3,7)))
 
 
 # components 
-comp1 = create_component(obj = pt1, md =0.5, type="POINT")
+comp1 = create_component(raw_obj = pt1, md =0.5, type="POINT")
 comp2 = new("Component", obj = pt2, md =0.7)
 comp3 = new("Component", obj = pt3, md =0.5)
 comp4 = new("Component", obj = pt4, md =0.3)
@@ -44,7 +44,7 @@ spo_test <- create_empty_spatial_plateau('plateau_point') # OK
 
 # formato WKT ....
 for(comp in components){
-  spo_test <- spa_plateau_builder(spo_test, comp)
+  spo_test <- spo_add_component(spo_test, comp)
 }
 
 
@@ -60,14 +60,14 @@ create_random_lists <- function(number_elems, min_size, max_size){
       len_list = len_list + 1
     }
     md_random = round(runif(1),2)
-    list_of_pairs <- list(matrix(round(runif(len_list, 2, 40)),ncol=2))
+    list_of_pairs <- list(matrix(round(runif(len_list, 2, 20)),ncol=2))
     component <- create_component(list_of_pairs, md_random, "LINE")
     list_pairs <- append(list_pairs, component)
   }
   return(list_pairs)
 }
 
-list_of_lines_comps <- create_random_lists(22, 2,12)
+list_of_lines_comps <- create_random_lists(10, 2,12)
 
 
 spo_line <- create_empty_spatial_plateau('plateau_line') # OK 
@@ -75,10 +75,43 @@ spo_line <- create_empty_spatial_plateau('plateau_line') # OK
 # st_buffer === checar .
 
 for(comp in list_of_lines_comps){
-  spo_line <- spa_plateau_builder(spo_line, comp)
+  spo_line <- spo_add_component(spo_line, comp)
 }
 
 
 
+### POLYGONS
 
+
+
+p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+p3 <- rbind(c(3,0), c(4,0), c(4,1), c(3,1), c(3,0))
+p4 <- rbind(c(3.3,0.3), c(3.8,0.3), c(3.8,0.8), c(3.3,0.8), c(3.3,0.3))[5:1,]
+p5 <- rbind(c(3,3), c(1,2), c(5,6), c(3,3))
+
+list_poly = list(p1,p2)
+list_multi_poli = list(list(p1,p2), list(p3,p4), list(p5))
+
+
+
+
+
+# REGION (POLYGON)
+singlePolygonComponent = create_component(list_poly, 0.3, "REGION")
+singlePolygonComponent2 = create_component(list_poly, 0.5, "REGION")
+
+multiPolygonComponent = create_component(list_multi_poli, 0.6, "REGION")
+
+
+list_of_polygons <- c(singlePolygonComponent, multiPolygonComponent)
+list_of_polygons <- c(singlePolygonComponent, singlePolygonComponent2)
+
+spo_poly_test <- create_empty_spatial_plateau('plateau_region')
+
+
+
+for(comp in list_of_polygons){
+  spo_poly_test <- spo_add_component(spo_poly_test, comp)
+}
 

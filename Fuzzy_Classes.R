@@ -4,6 +4,7 @@
 library('sf')
 library('tibble')
 library('dplyr')
+library('ggplot2')
 
 # Component Class 
 
@@ -249,7 +250,7 @@ md_binary_search_iter <- function(components, low, high, m){
 
 
 
-spa_plateau_builder <- function(spo, component){
+spo_add_component <- function(spo, component){
   
   # VALIDAR AS DUAS ENTRADAS:
   # Não permitir que sejam nulas.
@@ -404,7 +405,99 @@ create_spatial_plateau <- function(components, type){
 
 
 
+### Check the MD of a point.
+# Função útil
+get_md <- function(comp){
+  md <- comp@md
+  return(md)
+}
 
+
+# test 'get_md' 
+
+mds <- lapply(spo_line@component, get_md)
+
+
+check_md <- function(spo, point){
+  
+  # Checar função 
+  # Ponto do tipo SF ou SpatialPlateau ?
+  
+  ### CHECAR se SPO é de fato um spo.
+  
+  #check_spatial_plateau_type(class(point))
+  if(class(point)[[2]]!="POINT"){
+    stop("'point' must be a simple point object.")
+  }
+  
+  if(st_intersects(point, spo@supp, sparse=FALSE)[1]){
+    
+    ################################
+    # in_boundary ?
+    md_comps <- c()
+    for(component in spo@component){
+        if(st_intersects(point, st_boundary(component@obj), sparse=FALSE)[1]){
+          md_point <- get_md(component)
+          md_comps <- append(md_comps, md_point)
+        } # Se não estiver na borda, checar está no interior
+        else if(st_intersects(point, component@obj, sparse=FALSE)[1]){
+          md_point <- get_md(component)
+          return(md_point)
+        }
+    }
+      return(max(md_comps))
+  }
+  return(0)
+}
+
+
+
+
+# Função útil
+get_obj <- function(comp){
+  obj <- comp@obj
+  return(obj)
+}
+
+# função útil
+spo_as_tibble <- function(spo){
+  
+  spo_tibble <- tibble(
+    md <- unlist(lapply(spo@component, get_md)),
+    points <- st_sfc(lapply(spo@component, get_obj))
+  )
+  colnames(spo_tibble) <- c('md','geometry')
+  return(spo_tibble)
+}
+
+
+
+
+
+# Função Visualização
+
+# recebe apenas o objeto SPO para o plot.
+plot_spo <- function(spo, low = "white", high = "black"){
+  
+  spo_tibble <- spo_as_tibble(spo)
+  
+  if(inherits(spo_tibble$geometry, "sfc_MULTILINESTRING")|| 
+     inherits(spo_tibble$geometry, "sfc_MULTIPOINT")|| 
+     inherits(spo_tibble$geometry, "sfc_LINESTRING")|| 
+     inherits(spo_tibble$geometry, "sfc_POINT")){
+    
+    spo_plot <- ggplot(spo_tibble) + 
+      geom_sf(aes(colour = md, geometry=geometry), size = 2) + theme_classic() +
+      scale_colour_gradient(name="Membership Degree", limits = c(0, 1), low = low, high = high)
+  }
+  
+  else{ 
+    spo_plot <-  ggplot(spo_tibble) +
+      geom_sf(aes(fill = md, geometry=geometry), size = 2) + theme_classic() +
+      scale_fill_gradient(name="Membership Degree", limits = c(0, 1),  low = low, high = high)
+  }
+  return(spo_plot)
+}
 
 
 ##################################################################################################################################################################
