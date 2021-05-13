@@ -1,0 +1,43 @@
+
+# libraries para carregar
+
+
+
+
+
+
+
+
+
+Build the tar.gz file for FuzzySpatialR
+
+Option 1:
+
+PELO TERMINAL:
+
+No diretório que contém a pasta do pacote (parent folder):
+No terminal, digitar:
+
+R CMD build FuzzySpatialR
+
+PELO R:
+
+>library(devtools)
+
+## na pasta raiz do pacote:
+>build()
+
+
+
+#### Para INSTALAR o pacote:
+
+na pasta raiz do pacote:
+
+install(".") # OU
+
+install("parent_folder/diretorio_do_pacote")
+
+
+
+
+

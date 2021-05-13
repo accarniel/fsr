@@ -1,0 +1,21 @@
+Package: FuzzySpatialR
+Type: Package
+Title: An R Package for Handling Fuzzy Spatial Objects
+Version: 1.0.0
+Authors@R: c(
+    person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("aut","cre")),
+    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("aut")),
+    person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("aut")))
+Depends: R (>= 3.6.0), sf (>= 0.9.4), FuzzyR (>= 2.3.0), tidyverse (>= 1.3.0)
+Description: A package based on Spatial Plateau Algebra concepts(Carniel & Schneider 2017), which 
+    applies the Fuzzy Set Logic on spatial data types
+License: GPL 3
+LazyData: TRUE
+RoxygenNote: 7.1.1
+NeedsCompilation: no
+Encoding: UTF-8
+Collate: 'fsr_base.R''utility_functions.R''spa_functions.R''fsi_functions.R''builder_functions.R'
+Suggests: 
+    sf,
+    FuzzyR
+VignetteBuilder: knitr
