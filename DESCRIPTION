@@ -1,4 +1,4 @@
-Package: FuzzySpatialR
+Package: fsr
 Type: Package
 Title: An R Package for Handling Fuzzy Spatial Objects
 Version: 1.0.0
