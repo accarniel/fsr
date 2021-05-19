@@ -28,9 +28,9 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
     stop("The length of classes and mfs must be equal.")
   }
   
-  result <- tibble(x = as.numeric(tbl$x), 
-                   y = as.numeric(tbl$y), 
-                   z = as.numeric(tbl$z))
+  result <- tibble(x = as.numeric(tbl[[1]]), 
+                   y = as.numeric(tbl[[2]]), 
+                   z = as.numeric(tbl[[3]]))
   
   #adding the new columns
   for(i in 1:length(classes)){
@@ -75,9 +75,9 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 
   method <- tolower(method)
   
-  result <- tibble(x = as.numeric(tbl$x), 
-                   y = as.numeric(tbl$y), 
-                   z = as.numeric(tbl$z))
+  result <- tibble(x = as.numeric(tbl[[1]]), 
+                   y = as.numeric(tbl[[2]]), 
+                   z = as.numeric(tbl[[3]]))
   #the result of the clustering algorithm
   cm <- NULL
   
