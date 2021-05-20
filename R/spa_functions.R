@@ -27,74 +27,60 @@
 #' ### example 2...
 #'
 #' @export
-#' @importFrom dplyr "%>%"
-
-spa_add_component <- function(spo, component){
-
-  if(is.null(spo)){
-    stop("spo is null. Please use create_pgeom() to
+spa_add_component <- function(pgeom_obj, components) {
+  if(is.null(pgeom_obj)){
+    stop("pgeom_obj is null. Please use create_pgeom() to
          create an empty spatial plateau object.")
   }
 
-  if(is.null(component)){
-    stop("component is null. Please create a component.")
+  if(is.null(components)){
+    stop("components is null. It should be a single component or a list of components.")
   }
 
-  # Checar os tipos e classes...
-
-  if(class(spo)!="SpatialPlateau"){
-    stop(paste(spo, " is not a SpatialPlateau Object.", sep = ' '))
+  if(class(pgeom_obj) != "pgeom"){
+    stop(paste(pgeom_obj, "is not a pgeom object (Spatial Plateau Object.)", sep = ' '))
   }
 
-  if(class(component)!="Component"){
-    stop(paste(component, " is not a Component Object.", sep = ' '))
+  if(!inherits(components, "list")) {
+    components <- list(components)
   }
 
-  #
-
-  c <- component@obj
-  m <- component@md
-
-
-  # 1. spo ------> if c = ∅ ∨m = 0
-  # spo <- Se c é diferente de vazio  OU m = 0
-
-  if(is.null(c) || st_is_empty(c) || m == 0){
-    return(spo)
+  #should we check all components or just the first one?
+  if(class(components[[1]]) != "component"){
+    stop(paste(components, " is not a component object.", sep = ' '))
   }
 
 
-  # 2. if po = �� ∧ c �= ∅ ∧m > 0
-  # Se plateau_object E c diferente de vazio E m > 0
-  else if(pgeom_is_empty(spo) && !(is.null(c) || st_is_empty(c)) && m > 0){
-    spo@component[[1]] <- component
-    spo@supp <- c
-    return(spo)
-  }
+  for(component in components) {
+    c <- component@obj
+    m <- component@md
 
-
-
-
-  else if(!is.null(c) & length(c) >= 1){
-    index = search_by_md(spo@component, 1, length(spo@component), m)
-
-    # 3. if c �= ∅ ∧ n ≥ 1 ∧ ∃i ∈ {1, ..., n} : mi = m
-    if(index[1]==TRUE){
-      spo@component[[index[2]]]@obj <- st_union(spo@component[[index[2]]]@obj, c)
-      spo@supp <- st_union(spo@supp, c)
-
+    # does nothing, lets check the next component
+    if(is.null(c) || st_is_empty(c) || m == 0){
+      next
     }
 
-    # 4. if c �= ∅ ∧ n ≥ 2 ∧ ∃i ∈ {1, ..., n − 1} : mi < m < mi+1
-    # 5. if c �= ∅ ∧ n ≥ 1 ∧ 0 < m < mi
-    # 6. if c �= ∅ ∧ n ≥ 1 ∧m > mn
-    else{
-      spo@component <- append(spo@component, component, after=index[2]-1)
-      spo@supp <- st_union(spo@supp,c)
+    # 2. if the pgeom_obj is empty and the component is not empty and has a membership greater than 0
+    if(pgeom_is_empty(pgeom_obj) && !(is.null(c) || st_is_empty(c)) && m > 0){
+      pgeom_obj@component[[1]] <- component
+      pgeom_obj@supp <- c
 
+    } else if(!is.null(c) & length(c) >= 1){
+      index = search_by_md(pgeom_obj@component, 1, length(pgeom_obj@component), m)
+
+      # 3. if the membership degree exists in the pgeom_obj, we should merge it
+      if(index[1] == TRUE){
+        pgeom_obj@component[[index[2]]]@obj <- st_union(pgeom_obj@component[[index[2]]]@obj, c)
+      } else {
+        #otherwise, we simply append into the correct location
+        pgeom_obj@component <- append(pgeom_obj@component, component, after=index[2]-1)
+      }
+      #in both cases we update its support
+      pgeom_obj@supp <- st_union(pgeom_obj@supp, c)
     }
-    return(spo)
   }
+
+  pgeom_obj
 }
 
 
@@ -129,13 +115,13 @@ spa_eval <- function(obj, point=NA){
     if(st_intersects(point, obj@supp, sparse=FALSE)[1]){
 
       ################################
-      # in_boundary ?
+      # check in the boundary
       md_comps <- c()
       for(component in obj@component){
         if(st_intersects(point, st_boundary(component@obj), sparse=FALSE)[1]){
           md_point <- get_md(component)
           md_comps <- append(md_comps, md_point)
-        } # Se não estiver na borda, checar está no interior
+        } #  check in its interior...
         else if(st_intersects(point, component@obj, sparse=FALSE)[1]){
           md_point <- get_md(component)
           return(md_point)
@@ -151,6 +137,299 @@ spa_eval <- function(obj, point=NA){
 }
 
 
+#' @title spa_avg_degree
+#' @family Spatial Plateau Metric Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+spa_avg_degree <- function(pgeom){
+
+  get_md <- function(comp){
+    comp@md
+  }
+  mds_vec <- unlist(lapply(pgeom@component, get_md))
+  mean(mds_vec)
+}
+
+
+#' @title spa_ncomp
+#' @family Spatial Plateau Metric Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_ncomp <- function(pgeom){
+  length(pgeom@component)
+}
+
+#' @title spa_area
+#' @family Spatial Plateau Metric Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_area <- function(pgeom){
+
+  if(pgeom@type!='PLATEAUREGION'){
+    stop("Not PLATEAUREGION pgeom.")
+  }
+
+  area_comp <- function(comp){
+    md_comp = comp@md
+    area_obj = st_area(comp@obj)
+    area_obj * md_comp
+  }
+
+  comps_areas <- unlist(lapply(pgeom@component, area_comp))
+  sum(comps_areas)
+}
+
+
+#' @title spa_length
+#' @family Spatial Plateau Metric Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_length <- function(pgeom){
+
+  if(pgeom@type!='PLATEAULINE'){
+    stop("Not PLATEAULINE pgeom.")
+  }
+
+  length_comp <- function(comp){
+    md_comp = comp@md
+    length_obj = st_length(comp@obj)
+    length_obj * md_comp
+  }
+
+  components_lenghts <- unlist(lapply(spo@component, length_comp))
+  sum(components_lenghts)
+}
+
+#' @title spa_perimeter
+#' @family Spatial Plateau Metric Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_perimeter <- function(pgeom){
+
+  if(pgeom@type!='PLATEAUREGION'){
+    stop("Not PLATEAUREGION pgeom.")
+  }
+
+  perimeter_comp <- function(comp){
+    md_comp = comp@md
+    temp <- st_sfc(comp@obj)
+    st_set_crs(temp, 4326)
+    perimeter_obj = st_perimeter(temp)
+    perimeter_obj * md_comp
+  }
+
+  comps_perimeter <- unlist(lapply(pgeom@component, perimeter_comp))
+  sum(comps_perimeter)
+}
+
+#' @title spa_intersection
+#' @family Spatial Plateau Set Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_intersection <- function(pgeom1, pgeom2, itype="min"){
+
+  if(pgeom1@type != pgeom2@type){
+    stop("Different Spatial Plateau Types.")
+  }
+
+  sigma <- match.fun(itype)
+  result <- create_empty_pgeom(pgeom1@type)
+  lcomps <- vector("list")
+
+  for(comp1 in pgeom1@component){
+    obj_comp_p1 <- comp1@obj
+    md_comp_p1 <- comp1@md
+
+    for(comp2 in pgeom2@component){
+      obj_comp_p2 <- comp2@obj
+      md_comp_p2 <- comp2@md
+
+      result_md = sigma(c(md_comp_p1, md_comp_p2))
+
+      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
+
+      # check geom and pgeom
+      lcomps <- check_geom_sfg_pgeom(sf_result, result , result_md, lcomps)
+      }
+  }
+
+  if(length(lcomps) > 0){
+    spa_add_component(result, lcomps)
+  } else {
+    result
+  }
+}
 
 
 
+#' @title spa_union
+#' @family Spatial Plateau Set Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+#'
+spa_union <- function(pgeom1, pgeom2, utype="max"){
+
+  if(pgeom1@type != pgeom2@type){
+    stop("Different Spatial Plateau Types.")
+  }
+
+  tau <- match.fun(utype)
+  result <- create_empty_pgeom(pgeom1@type)
+  lcomps <- vector("list")
+
+  supp_intersected <- st_intersection(pgeom1@supp, pgeom2@supp)
+
+  for(comp1 in pgeom1@component){
+    obj_comp_p1 <- comp1@obj
+    md_comp_p1 <- comp1@md
+
+    for(comp2 in pgeom2@component){
+      obj_comp_p2 <- comp2@obj
+      md_comp_p2 <- comp2@md
+
+      result_md = tau(c(md_comp_p1, md_comp_p2))
+
+      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
+
+      lcomps <- check_geom_sfg_pgeom(sf_result, result , result_md, lcomps)
+    }
+
+    sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
+
+    # check result type and appends to list if compatible
+    lcomps <- check_geom_sfg_pgeom(sf_diff_1, result, md_comp_p1, lcomps)
+  }
+
+  for(comp2 in pgeom2@component){
+    obj_comp_p2 <- comp2@obj
+    md_comp_p2 <- comp2@md
+
+    sf_diff_3 <- st_difference(obj_comp_p2, supp_intersected)
+    # check result type and appends to list if compatible
+    lcomps <- check_geom_sfg_pgeom(sf_diff_3, result, md_comp_p2, lcomps)
+  }
+
+  if(length(lcomps) > 0){
+    spa_add_component(result, lcomps)
+  } else {
+    result
+  }
+}
+
+#' @title spa_difference
+#' @family Spatial Plateau Set Operations
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_difference <- function(pgeom1, pgeom2, dtype="fdiff"){
+
+}
+
+
+#' @title spa_support
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+#'
+spa_support <- function(pgeom){
+  return(pgeom@supp)
+}
+
+#' @title spa_core
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+#'
+spa_core <- function(pgeom){
+
+  last_comp <- tail(pgeom@component)
+
+  if(last_comp[[1]]@md == 1){
+    return(last_comp)
+  }
+  sf_type <- get_crisp_geom(pgeom)
+
+  sfg_obj <- switch(sf_type,
+                    POINT = st_point(),
+                    LINESTRING = st_linestring(),
+                    POLYGON = st_polygon())
+  sfg_obj
+}
