@@ -44,12 +44,15 @@ setClass("pgeom",
 #'
 pgeom_to_pwkt <- function(pgeom) {
 
+
   component_to_text <- function(comp) {
     paste0("(", st_as_text(comp@obj), ", ", comp@md, ")")
   }
   #to improve - return the PWKT representation of pgeom
   l <- unlist(lapply(pgeom@component, component_to_text))
   l <- paste(l, collapse = ", ")
+
+  l <- paste(pgeom@type," ", l, ")", sep="")
   l
 }
 
