@@ -65,16 +65,16 @@ create_component <- function(raw_obj, md, type){
 #'
 create_empty_pgeom <- function(type){
 
-  type = tolower(type)
+  type = toupper(type)
   if(is_pgeom(type)){
 
-    if(type=='plateau_point'){
+    if(type=='PLATEAUPOINT'){
       new("pgeom", component = list(), supp = st_multipoint(), type = type)
     }
-    else if(type=='plateau_line'){
+    else if(type=='PLATEAULINE'){
       new("pgeom", component = list(), supp = st_multilinestring(), type = type)
     }
-    else if(type=='plateau_region'){
+    else if(type=='PLATEAUREGION'){
       new("pgeom", component = list(), supp = st_multipolygon(), type = type)
     }
   }
@@ -96,7 +96,7 @@ create_empty_pgeom <- function(type){
 #'
 create_pgeom <- function(components, type){
 
-  type = tolower(type)
+  type = toupper(type)
 
   if(is_pgeom(type)){
 
@@ -283,7 +283,7 @@ pgeom_plot <- function(pgeom, low = "white", high = "black"){
 #' @description
 #'
 #'
-#' @param component
+#' @param sfg
 #' @param type
 #'
 #' @return
@@ -291,28 +291,28 @@ pgeom_plot <- function(pgeom, low = "white", high = "black"){
 #'
 #' @export
 #'
-is_compatible <- function(component, type){
+is_compatible <- function(sfg, ptype){
 
-  type = tolower(type)
+  ptype = toupper(ptype)
   #type to lower
-  if(class(component)[1] == "XY"){
-    component_type = class(component)[2]
-    if(component_type == "POINT" || component_type == "MULTIPOINT"){
-      if(type=="plateau_point"){
+  if(class(sfg)[1] == "XY"){
+    sfg_type = class(sfg)[2]
+    if(sfg_type == "POINT" || sfg_type == "MULTIPOINT"){
+      if(ptype=="PLATEAUPOINT"){
         TRUE
       } else{
         FALSE
       }
     }
-    else if(component_type == "LINESTRING" || component_type == "MULTILINE"){
-      if(type=="plateau_line"){
+    else if(sfg_type == "LINESTRING" || sfg_type == "MULTILINESTRING"){
+      if(ptype=="PLATEAULINE"){
         TRUE
       } else{
         FALSE
       }
     }
-    else if(component_type == "POLYGON" || component_type == "MULTIPOLYGON"){
-      if(type=="plateau_region"){
+    else if(sfg_type == "POLYGON" || sfg_type == "MULTIPOLYGON"){
+      if(ptype=="PLATEAUREGION"){
         TRUE
       } else{
         FALSE
@@ -337,7 +337,7 @@ is_compatible <- function(component, type){
 #' @export
 #'
 is_pgeom <- function(type){
-  if(!(type %in% c('plateau_point', 'plateau_line', 'plateau_region'))){
+  if(!(type %in% c('PLATEAUPOINT', 'PLATEAULINE', 'PLATEAUREGION'))){
     FALSE
   } else{
     TRUE
@@ -366,8 +366,54 @@ pgeom_is_empty <- function(pgeom){
   }
 }
 
+#' @title get_crisp_geom
+#'
+#' @description
+#'
+#'
+#' @param raw_obj
+#' @param md
+#' @param type
+#'
+#' @return
+#' @examples
+#'
+#' @export
+get_crisp_geom <- function(pgeom){
+  ptype <- pgeom@type
 
-#
+  type <- switch(ptype,
+                 PLATEAUPOINT = "POINT",
+                 PLATEAULINE = "LINESTRING",
+                 PLATEAUREGION = "POLYGON")
+
+  type
+}
+
+
+#' @title check_geom_sfg_pgeom
+#'
+#' @description
+#'
+#'
+#' @param spo
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+check_geom_sfg_pgeom <- function(sfg, pgeom , md, lcomps){
+  if(!st_is_empty(sfg) && is_compatible(sfg, pgeom@type)){
+    result_comp <- new("component", obj = sfg, md = md)
+    lcomps <- append(lcomps, result_comp)
+  } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
+    type_geom = get_crisp_geom(pgeom)
+    result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = type_geom))[[1]], md = md)
+    lcomps <- append(lcomps, result_comp)
+  }
+  lcomps
+}
+
 ########################################################################
 
 
