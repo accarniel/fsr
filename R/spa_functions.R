@@ -541,11 +541,7 @@ spa_exact_inside <- function(pgeom1, pgeom2){
 #'
 spa_overlap <- function(pgeom1, pgeom2, itype = "min"){
 
-  if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.")
-  } else if(pgeom1@type != "PLATEAUREGION"){
-    stop(paste("Operator not implemented to", pgeom1@type))
-  }
+  check_spa_topological_condition(pgeom1, pgeom2)
 
   r = spa_intersection(pgeom1, pgeom2, itype = itype)
   supp_pgeom1 <- pgeom1@supp
@@ -592,4 +588,100 @@ spa_meet <- function(pgeom1, pgeom2){
 #'
 #' @export
 #'
-spa_disjoint <- function(pgeom1, pgeom2, )
+spa_disjoint <- function(pgeom1, pgeom2, itype="min"){
+
+  check_spa_topological_condition(pgeom1, pgeom2)
+
+  supp_pgeom1 <- pgeom1@supp
+  supp_pgeom2 <- pgeom2@supp
+
+  if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
+    return(1)
+  }
+
+  r_overlap <- spa_overlap(pgeom1, pgeom2, itype = itype)
+  r_meet <- spa_meet(pgeom1, pgeom2)
+
+  if((r_overlap == 1) || (r_meet == 1) ||
+      spa_exact_inside(pgeom1, pgeom2) ||
+      spa_exact_inside(pgeom2, pgeom1) ||
+      spa_exact_equal(pgeom2, pgeom1))  {
+    return(0)
+  } else {
+    result <- 1 - max(r_overlap, r_meet)
+    return(result)
+  }
+}
+
+#' @title spa_equal
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_equal <- function(pgeom1, pgeom2, utype = "max"){
+
+  check_spa_topological_condition(pgeom1, pgeom2)
+
+  if(spa_exact_equal(pgeom1, pgeom2)){
+    return(1)
+  }
+
+  supp_pgeom1 <- pgeom1@supp
+  supp_pgeom2 <- pgeom2@supp
+
+  if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
+     st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
+    return(0)
+  } else {
+    r_diff <- spa_difference(pgeom1, pgeom2, dtype="f_symm_diff")
+    r_union <- spa_union(pgeom1, pgeom2, utype = utype)
+
+    r_spa_area <- spa_area(r_diff)
+    r_sfg_area <- st_area(r_union)
+
+    result <- 1 - (r_spa_area/r_sfg_area)
+    return(result)
+  }
+}
+
+#' @title spa_inside
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+spa_inside <- function(pgeom1, pgeom2, utype = "max"){
+
+  check_spa_topological_condition(pgeom1, pgeom2)
+
+  if(spa_exact_inside(pgeom1, pgeom2)){
+    return(1)
+  }
+
+  supp_pgeom1 <- pgeom1@supp
+  supp_pgeom2 <- pgeom2@supp
+
+  if(spa_equal(pgeom1, pgeom2, utype = utype) == 1 ||
+     st_disjoint(supp_pgeom1, supp_pgeom2) ||
+     st_touches(supp_pgeom1, supp_pgeom2)){
+    return(0)
+  } else {
+
+    r_diff <- spa_difference(pgeom1, pgeom2, dtype = "f_bound_diff")
+
+    result <- 1 - (spa_area(r_diff)/st_area(supp_pgeom1))
+    return(result)
+  }
+}
