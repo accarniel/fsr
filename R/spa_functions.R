@@ -525,3 +525,71 @@ spa_exact_inside <- function(pgeom1, pgeom2){
   spa_exact_equal(spa_intersection(pgeom1, pgeom2), pgeom1)
 }
 
+
+
+#' @title spa_overlap
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_overlap <- function(pgeom1, pgeom2, itype = "min"){
+
+  if(pgeom1@type != pgeom2@type){
+    stop("Different Spatial Plateau Types.")
+  } else if(pgeom1@type != "PLATEAUREGION"){
+    stop(paste("Operator not implemented to", pgeom1@type))
+  }
+
+  r = spa_intersection(pgeom1, pgeom2, itype = itype)
+  supp_pgeom1 <- pgeom1@supp
+  supp_pgeom2 <- pgeom2@supp
+
+  if(spa_ncomp(r) == 1 && !(st_is_empty(spa_core(r)))){
+    return(1)
+  } else if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
+            st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
+            spa_exact_inside(pgeom1, pgeom2) ||
+            spa_exact_inside(pgeom2, pgeom1) ||
+            spa_exact_equal(pgeom2, pgeom1)) {
+    return(0)
+  } else {
+    return(spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2)))
+  }
+}
+
+#' @title spa_meet
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_meet <- function(pgeom1, pgeom2){
+
+}
+
+#' @title spa_disjoint
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+spa_disjoint <- function(pgeom1, pgeom2, )
