@@ -458,4 +458,20 @@ f_symm_diff <- function(x, y){
   abs(x - y)
 }
 
-
+#' @title
+#' @family Fuzzy Difference Operators
+#' @description
+#'
+#'
+#' @param spo
+#'
+#' @return
+#' @examples
+#' @export
+check_spa_topological_condition <- function(pgeom1, pgeom2){
+  if(pgeom1@type != pgeom2@type){
+    return(stop("Different Spatial Plateau Types."))
+  } else if(pgeom1@type != "PLATEAUREGION"){
+    return(stop(paste("Operator not implemented to", pgeom1@type)))
+  }
+}
