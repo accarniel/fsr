@@ -183,8 +183,8 @@ pgeom_as_tibble <- function(pgeom){
   }
 
   pgeom_tibble <- tibble(
-    md <- unlist(lapply(spo@component, get_md)),
-    points <- st_sfc(lapply(spo@component, get_obj))
+    md <- unlist(lapply(pgeom@component, get_md)),
+    points <- st_sfc(lapply(pgeom@component, get_obj))
   )
   colnames(pgeom_tibble) <- c('md','geometry')
   return(pgeom_tibble)
@@ -366,20 +366,18 @@ pgeom_is_empty <- function(pgeom){
   }
 }
 
-#' @title get_crisp_geom
+#' @title get_counter_ctype
 #'
 #' @description
+#' Get the equivalent crisp spatial data type
 #'
-#'
-#' @param raw_obj
-#' @param md
-#' @param type
+#' @param pgeom
 #'
 #' @return
 #' @examples
 #'
-#' @export
-get_crisp_geom <- function(pgeom){
+#' @noRd
+get_counter_ctype <- function(pgeom){
   ptype <- pgeom@type
 
   type <- switch(ptype,
@@ -402,12 +400,12 @@ get_crisp_geom <- function(pgeom){
 #' @examples
 #'
 #' @noRd
-check_geom_sfg_pgeom <- function(sfg, pgeom , md, lcomps){
+check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
   if(!st_is_empty(sfg) && is_compatible(sfg, pgeom@type)){
     result_comp <- new("component", obj = sfg, md = md)
     lcomps <- append(lcomps, result_comp)
   } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
-    type_geom = get_crisp_geom(pgeom)
+    type_geom = get_counter_ctype(pgeom)
     result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = type_geom))[[1]], md = md)
     lcomps <- append(lcomps, result_comp)
   }
@@ -416,5 +414,48 @@ check_geom_sfg_pgeom <- function(sfg, pgeom , md, lcomps){
 
 ########################################################################
 
+#' @title f_diff
+#' @family Fuzzy Difference Operators
+#' @description
+#'
+#'
+#' @param spo
+#'
+#' @return
+#' @examples
+#' @export
+#'
+fdiff <- function(x, y){
+  min(x, (1 - y))
+}
+
+#' @title f_bound_diff
+#' @family Fuzzy Difference Operators
+#' @description
+#'
+#'
+#' @param spo
+#'
+#' @return
+#' @examples
+#'
+#' @export
+f_bound_diff <- function(x, y){
+  max(0, (x - y))
+}
+
+#' @title f_symm_diff
+#' @family Fuzzy Difference Operators
+#' @description
+#'
+#'
+#' @param spo
+#'
+#' @return
+#' @examples
+#' @export
+f_symm_diff <- function(x, y){
+  abs(x - y)
+}
 
 

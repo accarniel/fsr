@@ -291,7 +291,7 @@ spa_intersection <- function(pgeom1, pgeom2, itype="min"){
       obj_comp_p2 <- comp2@obj
       md_comp_p2 <- comp2@md
 
-      result_md = sigma(c(md_comp_p1, md_comp_p2))
+      result_md = sigma(md_comp_p1, md_comp_p2)
 
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
@@ -342,7 +342,7 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
       obj_comp_p2 <- comp2@obj
       md_comp_p2 <- comp2@md
 
-      result_md = tau(c(md_comp_p1, md_comp_p2))
+      result_md = tau(md_comp_p1, md_comp_p2)
 
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
@@ -383,8 +383,44 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
 #'
 #' @export
 #'
-spa_difference <- function(pgeom1, pgeom2, dtype="fdiff"){
+spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
 
+  if(pgeom1@type != pgeom2@type){
+    stop("Different Spatial Plateau Types.")
+  }
+
+  nu <- match.fun(dtype)
+  result <- create_empty_pgeom(pgeom1@type)
+  lcomps <- vector("list")
+
+  supp_intersected <- st_intersection(pgeom1@supp, pgeom2@supp)
+
+  for(comp1 in pgeom1@component){
+    obj_comp_p1 <- comp1@obj
+    md_comp_p1 <- comp1@md
+
+    for(comp2 in pgeom2@component){
+      obj_comp_p2 <- comp2@obj
+      md_comp_p2 <- comp2@md
+
+      result_md = nu(md_comp_p1, md_comp_p2)
+
+      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
+
+      lcomps <- check_geom_sfg_pgeom(sf_result, result , result_md, lcomps)
+    }
+
+    sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
+
+    # check result type and appends to list if compatible
+    lcomps <- check_geom_sfg_pgeom(sf_diff_1, result, md_comp_p1, lcomps)
+  }
+
+  if(length(lcomps) > 0){
+    spa_add_component(result, lcomps)
+  } else {
+    result
+  }
 }
 
 
@@ -423,9 +459,9 @@ spa_core <- function(pgeom){
   last_comp <- tail(pgeom@component)
 
   if(last_comp[[1]]@md == 1){
-    return(last_comp)
+    return(last_comp@obj)
   }
-  sf_type <- get_crisp_geom(pgeom)
+  sf_type <- get_counter_ctype(pgeom)
 
   sfg_obj <- switch(sf_type,
                     POINT = st_point(),
@@ -433,3 +469,59 @@ spa_core <- function(pgeom){
                     POLYGON = st_polygon())
   sfg_obj
 }
+
+#' @title spa_exact_equal
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+#'
+spa_exact_equal <- function(pgeom1, pgeom2){
+
+  comp_check <- function(comp1, comp2){
+    if(st_equals(comp1@obj, comp2@obj, sparse=FALSE)[1] && (comp1@md == comp2@md)){
+      return(TRUE)
+    }
+    return(FALSE)
+  }
+
+  if((pgeom1@type != pgeom2@type) ||
+     (spa_ncomp(pgeom1) != spa_ncomp(pgeom2)) ||
+     (!(st_equals(pgeom1@supp, pgeom2@supp, sparse=FALSE)[1]))){
+    return(FALSE)
+  } else {
+    for(i in 1:spa_ncomp(pgeom1)){
+      if(!(comp_check(pgeom1@component[[i]], pgeom2@component[[i]]))){
+        return(FALSE)
+      }
+    }
+    # to do - improve comparison method
+  }
+  return(TRUE)
+}
+
+
+#' @title spa_exact_inside
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#'
+#'
+spa_exact_inside <- function(pgeom1, pgeom2){
+  spa_exact_equal(spa_intersection(pgeom1, pgeom2), pgeom1)
+}
+
