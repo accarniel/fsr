@@ -1,5 +1,5 @@
 
-#' @title new_fsi
+#' @title fsi_create
 #'
 #' @description
 #'
@@ -8,6 +8,7 @@
 #' @param fsi_type
 #' @param and_method
 #' @param or_method
+#' @param default_conseq optional. If...MUST be a fuzzy set (something returned by genmf)
 #' @imp_method
 #' @agg_method
 #' @defuzz_method
@@ -18,20 +19,20 @@
 #' @export
 #' @importFrom
 #'
-new_fsi <- function(name, fsi_type = "mamdani", and_method = "min",
+fsi_create <- function(name, fsi_type = "mamdani", and_method = "min",
                     or_method = "max", imp_method = "min", agg_method = "max",
-                    defuzz_method = "centroid") {
+                    defuzz_method = "centroid", default_conseq=NULL) {
   fsi <- list(name = name, type = fsi_type,
               and_method = and_method, or_method = or_method, imp_method = imp_method,
               agg_method = agg_method, defuzz_method = defuzz_method,
               fsa_names = NULL, cs_names = NULL,
-              input = NULL, output = NULL, rule = NULL)
+              input = NULL, output = NULL, rule = NULL, default_conseq=default_conseq)
   fsi
 }
 
 
 
-#' @title add_fsa
+#' @title fsi_add_fsa
 #'
 #' @description
 #'
@@ -46,7 +47,7 @@ new_fsi <- function(name, fsi_type = "mamdani", and_method = "min",
 #' @export
 #' @importFrom
 #'
-add_fsa <- function(fsi, lvar, lvar_domain) {
+fsi_add_fsa <- function(fsi, lvar, lvar_domain) {
   # fsi$input <- append(fsi$input, list(list(name = lvar,
   #                                          domain = lvar_domain, layer = NULL)))
   fsi$input <- append(fsi$input, list(list(name = lvar, domain = lvar_domain,
@@ -58,7 +59,7 @@ add_fsa <- function(fsi, lvar, lvar_domain) {
 
 
 
-#' @title add_cs
+#' @title fsi_add_cs
 #'
 #' @description
 #'
@@ -73,7 +74,7 @@ add_fsa <- function(fsi, lvar, lvar_domain) {
 #' @export
 #' @importFrom
 #'
-add_cs <- function(fsi, lvar, lvar_domain, bounds) {
+fsi_add_cs <- function(fsi, lvar, lvar_domain, bounds) {
   fsi$output <- append(fsi$output, list(list(name = lvar, domain = lvar_domain,
                                              range = bounds, mf = NULL, defuzzification.method = NULL)))
   fsi$cs_names <- append(fsi$cs_names, lvar)
@@ -82,7 +83,7 @@ add_cs <- function(fsi, lvar, lvar_domain, bounds) {
 
 
 
-#' @title add_pgeom_layer
+#' @title fsi_add_pgeom_layers
 #'
 #' @description
 #'
@@ -97,30 +98,21 @@ add_cs <- function(fsi, lvar, lvar_domain, bounds) {
 #' @export
 #' @importFrom
 #'
-add_pgeom_layer <- function(fsi, lvar, lval, spo) {
+fsi_add_pgeom_layers <- function(fsi, lvar, tbl) {
 
   lvar_index <- match(lvar, fsi$fsa_names)
 
-  if(length(fsi$input[[lvar_index]]$domain[fsi$input[[lvar_index]]$domain == lval]) < 1) {
-    warning(paste0("lval (", lval, ") does not belong to the domain of the linguistic variable (", lvar, ")"))
-    fsi
-  }
-
-  lval_index <- match(lval, fsi$input[[lvar_index]]$domain)
-
-
-  #fsi$input[[lvar_index]]$layer <- append(fsi$input[[lvar_index]]$layer,
-  #                                   list(list(spo = spo, lval = lval)))
-
-  fsi$input[[lvar_index]]$layer <- add_row(fsi$input[[lvar_index]]$layer, lval = lval, spo = list(spo))
+  # TODO validar a var linguistica: verificar se o valor linguistico faz parte do domain do lvar.
+  
+  fsi$input[[lvar_index]]$layer <- tbl[c(1,2)]
+  colnames(fsi$input[[lvar_index]]$layer) <- c("lval", "pgeom")
 
   fsi
 }
 
 
 
-
-#' @title add_cs_mf
+#' @title fsi_add_pgeom_layer
 #'
 #' @description
 #'
@@ -135,7 +127,44 @@ add_pgeom_layer <- function(fsi, lvar, lval, spo) {
 #' @export
 #' @importFrom
 #'
-add_cs_mf <- function(fsi, lvar, lval, mf_type, mf_params) {
+fsi_add_pgeom_layer <- function(fsi, lvar, lval, spo) {
+  
+  lvar_index <- match(lvar, fsi$fsa_names)
+  
+  if(length(fsi$input[[lvar_index]]$domain[fsi$input[[lvar_index]]$domain == lval]) < 1) {
+    warning(paste0("lval (", lval, ") does not belong to the domain of the linguistic variable (", lvar, ")"))
+    fsi
+  }
+  
+  lval_index <- match(lval, fsi$input[[lvar_index]]$domain)
+  
+  
+  #fsi$input[[lvar_index]]$layer <- append(fsi$input[[lvar_index]]$layer,
+  #                                   list(list(spo = spo, lval = lval)))
+  
+  fsi$input[[lvar_index]]$layer <- add_row(fsi$input[[lvar_index]]$layer, lval = lval, spo = list(spo))
+  
+  fsi
+}
+
+
+
+#' @title fsi_add_cs_mf
+#'
+#' @description
+#'
+#'
+#' @param fsi
+#' @param p
+#'
+#'
+#' @return
+#' @examples
+#'
+#' @export
+#' @importFrom
+#'
+fsi_add_cs_mf <- function(fsi, lvar, lval, mf_type, mf_params) {
   lvar_index <- match(lvar, fsi$cs_names)
 
   if(length(fsi$output[[lvar_index]]$domain[fsi$output[[lvar_index]]$domain == lval]) < 1) {
@@ -154,8 +183,77 @@ add_cs_mf <- function(fsi, lvar, lval, mf_type, mf_params) {
 
 
 
+#' Get antecedent(s) from an input rule specified by the user.
+#'
+#' This function extracts the linguistic variable and its value from an input rule.
+#' The rule must be in the following pattern:
+#' IF linguistic variable is linguistic value LOGICAL OPERATOR linguistic variable is linguistic value THEN linguistic variable is linguistic value
+#' Example:
+#' IF hotel is affordable AND attraction is free THEN visiting is accessible
+#' Pay attention that there is no punctuation in the rule.
+#' The rule can use only one type of logical operator at a time (e.g. antecedents connected only by AND or only by OR).
+#' A rule can have one or more antecedents.
+#'
+#' @param user_rule Input rule specified by the user
+#' @param logical_op_ant Logical operator for antecedents. Default value is NULL (there is only one antecedent)
+#' @return A list of linguistic variable and its value from the antecedent(s) of the rule
+#' # GNEMF FONTE DA FUZZYR (ADD_SMF)
+#' # doc do fsi_eval em details colocar os passos
+#' @noRd
+#' 
+#'
+get_antecedents <- function(user_rule) {
+  us_rule <- str_to_lower(user_rule)
+  antecedents <- str_extract(us_rule, "(?<=if )(.*\n?)(?=then)")
+  
+  if (str_count(antecedents, pattern = " and ") > 0) {
+    lant <- "AND"
+    
+    qtd_and <- str_count(antecedents, pattern = " and ") + 1
+    ant <- vector("list", length = qtd_and)
+    tmpres <- str_split_fixed(antecedents, " and ", qtd_and)
+    
+    for (i in 1:qtd_and) {
+      tmp_res <- str_split_fixed(tmpres[i], " is ", 2)
+      a1 <- c(tmp_res[1][1], tmp_res[2][1])
+      ant[[i]] <- a1
+    }
+  } else if (str_count(antecedents, pattern = " or ") > 0) {
+    lant <- "OR"
+    qtd_or <- str_count(antecedents, pattern = " or ") + 1
+    ant <- vector("list", length = qtd_or)
+    tmpres <- str_split_fixed(antecedents, " or ", qtd_or)
+    
+    for (i in 1:qtd_or) {
+      tmp_res <- str_split_fixed(tmpres[i], " is ", 2)
+      a1 <- c(tmp_res[1][1], tmp_res[2][1])
+      ant[[i]] <- a1
+    }
+  } else {
+    lant <- "OR"
+    ant <- vector("list", length = 1)
+    tmp_res <- str_split_fixed(antecedents, " is ", 2)
+    a1 <- c(tmp_res[1][1], tmp_res[2][1])
+    ant[[1]] <- a1
+  }
+  list(ants=ant, op=lant)
+}
 
-#' @title add_rule
+
+# add documentation
+get_consequent <- function(user_rule) {
+  us_rule <- str_to_lower(user_rule)
+  consequent <- str_extract(us_rule, "(?<=then )(.*\n?)")
+  conseq <- vector("list", length = 1)
+  tmp_res <- str_split_fixed(consequent, " is ", 2)
+  cons1 <- c(tmp_res[1][1], tmp_res[2][1])
+  conseq[[1]] <- cons1
+  return(conseq)
+}
+
+
+
+#' @title fsi_add_rules
 #'
 #' @description
 #'
@@ -170,11 +268,21 @@ add_cs_mf <- function(fsi, lvar, lval, mf_type, mf_params) {
 #' @export
 #' @importFrom
 #'
-add_rule <- function(fsi, antecedents, consequents, weights = 1, logical_op_ant = "AND", logical_op_conseq = "AND") {
+
+fsi_add_rules <- function(fsi, user_rules, weights = rep(1, length(user_rules))) {
   #TODO depois do PI - validar se o usuário passou valores válidos (ou seja, que existem) - Juliana
-  fsi$rule <- append(fsi$rule,
-                     list(list(ants = antecedents, cons = consequents, w = weights, loa = logical_op_ant,
-                               loc = logical_op_conseq)))
+  #TODO: improve performance
+  if (length(user_rules) != length(weights)) {
+    stop("The lengths of parameters for user_rules and weights are different")
+  }
+  i <- 1
+  for(ur in user_rules) {
+    antecedents <- get_antecedents(ur, logical_op_ant)
+    consequents <- get_consequent(ur)
+    fsi$rule <- append(fsi$rule, 
+                       list(list(ants = antecedents$ants, cons = consequents, w = weights[i], loa = antecedents$op)))
+    i <- i + 1
+  }
   fsi
 }
 
@@ -195,7 +303,7 @@ add_rule <- function(fsi, antecedents, consequents, weights = 1, logical_op_ant 
 #' @export
 #' @importFrom
 #'
-fsi_eval <- function(fsi, p) {
+fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
   # 1 - The first step of the algorithm is to find the fuzzy regions
   # that contain the point P with some membership degree greater
   # than 0
@@ -231,8 +339,9 @@ fsi_eval <- function(fsi, p) {
         # ARRUMAR ISSO NA REUNIÃO!!!!!!!!!!!!!!
         # AQUI NA VERDADE NÃO PRECISA SABER O GRAU DE PERTINÊNCIA, MAS SIM SABER SE ELE SERÁ MAIOR QUE 0 OU NÃO
         # ASSIM, PODE DEIXAR ESSA PARTE MAIS OTIMIZADA
-        if(check_md(row$spo[[1]], p) > 0) {
-          r <- add_row(r, lval = row$lval, spo = list(row$spo[[1]]))
+        # TODO change spo name at line 342: obj
+        if(spa_eval(row$pgeom[[1]], p) > 0) {
+          r <- add_row(r, lval = row$lval, spo = list(row$pgeom[[1]]))
         }
       }
     }
@@ -241,7 +350,7 @@ fsi_eval <- function(fsi, p) {
                        list(list(lvar = input$name, objects = r)))
 
     #TODO como usar o filter com funções que não são vetorizadas
-    #r <- filter(i$layer, check_md(spo, p) > 0)
+    #r <- filter(i$layer, spa_eval(spo, p) > 0)
   }
 
   # The next step computes the Cartesian product on the values
@@ -272,7 +381,7 @@ fsi_eval <- function(fsi, p) {
     for(ant in antecedents) {
       lvar_ant <- ant[1]
       lval_ant <- ant[2]
-      entrou <- FALSE
+      flag <- FALSE
       # TODO Juliana - melhorar pós PI
       for(layer in all_spos) {
         # cat(paste0("a camada sendo percorrida eh...", layer$lvar, "\n"))
@@ -285,10 +394,10 @@ fsi_eval <- function(fsi, p) {
 
         if(layer$lvar == lvar_ant && !is.na(position) && position >= 1) {
           membership_degrees_antecedents <- append(membership_degrees_antecedents,
-                                                   check_md(layer$objects$spo[position][[1]], p))
+                                                   spa_eval(layer$objects$spo[position][[1]], p))
 
           # cat(paste0("Graus de pertinencia adicionando esse antecedente fica: ", membership_degrees_antecedents, "\n"))
-          entrou <- TRUE
+          flag <- TRUE
           break
         } #else {
         #  membership_degrees_antecedents <- append(membership_degrees_antecedents,
@@ -297,7 +406,7 @@ fsi_eval <- function(fsi, p) {
 
 
       }
-      if(!entrou) {
+      if(!flag) {
         membership_degrees_antecedents <- append(membership_degrees_antecedents, 0)
 
       }
@@ -309,8 +418,7 @@ fsi_eval <- function(fsi, p) {
     #loa = logical operator do antecedent
     if(all_rules[[pos_r]]$loa == 'AND') {
       and_method <- match.fun(fsi$and_method)
-      # fire_rules <- append(fire_rules, list(list(pos_rule = pos_r, fire_rule = and_method(membership_degrees_antecedents))))
-      fire_rules <- append(fire_rules, list(list(pos_rule = pos_r, fire_rule = max(membership_degrees_antecedents))))
+      fire_rules <- append(fire_rules, list(list(pos_rule = pos_r, fire_rule = and_method(membership_degrees_antecedents))))
     } else {
       or_method <- match.fun(fsi$or_method)
       fire_rules <- append(fire_rules, list(list(pos_rule = pos_r, fire_rule = or_method(membership_degrees_antecedents))))
@@ -361,36 +469,25 @@ fsi_eval <- function(fsi, p) {
   ## 2 - agregacao de diversos conjuntos fuzzy
   agg_method <- match.fun(fsi$agg_method)
   if(length(results_imp) == 0) {
-    return(0) # mudar depois para NA
-  }
-  result_fsi <- evalmf(seq(min_conseq, max_conseq, by=1), results_imp[[1]])
-  if(length(results_imp) >= 2) {
-    for(i in 2:length(results_imp)) {
-      result_fsi <- pmax(evalmf(seq(min_conseq, max_conseq, by=1), results_imp[[i]]), result_fsi)
+    db <- fsi$default_conseq
+    if(is.null(db)) {
+      warning("No default rule defined")
+      return(NA)
     }
-
-    ## TODO improve latter (JULIANA)
+    result_fsi <- evalmf(seq(min_conseq, max_conseq, by=discret_by, length.out=discret_length), db)
+  } else {
+    result_fsi <- evalmf(seq(min_conseq, max_conseq, by=discret_by, length.out=discret_length), results_imp[[1]])
+    if(length(results_imp) >= 2) {
+      for(i in 2:length(results_imp)) {
+        result_fsi <- pmax(evalmf(seq(min_conseq, max_conseq, by=1), results_imp[[i]]), result_fsi)
+      }
+      ## TODO improve latter (JULIANA)
+    }
   }
-
-
-  # result_fsi <- results_imp[[1]]
-  # if(length(results_imp) > 1) {
-  #
-  #   ## TODO improve latter (JULIANA)
-  #
-  #   result_fsi <- fuzzy.tconorm(agg_method, results_imp[[1]], results_imp[[2]])
-  #
-  #   for(i in 3:length(results_imp)) {
-  #     result_fsi <- fuzzy.tconorm(agg_method, result_fsi, results_imp[[i]])
-  #   }
-  # }
-  # cat("defuzificando... \n")
-  ## 3 - defuzzificacao
-  # crisp_result <- defuzz(seq(min_conseq, max_conseq, by=1), evalmf(seq(min_conseq, max_conseq, by=1), result_fsi), fsi$defuzz_method)
-  crisp_result <- defuzz(seq(min_conseq, max_conseq, by=1), result_fsi, fsi$defuzz_method)
+  
+  crisp_result <- defuzz(seq(min_conseq, max_conseq, by=discret_by, length.out=discret_length), result_fsi, fsi$defuzz_method)
 
   crisp_result
-  #result_fsi
 }
 
 
