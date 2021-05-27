@@ -1,18 +1,79 @@
-#' @title create_component
+# @title
+# @description
+# @usage
+# @param (todos os parâmetros...)
+# @details
+# @return
+# @references (para aquelas funções que foram definidas em algum artigo)
+# @seelaso (apontando para funções similares)
+# @examples
+# @export -> para deixar a função visivel para os usuários
+
+
+#' @title Create a Component of Spatial Plateau Geometry
 #'
 #' @description
+#' Create an object composed by a Spatial Feature Geometry (sfg) and a Membership Degree.
+#'
+#' @param raw_obj Vector, list or matrix containing the points to create a sfg object.
+#' @param md Component Membership Degree.
+#' @param type Spatial Feature Geometric to create.
+#'
+#' @details
+#' A component class is a object composed by 2 slots: (1) a Crisp spatial object (sfg)
+#' and a Membership Degree associated to this object, in the interval ]0,1].
+#'
+#' The types "POINT", "LINE" and "REGION" are related to Spatial Plateau Point,
+#' Spatial Plateau Line and Spatial Plateau Region. For each input type, we have the
+#' following sfg objects created:
+#' \itemize{
+#' \item{"POINT"}{ If raw_obj is a vector of single points, }
+#' \item{"LINE"}{ If raw_obj is a vector of single points, }
+#' \item{"REGION"}{ If raw_obj is a vector of single points, }
+#' }
 #'
 #'
-#' @param raw_obj
-#' @param md
-#' @param type
-#'
-#' @return
+#' @return A object of class "component".
 #' @examples
+#'
+#' # Creating a POINT component type
+#' v1 = rbind(c(1,2), c(3,4))
+#' v2 = rbind(c(1,4), c(2,3),c(4,4))
+#'
+#' md1 = 0.2
+#' md2 = 0.1
+#'
+#' comp1 <- create_component(v1, md1, type="POINT")
+#' comp2 <- create_component(v2, md2, type="POINT")
+#'
+#' # Creating a LINE component type
+#'
+#' md3 = 0.45
+#' md4 = 0.32
+#'
+#' v3 = rbind(c(2,2), c(3,3))
+#' v4 = rbind(c(1,1), c(3,2))
+#'
+#' comp3 <- create_component(v3, md3, type="LINE")
+#' comp4 <- create_component(v4, md4, type="LINE")
+#'
+#' # Creating a REGION component type
+#'
+#' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+#' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+#' list_pols_1 <- list(p1,p2)
+#'
+#'
+#' p3 <- rbind(c(1,0), c(2,0), c(4,2), c(3,4), c(2,4), c(1,0))
+#' p4 <- rbind(c(2,2), c(2,3), c(3,4), c(2,2))
+#' list_pols_2 <- list(p3,p4)
+#'
+#' comp_pol1 <- create_component(list_pols_1, 0.4, "REGION")
+#' comp_pol2 <- create_component(list_pols_2, 0.6, "REGION")
+#'
 #'
 #' @export
 #'
-
 create_component <- function(raw_obj, md, type){
 
   if(type=="POINT"){
@@ -43,23 +104,69 @@ create_component <- function(raw_obj, md, type){
     }
   }
 
-  component <- new("component", obj = obj_component,md=md)
-  component
+  new("component", obj = obj_component,md=md)
 }
+
+
+#' @title Create an empty Plateau Geometry object
+#'
+#' @description
+#'
+#'
+#' @param type Type of Plateau Geometry to be created..
+#'
+#' @return
+#' A pgeom class object.
+#' @examples
+#'
+#' pgeom_point <- create_empty_pgeom("PLATEAUPOINT")
+#' pgeom_line <- create_empty_pgeom("PLATEAULINE")
+#' pgeom_region <- create_empty_pgeom("PLATEAUREGION")
+#'
+#' @export
+#'
+component_from_sfg <- function(sfg, md){
+
+  possible_geometries = c("sfc_POINT",
+                          "sfc_MULTIPOINT",
+                          "sfc_LINESTRING",
+                          "sfc_MULTILINESTRING",
+                          "sfc_POLYGON",
+                          "sfc_MULTIPOLYGON")
+
+  sfg_type = class(st_geometry(sfg))[1]
+
+  if(sfg_type %in% possible_geometries){
+    new("component", obj = sfg,md=md)
+  } else {
+    stop(paste(sfg_type, "type not allowed to create a component."))
+  }
+}
+
+
+
+
+
+
 
 
 ################################################################################
 
 
-#' @title create_empty_pgeom
+#' @title Create an empty Plateau Geometry object
 #'
 #' @description
 #'
 #'
-#' @param type
+#' @param type Type of Plateau Geometry to be created..
 #'
 #' @return
+#' A pgeom class object.
 #' @examples
+#'
+#' pgeom_point <- create_empty_pgeom("PLATEAUPOINT")
+#' pgeom_line <- create_empty_pgeom("PLATEAULINE")
+#' pgeom_region <- create_empty_pgeom("PLATEAUREGION")
 #'
 #' @export
 #'
@@ -68,13 +175,13 @@ create_empty_pgeom <- function(type){
   type = toupper(type)
   if(is_pgeom(type)){
 
-    if(type=='PLATEAUPOINT'){
+    if(type == "PLATEAUPOINT"){
       new("pgeom", component = list(), supp = st_multipoint(), type = type)
     }
-    else if(type=='PLATEAULINE'){
+    else if(type == "PLATEAULINE"){
       new("pgeom", component = list(), supp = st_multilinestring(), type = type)
     }
-    else if(type=='PLATEAUREGION'){
+    else if(type == "PLATEAUREGION"){
       new("pgeom", component = list(), supp = st_multipolygon(), type = type)
     }
   }
@@ -84,14 +191,16 @@ create_empty_pgeom <- function(type){
 #' @title create_pgeom
 #'
 #' @description
+#' Create an object of class pgeom (Plateau Geomtry)
 #'
-#'
-#' @param components
-#' @param type
+#' @param components A list, tibble or dataframe of componenets.
+#' @param type The type of Spatial Plateau Geometry Object to be created.
 #'
 #' @return
+#' An pgeom class object.
 #' @examples
 #'
+#' @seealso \code{\link{create_component}}
 #' @export
 #'
 create_pgeom <- function(components, type){
@@ -100,9 +209,7 @@ create_pgeom <- function(components, type){
 
   if(is_pgeom(type)){
 
-
     if(inherits(components, "list")){
-
 
       md_value = c()
       for(comp in 1:length(components)){
@@ -158,14 +265,15 @@ create_pgeom <- function(components, type){
 
 
 
-#' @title pgeom_as_tibble
+#' @title Transforms a pgeom object into a tibble object
 #'
 #' @description
 #'
 #'
-#' @param pgeom
+#' @param pgeom pgeom object
 #'
 #' @return
+#' A tibble object with two columns: md and geometry
 #' @examples
 #'
 #' @export
@@ -254,7 +362,7 @@ search_by_md <- function(components, low, high, m){
 #'
 #' @export
 #'
-pgeom_plot <- function(pgeom, low = "white", high = "black"){
+pgeom_plot <- function(pgeom, low = "white", high = "black", palette = "Greys", m = 10){
 
   pgeom_tibble <- pgeom_as_tibble(pgeom)
 
@@ -263,22 +371,52 @@ pgeom_plot <- function(pgeom, low = "white", high = "black"){
      inherits(pgeom_tibble$geometry, "sfc_LINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_POINT")){
 
+  if(nrow(pgeom_tibble) > m){
+
+    plot <-  ggplot(pgeom_tibble) +
+      geom_sf(aes(color = md, geometry=geometry)) +
+      scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
+      theme_classic()
+
+  } else {
+
+    pgeom_tibble$md <- as.factor(pgeom_tibble$md)
+
     plot <- ggplot(pgeom_tibble) +
-      geom_sf(aes(colour = md, geometry=geometry), size = 0) + theme_classic() +
-      scale_colour_gradient(name="", limits = c(0, 1), low = low, high = high)
+      geom_sf(aes(color = md, geometry=geometry), legend=FALSE) +
+      scale_colour_brewer(name="", palette = palette) +
+      theme_classic()
+  }
+
   }
 
   else{
-    plot <-  ggplot(pgeom_tibble) +
-      geom_sf(aes(fill = md, geometry=geometry), size = 0) + theme_classic() +
-      scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high)
+
+    if(nrow(pgeom_tibble) > m){
+
+      plot <-  ggplot(pgeom_tibble) +
+        geom_sf(aes(fill = md, geometry=geometry), lwd = 0) +
+        scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
+        theme_classic()
+
+    } else {
+
+      pgeom_tibble$md <- as.factor(pgeom_tibble$md)
+
+      plot <- ggplot(pgeom_tibble) +
+        geom_sf(aes(fill = md, geometry=geometry), lwd = 0, legend=FALSE) +
+        scale_fill_brewer(name="", palette = palette) +
+        theme_classic()
+    }
+
+
   }
   return(plot)
 }
 
 
 
-#' @title is_compatible
+#' @title Check compatibility of sfg object
 #'
 #' @description
 #'
@@ -294,7 +432,7 @@ pgeom_plot <- function(pgeom, low = "white", high = "black"){
 is_compatible <- function(sfg, ptype){
 
   ptype = toupper(ptype)
-  #type to lower
+
   if(class(sfg)[1] == "XY"){
     sfg_type = class(sfg)[2]
     if(sfg_type == "POINT" || sfg_type == "MULTIPOINT"){
@@ -318,13 +456,13 @@ is_compatible <- function(sfg, ptype){
         FALSE
       }
     }} else{
-      stop("Component is not a sf data type")
+      stop("Component is not a sfg data type")
     }
 }
 
 
 
-#' @title is_pgeom
+#' @title Check validity of
 #'
 #' @description
 #'
@@ -434,7 +572,8 @@ fdiff <- function(x, y){
 #' @description
 #'
 #'
-#' @param spo
+#' @param x
+#' @param y
 #'
 #' @return
 #' @examples
@@ -467,11 +606,11 @@ f_symm_diff <- function(x, y){
 #'
 #' @return
 #' @examples
-#' @export
+#' @noRd
 check_spa_topological_condition <- function(pgeom1, pgeom2){
   if(pgeom1@type != pgeom2@type){
-    return(stop("Different Spatial Plateau Types."))
+    stop("Different Spatial Plateau Types.")
   } else if(pgeom1@type != "PLATEAUREGION"){
-    return(stop(paste("Operator not implemented to", pgeom1@type)))
+    stop(paste("Operator not implemented to", pgeom1@type))
   }
 }

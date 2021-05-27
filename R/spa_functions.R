@@ -113,8 +113,6 @@ spa_eval <- function(obj, point=NA){
     }
 
     if(st_intersects(point, obj@supp, sparse=FALSE)[1]){
-
-      ################################
       # check in the boundary
       md_comps <- c()
       for(component in obj@component){
@@ -130,10 +128,7 @@ spa_eval <- function(obj, point=NA){
       return(max(md_comps))
     }
     return(0)
-
   }
-
-
 }
 
 
@@ -265,6 +260,12 @@ spa_perimeter <- function(pgeom){
 #' @family Spatial Plateau Set Operations
 #' @description
 #'
+#' \deqn{spaintersection(po_1, po_2, \sigma) = \langle \rangle \odot \bigodot \underset ab}
+# \underset ab}
+# \underset{1 \leq j \leq n_2}}
+# = \newline
+# \langle\rangle \odot \bigodot\underset{1 \leq j \leq n_2}{1 \leq i \leq n_1} \newline
+# (o_1,_i \otimes o_2,_j), \sigma(m_1,_i,m_2,_j)}
 #'
 #' @param pgeom
 #'
@@ -350,7 +351,6 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
     }
 
     sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
-
     # check result type and appends to list if compatible
     lcomps <- check_geom_sfg_pgeom(sf_diff_1, result, md_comp_p1, lcomps)
   }
@@ -685,3 +685,137 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max"){
     return(result)
   }
 }
+
+#' @title spa_contains
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+spa_contains <- function(pgeom1, pgeom2, utype = "max"){
+  spa_inside(pgeom2, pgeom1, utype = utype)
+}
+
+#' @title spa_common_points
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
+
+  if(pgeom1@type != pgeom2@type){
+    stop("Different Spatial Plateau Types.")
+  }
+
+  sigma <- match.fun(itype)
+  result <- create_empty_pgeom(pgeom1@type)
+  lcomps <- vector("list")
+
+  for(comp1 in pgeom1@component){
+    obj_comp_p1 <- comp1@obj
+    md_comp_p1 <- comp1@md
+
+    for(comp2 in pgeom2@component){
+      obj_comp_p2 <- comp2@obj
+      md_comp_p2 <- comp2@md
+
+      result_md = sigma(md_comp_p1, md_comp_p2)
+
+      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
+
+      # check geom and pgeom
+      if(!st_is_empty(sfg) && st_geometry_type(sfg) %in% c("POINT", "MULTIPOINT")){
+        result_comp <- new("component", obj = sfg, md = md)
+        lcomps <- append(lcomps, result_comp)
+      } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
+        type_geom = get_counter_ctype(pgeom)
+        result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = "POINT"))[[1]], md = md)
+        lcomps <- append(lcomps, result_comp)
+      }
+    }
+  }
+
+  if(length(lcomps) > 0){
+    spa_add_component(result, lcomps)
+  } else {
+    result
+  }
+}
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
+spa_contour <- function(pregion){
+  # to do : checar o tipo (somente plateau region)
+
+  pregion_tibble <- pgeom_as_tibble(pregion)
+
+  sf_region <- st_sf(pregion_tibble)
+  sf_line <- st_boundary(sf_region)
+
+  pline_df <- as.data.frame(sf_line)
+
+  create_pgeom(pline_df, "PLATEAULINE")
+}
+
+
+pkg_env <- new.env()
+
+
+pkg_env$ftopological_class <- c("a little bit", "somewhat", "slightly", "averagely", "mostly","quite")
+
+#pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8),
+                                            # to do......)
+
+spa_set_classification <- function(classes, mfs){
+
+  # to do: checar se possuem o mesmo length e
+  # class só string e mfs só funções
+
+  pkg_env$ftopological_class <- classes
+  pkg_env$ftopolical_mfs <- mfs
+}
+
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+spa_eval_relation <- function(degree){
+
+  ## Pegar os valores e variáveis linguisticas no Environment ...
+
+  # fazer um loop para percorrer mfs e verificar o
+  # grau de pertinencia do Degree em cada mf ,
+  # retorna: list com a variavel linguistica dos graus de pertinência de cada termo linguistico
+   # exemplo: list(a_little_bit = x, somewhat = y ....)
+}
+
+
+
