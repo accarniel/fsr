@@ -74,7 +74,7 @@ setMethod("as.character", "pgeom", function(x, ...) {
 
 
 setMethod("plot", "pgeom", function(x, ...) {
-  pgeom_plot(x)
+  pgeom_plot(x, ...)
 })
 
 
