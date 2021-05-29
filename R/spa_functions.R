@@ -97,37 +97,37 @@ spa_add_component <- function(pgeom_obj, components) {
 #'
 #' @export
 #'
-spa_eval <- function(obj, point=NA){
-
+spa_eval <- function(obj, point = NA){
   if(inherits(obj, "component")){
-    md <- obj@md
-    return(md)
+    obj@md
   } else if(inherits(obj, "pgeom")){
-
-    if(is.na(point)){
+    if(any(is.na(point))){
       stop("point is NA.")
     }
-
-    if(class(point)[[2]]!="POINT"){
+    ret <- 0
+    if(class(point)[[2]] != "POINT"){
       stop("'point' must be a simple point object.")
     }
 
-    if(st_intersects(point, obj@supp, sparse=FALSE)[1]){
+    if(st_intersects(point, obj@supp, sparse = FALSE)[1]){
       # check in the boundary
       md_comps <- c()
       for(component in obj@component){
-        if(st_intersects(point, st_boundary(component@obj), sparse=FALSE)[1]){
-          md_point <- get_md(component)
-          md_comps <- append(md_comps, md_point)
+        if(st_intersects(point, st_boundary(component@obj), sparse = FALSE)[1]){
+          md_comps <- append(md_comps, component@md)
         } #  check in its interior...
-        else if(st_intersects(point, component@obj, sparse=FALSE)[1]){
-          md_point <- get_md(component)
-          return(md_point)
+        else if(st_intersects(point, component@obj, sparse = FALSE)[1]){
+          if(obj@type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
+            return(component@md)
+          } else{
+            md_comps <- append(md_comps, component@md)
+          }
+
         }
       }
-      return(max(md_comps))
+      ret <- max(md_comps)
     }
-    return(0)
+    ret
   }
 }
 
@@ -539,13 +539,15 @@ spa_exact_inside <- function(pgeom1, pgeom2){
 #'
 #' @export
 #'
-spa_overlap <- function(pgeom1, pgeom2, itype = "min"){
+spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret_type = "degree", ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
 
   r = spa_intersection(pgeom1, pgeom2, itype = itype)
   supp_pgeom1 <- pgeom1@supp
   supp_pgeom2 <- pgeom2@supp
+
+  ret <- 0
 
   if(spa_ncomp(r) == 1 && !(st_is_empty(spa_core(r)))){
     return(1)
@@ -554,10 +556,22 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min"){
             spa_exact_inside(pgeom1, pgeom2) ||
             spa_exact_inside(pgeom2, pgeom1) ||
             spa_exact_equal(pgeom2, pgeom1)) {
-    return(0)
+    ret <- 0
   } else {
-    return(spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2)))
+    ret <- spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2))
   }
+
+  # args <- list(...)
+  # FAZER UMA FUNÇÂO function(degree, ...)
+  # Se o ret_type = degree , retorna ret
+  # Se o ret_type = list , retorna o resultado spa_eval_relation
+  # Se o ret_type = 'bool, pegar o resultado de spa_eval_relation
+    # e processar o eval_mode no termo linguistico que o usuario informou
+    # em "..." list(...)
+    # list$term (o termo que ele passou...)
+    # list$alpha para o eval_mode, caso tenha alpha...
+    # eval_mode ? list$eval_mode
+
 }
 
 #' @title spa_meet
@@ -572,9 +586,55 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min"){
 #'
 #' @export
 #'
-spa_meet <- function(pgeom1, pgeom2){
-
-}
+# spa_meet <- function(pgeom1, pgeom2){
+#
+#   check_spa_topological_condition(pgeom1, pgeom2)
+#
+#   countour_pgeom1 <- spa_contour(pgeom1)
+#   countour_pgeom2 <- spa_contour(pgeom2)
+#
+#   p <- spa_common_points(countour_pgeom1, countour_pgeom2, itype = "min")
+#   c <- spa_intersection(countour_pgeom1, countour_pgeom2, itype = "min")
+#
+#   p_ncomp <- spa_ncomp(p)
+#   c_ncomp <- spa_ncomp(c)
+#   p_core <- spa_core(p)
+#   c_core <- spa_core(c)
+#
+#   if((p_ncomp == 1) & !(st_is_empty(p_core)) ||
+#      (c_ncomp == 1) & !(st_is_empty(c_core))){
+#     return(1)
+#   }
+#
+#   supp_1 <- pgeom1@supp
+#   supp_2 <- pgeom2@supp
+#
+#   pgeom1_core <- spa_core(pgeom1)
+#   pgeom2_core <- spa_core(pgeom2)
+#
+#   if((st_disjoint(supp1, supp2, sparse=FALSE)[1]) ||
+#     !(st_disjoint(pgeom1_core, pgeom2_core, sparse=FALSE)[1]) ||
+#     st_touches(pgeom1_core, pgeom2_core, sparse=FALSE)[1] ||
+#     spa_exact_inside(pgeom1, pgeom2) ||
+#     spa_exact_inside(pgeom2, pgeom1) ||
+#     spa_exact_equal(pgeom1, pgeom2)){
+#
+#     return(0)
+#   }
+#
+#   meet_c <- st_touches(supp1, supp2)
+#
+#   if(#meet em ponto){
+#     return(spa_avg_degree(p))
+# }
+#
+#   if(# meet ponto e linha){
+#
+#
+#   }
+#
+#
+# }
 
 #' @title spa_disjoint
 #' @family Spatial Plateau Topological Relationships
@@ -753,7 +813,7 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
   }
 }
 
-#' @title spa_eval_relation
+#' @title spa_contour
 #' @family Spatial Plateau Topological Relationships
 #' @description
 #'
@@ -765,34 +825,58 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 #'
 #' @export
 spa_contour <- function(pregion){
-  # to do : checar o tipo (somente plateau region)
+
+
+  if(pregion@type != "PLATEAUREGION"){
+    stop("pgeom must be a PLATEAUREGION type.")
+  }
 
   pregion_tibble <- pgeom_as_tibble(pregion)
+  pregion_tibble$boundary <- st_boundary(pregion_tibble$geometry)
 
-  sf_region <- st_sf(pregion_tibble)
-  sf_line <- st_boundary(sf_region)
-
-  pline_df <- as.data.frame(sf_line)
-
-  create_pgeom(pline_df, "PLATEAULINE")
+  pregion_df <- as.data.frame(pregion_tibble)
+  create_pgeom(pregion_df[,c(1,3)], "PLATEAULINE")
 }
 
 
 pkg_env <- new.env()
 
 
-pkg_env$ftopological_class <- c("a little bit", "somewhat", "slightly", "averagely", "mostly","quite")
+pkg_env$ftopological_classes <- c("a little bit", "somewhat", "slightly", "averagely", "mostly","quite")
 
-#pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8),
-                                            # to do......)
+pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
+                              FuzzyR::genmf("trapmf", c(0.3, 0.8, 1.3, 1.5)),
+                              FuzzyR::genmf("trapmf", c(1.1, 1.5, 1.6, 2.0)),
+                              FuzzyR::genmf("trapmf", c(1.8, 2.1, 2.5, 2.9)),
+                              FuzzyR::genmf("trapmf", c(2.7, 3.1, 3.6, 3.9)),
+                              FuzzyR::genmf("trapmf", c(3.8, 4.1, 4.5, 4.5)))
 
+
+#' @title spa_set_classification
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @export
 spa_set_classification <- function(classes, mfs){
 
-  # to do: checar se possuem o mesmo length e
-  # class só string e mfs só funções
+  if(!(length(classes) == length(mfs))){
+    stop("Topological classes and topological_mfs are different length.")
 
-  pkg_env$ftopological_class <- classes
-  pkg_env$ftopolical_mfs <- mfs
+  } else if(class(classes) != "character"){
+    stop("Topological_classes needs to be a 'character' type.")
+
+  } else if(any(sapply(mfs, function(x) !(is.function(x))))){
+    stop("Topoligcal_mfs needs to be a list of functions.")
+  }
+
+  pkg_env$ftopological_classes <- classes
+  pkg_env$ftopological_mfs <- mfs
 }
 
 
@@ -809,13 +893,90 @@ spa_set_classification <- function(classes, mfs){
 #' @noRd
 spa_eval_relation <- function(degree){
 
-  ## Pegar os valores e variáveis linguisticas no Environment ...
+  classes <- pkg_env$ftopological_classes
+  mfs <- pkg_env$ftopological_mfs
 
-  # fazer um loop para percorrer mfs e verificar o
-  # grau de pertinencia do Degree em cada mf ,
-  # retorna: list com a variavel linguistica dos graus de pertinência de cada termo linguistico
-   # exemplo: list(a_little_bit = x, somewhat = y ....)
+  values_set <- list()
+  degrees <- lapply(mfs, function(mf) mf(degree))
+
+  names(degrees) <- classes
+  degrees
 }
 
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+soft_eval <- function(degree){
+  degree > 0
+}
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+strict_eval <- function(degree){
+  degree == 0
+}
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+alpha_eval <- function(degree, alpha){
+  degree >= alpha
+}
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+soft_alpha_eval <- function(degree, alpha){
+  degree > alpha
+}
+
+#' @title spa_eval_relation
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#' @noRd
+soft_alpha_eval <- function(degree, alpha){
+  degree > alpha
+}
 
 

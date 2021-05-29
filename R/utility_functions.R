@@ -362,49 +362,56 @@ search_by_md <- function(components, low, high, m){
 #'
 #' @export
 #'
-pgeom_plot <- function(pgeom, low = "white", high = "black", palette = "Greys", m = 10){
+pgeom_plot <- function(pgeom,  base_poly = NULL, low = "white", high = "black", palette = "Greys", m = 10, ...){
 
   pgeom_tibble <- pgeom_as_tibble(pgeom)
+
+  if(!is.null(base_poly)) {
+    pgeom_tibble$geometry <- st_intersection(pgeom_tibble$geometry, base_poly)
+  }
 
   if(inherits(pgeom_tibble$geometry, "sfc_MULTILINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_MULTIPOINT")||
      inherits(pgeom_tibble$geometry, "sfc_LINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_POINT")){
 
-  if(nrow(pgeom_tibble) > m){
+    if(nrow(pgeom_tibble) > m){
 
-    plot <-  ggplot(pgeom_tibble) +
-      geom_sf(aes(color = md, geometry=geometry)) +
-      scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
-      theme_classic()
+      plot <-  ggplot(pgeom_tibble) +
+        geom_sf(aes(color = md, geometry=geometry), ...) +
+        scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
+        theme_classic()
 
-  } else {
+    } else {
 
-    pgeom_tibble$md <- as.factor(pgeom_tibble$md)
+      pgeom_tibble$md <- as.factor(pgeom_tibble$md)
+      pgeom_tibble$md <- factor(pgeom_tibble$md, levels=c(levels(pgeom_tibble$md), "0"))
 
-    plot <- ggplot(pgeom_tibble) +
-      geom_sf(aes(color = md, geometry=geometry), legend=FALSE) +
-      scale_colour_brewer(name="", palette = palette) +
-      theme_classic()
-  }
+      plot <- ggplot(pgeom_tibble) +
+        geom_sf(aes(color = md, geometry=geometry), ...) +
+        scale_colour_brewer(name="", palette = palette) +
+        theme_classic() +
+        theme(legend.position = "none")
+    }
 
   }
 
   else{
 
     if(nrow(pgeom_tibble) > m){
-
+      # lwd = 0 ; color = NA
       plot <-  ggplot(pgeom_tibble) +
-        geom_sf(aes(fill = md, geometry=geometry), lwd = 0) +
+        geom_sf(aes(fill = md, geometry=geometry), ...) +
         scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
         theme_classic()
 
     } else {
 
       pgeom_tibble$md <- as.factor(pgeom_tibble$md)
+      pgeom_tibble$md <- factor(pgeom_tibble$md, levels=c(levels(pgeom_tibble$md), "0", "1"))
 
       plot <- ggplot(pgeom_tibble) +
-        geom_sf(aes(fill = md, geometry=geometry), lwd = 0, legend=FALSE) +
+        geom_sf(aes(fill = md, geometry=geometry), ...) +
         scale_fill_brewer(name="", palette = palette) +
         theme_classic()
     }
@@ -413,7 +420,6 @@ pgeom_plot <- function(pgeom, low = "white", high = "black", palette = "Greys", 
   }
   return(plot)
 }
-
 
 
 #' @title Check compatibility of sfg object

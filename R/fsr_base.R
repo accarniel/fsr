@@ -54,7 +54,7 @@ pgeom_to_pwkt <- function(pgeom) {
 
   l <- unlist(lapply(pgeom@component, component_to_text))
 
-  l <- paste(pgeom@type," ", paste(l, collapse = ", "), ")", sep="")
+  l <- paste(pgeom@type," (", paste(l, collapse = ", "), ")", sep="")
   l
 }
 
