@@ -277,7 +277,7 @@ fsi_add_rules <- function(fsi, user_rules, weights = rep(1, length(user_rules)))
   }
   i <- 1
   for(ur in user_rules) {
-    antecedents <- get_antecedents(ur, logical_op_ant)
+    antecedents <- get_antecedents(ur) #, logical_op_ant)
     consequents <- get_consequent(ur)
     fsi$rule <- append(fsi$rule, 
                        list(list(ants = antecedents$ants, cons = consequents, w = weights[i], loa = antecedents$op)))
@@ -303,39 +303,39 @@ fsi_add_rules <- function(fsi, user_rules, weights = rep(1, length(user_rules)))
 #' @export
 #' @importFrom
 #'
-fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
+fsi_eval <- function(fsi, p, discret_by = 0.5, discret_length = NULL) {
   # 1 - The first step of the algorithm is to find the fuzzy regions
   # that contain the point P with some membership degree greater
   # than 0
-
+  
   # this is a list of lists
   # Linguistic Variable [..., ..., ...]
   # texture [um tibble de objetos que contém o ponto p com algum grau de pertinência]
   all_spos <- list()
-
+  
   for(input in fsi$input) {
     #print(input)
-
+    
     #aqui seria a OTIMIZAÇÃO 1, ao invés de armazenar o spo, armazenar apenas seus graus de pertinência
     r <- tibble(lval = character(), spo = list())
-
+    
     #layer é uma tabela!
     layer <- input$layer
-
+    
     #aqui seria a OTIMIZAÇÃO 2 - fazer o tratamento adequado dependento do tipo de layer definido
-
+    
     # print(layer)
     # print(nrow(layer))
-
+    
     if(nrow(layer) > 0) {
-
+      
       for(i in 1:nrow(layer)) {
         row <- layer[i, ]
-
+        
         # print(row$lval)
         # print(row$spo[[1]])
-
-
+        
+        
         # ARRUMAR ISSO NA REUNIÃO!!!!!!!!!!!!!!
         # AQUI NA VERDADE NÃO PRECISA SABER O GRAU DE PERTINÊNCIA, MAS SIM SABER SE ELE SERÁ MAIOR QUE 0 OU NÃO
         # ASSIM, PODE DEIXAR ESSA PARTE MAIS OTIMIZADA
@@ -345,39 +345,39 @@ fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
         }
       }
     }
-
+    
     all_spos <- append(all_spos,
                        list(list(lvar = input$name, objects = r)))
-
+    
     #TODO como usar o filter com funções que não são vetorizadas
     #r <- filter(i$layer, spa_eval(spo, p) > 0)
   }
-
+  
   # The next step computes the Cartesian product on the values
   # of the arrays stored in N to find all combinations of the
   # linguistic values of the stored fuzzy regions
   # this results in a matrix called K
-
+  
   # Each row of the K indicates a fuzzy rule to be executed by
   # the fuzzy inference method IM
-
+  
   #aqui seria a OTIMIZAÇÃO 3: evitar a varredura sequencial de todas as regras
-
+  
   # Compute the degree of fulfillment of each rule (fire rule)
   fire_rules <- list()
-
+  
   all_rules <- fsi$rule
-
+  
   for(pos_r in 1:length(all_rules)) {
     #checando se as variaveis linguisticas e valores linguisticas do all_spos
     #tem um match com os antecedentes de cada regra
-
+    
     antecedents <- all_rules[[pos_r]]$ants
-
+    
     # cat(paste0("checando a regra com antecedentes...", antecedents, "\n"))
-
+    
     membership_degrees_antecedents <- numeric()
-
+    
     for(ant in antecedents) {
       lvar_ant <- ant[1]
       lval_ant <- ant[2]
@@ -385,17 +385,17 @@ fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
       # TODO Juliana - melhorar pós PI
       for(layer in all_spos) {
         # cat(paste0("a camada sendo percorrida eh...", layer$lvar, "\n"))
-
+        
         position <- match(lval_ant, layer$objects$lval)
-
+        
         # cat(paste0("comparando... ", lvar_ant, " [", lval_ant, "] com ", layer$objects$lval[position], "\n"))
-
+        
         #cat(paste0("evaluating the membership degree for ", layer$objects$lval[position], "\n"))
-
+        
         if(layer$lvar == lvar_ant && !is.na(position) && position >= 1) {
           membership_degrees_antecedents <- append(membership_degrees_antecedents,
                                                    spa_eval(layer$objects$spo[position][[1]], p))
-
+          
           # cat(paste0("Graus de pertinencia adicionando esse antecedente fica: ", membership_degrees_antecedents, "\n"))
           flag <- TRUE
           break
@@ -403,18 +403,18 @@ fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
         #  membership_degrees_antecedents <- append(membership_degrees_antecedents,
         #                                           0)
         #}
-
-
+        
+        
       }
       if(!flag) {
         membership_degrees_antecedents <- append(membership_degrees_antecedents, 0)
-
+        
       }
     }
-
+    
     # cat("os graus de pertinencia dos antecedents sao...\n")
     # print(membership_degrees_antecedents)
-
+    
     #loa = logical operator do antecedent
     if(all_rules[[pos_r]]$loa == 'AND') {
       and_method <- match.fun(fsi$and_method)
@@ -424,49 +424,57 @@ fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
       fire_rules <- append(fire_rules, list(list(pos_rule = pos_r, fire_rule = or_method(membership_degrees_antecedents))))
     }
   }
-
+  
   # cat("os disparos das regras sao:\n")
   # print(fire_rules)
-
+  
   # Compute the implication
   imp_method <- match.fun(fsi$imp_method)
-
+  
   results_imp <- list()
-
+  
   min_conseq <- fsi$output[[1]]$range[1]
   max_conseq <- fsi$output[[1]]$range[2]
-
+  
   # cat(paste0(min_conseq, "-", max_conseq, " como range do consequente\n"))
-
+  
   for(fr in fire_rules) {
     # cat("a regra sendo percorrida eh:\n")
     # print(fr)
-
+    
     fire_rule <- fr$fire_rule
-
+    
     if(fire_rule > 0) {
       which_rule <- fr$pos_rule
       consequent <- fsi$rule[[which_rule]]$cons
-
+      
       # cat(paste0(fsi$rule[[which_rule]], " com grau de disparo ", fire_rule, "\n"))
-
+      
       mf_pos <- match(consequent[[1]][2], fsi$output[[1]]$domain)
-
+      
       if(!is.na(mf_pos) && mf_pos >= 1) {
         mf_conseq <- fsi$output[[1]]$mf[[mf_pos]]
-
+        
         #### resultado da implicacao
         mf_fuzzyr <- genmf(mf_conseq$type, mf_conseq$params)
-
+        
         mf_cut <- genmf("trapmf", c(min_conseq, min_conseq, max_conseq, max_conseq, fire_rule))
-
+        
         res_imp <- fuzzy.tnorm(imp_method, mf_fuzzyr, mf_cut)
         results_imp <- append(results_imp, res_imp)
       }
     }
   }
-
-  ## 2 - agregacao de diversos conjuntos fuzzy
+  
+  conseq_values <- NULL
+  if(!is.null(discret_by)) {
+    conseq_values <- seq(min_conseq, max_conseq, by = discret_by)
+  } else if(!is.null(discret_length)) {
+    conseq_values <- seq(min_conseq, max_conseq, length.out = discret_length)
+  } else {
+    conseq_values <- seq(min_conseq, max_conseq)
+  }
+  
   agg_method <- match.fun(fsi$agg_method)
   if(length(results_imp) == 0) {
     db <- fsi$default_conseq
@@ -474,22 +482,21 @@ fsi_eval <- function(fsi, p, discret_by=0.5, discret_length=NULL) {
       warning("No default rule defined")
       return(NA)
     }
-    result_fsi <- evalmf(seq(min_conseq, max_conseq, by=discret_by, length.out=discret_length), db)
+    result_fsi <- evalmf(conseq_values, db)
   } else {
-    result_fsi <- evalmf(seq(min_conseq, max_conseq, by=discret_by, length.out=discret_length), results_imp[[1]])
+    result_fsi <- evalmf(conseq_values, results_imp[[1]])
     if(length(results_imp) >= 2) {
       for(i in 2:length(results_imp)) {
-        result_fsi <- pmax(evalmf(seq(min_conseq, max_conseq, by=1), results_imp[[i]]), result_fsi)
+        result_fsi <- pmax(evalmf(conseq_values, results_imp[[i]]), result_fsi)
       }
       ## TODO improve latter (JULIANA)
     }
   }
   
-  crisp_result <- defuzz(seq(min_conseq, max_conseq, by=discret_by, length.out=discret_length), result_fsi, fsi$defuzz_method)
-
+  crisp_result <- defuzz(conseq_values, result_fsi, fsi$defuzz_method)
+  
   crisp_result
 }
-
 
 #' @title fsi_eval_pso
 #'
