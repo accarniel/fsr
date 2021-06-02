@@ -539,7 +539,7 @@ spa_exact_inside <- function(pgeom1, pgeom2){
 #'
 #' @export
 #'
-spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret_type = "degree", ...){
+spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
 
@@ -547,32 +547,53 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret_type = "degree", ...)
   supp_pgeom1 <- pgeom1@supp
   supp_pgeom2 <- pgeom2@supp
 
-  ret <- 0
+  result <- 0
 
   if(spa_ncomp(r) == 1 && !(st_is_empty(spa_core(r)))){
-    return(1)
+    result <- 1
   } else if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
             st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
             spa_exact_inside(pgeom1, pgeom2) ||
             spa_exact_inside(pgeom2, pgeom1) ||
             spa_exact_equal(pgeom2, pgeom1)) {
-    ret <- 0
+    result <- 0
   } else {
-    ret <- spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2))
+    result <- spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2))
   }
 
-  # args <- list(...)
-  # FAZER UMA FUNÇÂO function(degree, ...)
-  # Se o ret_type = degree , retorna ret
-  # Se o ret_type = list , retorna o resultado spa_eval_relation
-  # Se o ret_type = 'bool, pegar o resultado de spa_eval_relation
-    # e processar o eval_mode no termo linguistico que o usuario informou
-    # em "..." list(...)
-    # list$term (o termo que ele passou...)
-    # list$alpha para o eval_mode, caso tenha alpha...
-    # eval_mode ? list$eval_mode
+  ret_apply(ret, result, ...)
 
 }
+
+#' @title spa_overlap
+#' @family Spatial Plateau Topological Relationships
+#' @description
+#'
+#'
+#' @param pgeom
+#'
+#' @return
+#' @examples
+#'
+#'
+#' @noRd
+ret_apply <- function(ret, result, ...){
+  args <- list(...)
+  switch(ret,
+         degree = return(result),
+         list = return(spa_eval_relation(result)),
+         bool = {
+           list_res <- spa_eval_relation(result)
+           if(!("eval_mode" %in% names(args) & "lval" %in% names(args))){
+             stop("args not supplied. 'eval_mode' and 'lval' needed for bool result type")
+           }
+           e_mode <- match.fun(args$eval_mode)
+           term <- args$lval
+           return(e_mode(list_res[[term]]))
+         },
+         stop("Return type does not exist."))
+}
+
 
 #' @title spa_meet
 #' @family Spatial Plateau Topological Relationships
@@ -648,15 +669,16 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret_type = "degree", ...)
 #'
 #' @export
 #'
-spa_disjoint <- function(pgeom1, pgeom2, itype="min"){
+spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
 
   supp_pgeom1 <- pgeom1@supp
   supp_pgeom2 <- pgeom2@supp
+  result <- 0
 
   if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
-    return(1)
+    result <- 1
   }
 
   r_overlap <- spa_overlap(pgeom1, pgeom2, itype = itype)
@@ -666,11 +688,11 @@ spa_disjoint <- function(pgeom1, pgeom2, itype="min"){
       spa_exact_inside(pgeom1, pgeom2) ||
       spa_exact_inside(pgeom2, pgeom1) ||
       spa_exact_equal(pgeom2, pgeom1))  {
-    return(0)
+    result <- 0
   } else {
     result <- 1 - max(r_overlap, r_meet)
-    return(result)
   }
+  ret_apply(ret, result, ...)
 }
 
 #' @title spa_equal
@@ -685,12 +707,12 @@ spa_disjoint <- function(pgeom1, pgeom2, itype="min"){
 #'
 #' @export
 #'
-spa_equal <- function(pgeom1, pgeom2, utype = "max"){
+spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
 
   if(spa_exact_equal(pgeom1, pgeom2)){
-    return(1)
+    result <- 1
   }
 
   supp_pgeom1 <- pgeom1@supp
@@ -698,7 +720,7 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max"){
 
   if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
      st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
-    return(0)
+    result <- 0
   } else {
     r_diff <- spa_difference(pgeom1, pgeom2, dtype="f_symm_diff")
     r_union <- spa_union(pgeom1, pgeom2, utype = utype)
@@ -707,8 +729,8 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max"){
     r_sfg_area <- st_area(r_union)
 
     result <- 1 - (r_spa_area/r_sfg_area)
-    return(result)
   }
+  ret_apply(ret, result, ...)
 }
 
 #' @title spa_inside
@@ -722,12 +744,12 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max"){
 #' @examples
 #'
 #' @export
-spa_inside <- function(pgeom1, pgeom2, utype = "max"){
+spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
 
   if(spa_exact_inside(pgeom1, pgeom2)){
-    return(1)
+    result <- 1
   }
 
   supp_pgeom1 <- pgeom1@supp
@@ -736,14 +758,14 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max"){
   if(spa_equal(pgeom1, pgeom2, utype = utype) == 1 ||
      st_disjoint(supp_pgeom1, supp_pgeom2) ||
      st_touches(supp_pgeom1, supp_pgeom2)){
-    return(0)
+    result <- 0
   } else {
 
     r_diff <- spa_difference(pgeom1, pgeom2, dtype = "f_bound_diff")
 
     result <- 1 - (spa_area(r_diff)/st_area(supp_pgeom1))
-    return(result)
   }
+  ret_apply(ret, result, ...)
 }
 
 #' @title spa_contains
@@ -757,8 +779,8 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max"){
 #' @examples
 #'
 #' @export
-spa_contains <- function(pgeom1, pgeom2, utype = "max"){
-  spa_inside(pgeom2, pgeom1, utype = utype)
+spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
+  spa_inside(pgeom2, pgeom1, utype = utype, ret = 'degree', ...)
 }
 
 #' @title spa_common_points
@@ -931,10 +953,10 @@ soft_eval <- function(degree){
 #'
 #' @noRd
 strict_eval <- function(degree){
-  degree == 0
+  degree == 1
 }
 
-#' @title spa_eval_relation
+#' @title alpha_eval
 #' @family Spatial Plateau Topological Relationships
 #' @description
 #'
@@ -974,9 +996,35 @@ soft_alpha_eval <- function(degree, alpha){
 #' @return
 #' @examples
 #'
-#' @noRd
-soft_alpha_eval <- function(degree, alpha){
-  degree > alpha
+#' @export
+#'
+spa_boundary_pregion <- function(pgeom, bound_part = "region"){
+
+  if(pgeom@type != "PLATEAUREGION"){
+    stop("pgeom is not a PLATEAUREGION type.")
+  }
+
+
+  if(bound_part == "region"){
+    new_pgeom <- create_empty_pgeom("PLATEAUREGION")
+    last_comp <- tail(pgeom@component)
+    if(last_comp@md == 1){
+      boundary_component <- st_boundary(last_comp@obj)
+      new_pgeom <- spa_add_component(new_pgeom, boundary_component)
+    }
+
+  }
+  else if(bound_part == "line"){
+    new_pgeom <- create_empty_pgeom("PLATEAULINE")
+
+    bpl
+  }
+
+  else{
+    stop("Bound part invalid.")
+  }
+
 }
+
 
 
