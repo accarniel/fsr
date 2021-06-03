@@ -498,23 +498,47 @@ fsi_eval <- function(fsi, p, discret_by = 0.5, discret_length = NULL) {
   crisp_result
 }
 
-#' @title fsi_eval_pso
-#'
-#' @description
-#'
-#'
-#' @param fsi
-#' @param bbox
-#' @param bbox
-#'
-#' @return
-#' @examples
-#'
-#' @export
-#' @importFrom
-#'
-fsi_eval_pso <- function(fsi, bbox, n_quads, ...){
-  # O código do PI
+#' @noRd
+fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
+  if(!(is.null(n_col) && is.null(n_row))) {
+    regular_grid_points <- st_make_grid(query_window[[1]], n = c(n_row, n_col), what = "centers")
+  } else {
+    #TODO check if sqrt(k ) is an integer value
+    regular_grid_points <- st_make_grid(query_window[[1]], n = c(sqrt(k), sqrt(k)), what = "centers")
+  }
+  qw_inference_grid_output <- numeric(length = length(regular_grid_points))
+  
+  i <- 1
+  for(point in regular_grid_points) {
+    qw_inference_grid_output[i] <- fsi_eval(fsi, point)
+    i <- i + 1
+  }
+  
+  tibble(points = regular_grid_points, inferred_values = qw_inference_grid_output)
 }
+
+
+#' @export
+fsi_qw_eval <- function(fsi, qw, target_lval, approach = "discretization", ...) {
+  params <- list(...)
+  result_qwi <- switch(approach,
+                       discretization = do.call(fsi_qwi_discretization, c(list(fsi, qw), params)),
+                       #include the PSO approach...
+                       stop("This query window inference approach is not valid.")
+  )
+  # target_lval defines what should be returned
+  # all, or a specific character vector of lvals from the consequent part
+  # target_lval = "great".. 
+  #   it should return the collection of points with their corresponding result that have some membership degree in the set "great"
+  target_mf <- NULL
+  for(part in fsi$output[[1]]$mf) {
+    if(part$name == target_lval) {
+      target_mf <- genmf(part$type, part$params)
+    }
+  }
+  
+  filter(result_qwi, target_mf(inferred_values) >= 0)
+}
+
 
 
