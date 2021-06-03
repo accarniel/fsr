@@ -501,10 +501,10 @@ fsi_eval <- function(fsi, p, discret_by = 0.5, discret_length = NULL) {
 #' @noRd
 fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
   if(!(is.null(n_col) && is.null(n_row))) {
-    regular_grid_points <- st_make_grid(query_window[[1]], n = c(n_row, n_col), what = "centers")
+    regular_grid_points <- st_make_grid(qw[[1]], n = c(n_row, n_col), what = "centers")
   } else {
     #TODO check if sqrt(k ) is an integer value
-    regular_grid_points <- st_make_grid(query_window[[1]], n = c(sqrt(k), sqrt(k)), what = "centers")
+    regular_grid_points <- st_make_grid(qw[[1]], n = c(sqrt(k), sqrt(k)), what = "centers")
   }
   qw_inference_grid_output <- numeric(length = length(regular_grid_points))
   
@@ -537,7 +537,7 @@ fsi_qw_eval <- function(fsi, qw, target_lval, approach = "discretization", ...) 
     }
   }
   
-  filter(result_qwi, target_mf(inferred_values) >= 0)
+  filter(result_qwi, target_mf(inferred_values) > 0)
 }
 
 
