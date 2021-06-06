@@ -324,21 +324,25 @@ fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
 #' @export
 fsi_qw_eval <- function(fsi, qw, target_lval, approach = "discretization", ...) {
   params <- list(...)
-  result_qwi <- switch(approach,
-                       discretization = do.call(fsi_qwi_discretization, c(list(fsi, qw), params)),
-                       #include the PSO approach...
-                       stop("This query window inference approach is not valid.")
-  )
+  
   # target_lval defines what should be returned
   # all, or a specific character vector of lvals from the consequent part
   # target_lval = "great".. 
   #   it should return the collection of points with their corresponding result that have some membership degree in the set "great"
   target_mf <- NULL
-  for(part in fsi$output[[1]]$mf) {
-    if(part$name == target_lval) {
-      target_mf <- genmf(part$type, part$params)
-    }
+  mf_pos <- match(target_lval, fsi$cs[[1]]$lvals)
+  if(!is.na(mf_pos) && mf_pos >= 1) {
+    target_mf <- fsi$cs[[1]]$mfs[[mf_pos]]
+  } else {
+    stop("Invalid target linguistic value.", call. = FALSE)
   }
+  
+  result_qwi <- switch(approach,
+                       discretization = do.call(fsi_qwi_discretization, c(list(fsi, qw), params)),
+                       #include the PSO approach...
+                       stop("This query window inference approach is not valid.")
+  )
+  
   
   filter(result_qwi, target_mf(inferred_values) > 0)
 }
