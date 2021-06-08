@@ -330,7 +330,6 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 5, maxit = 100, populati
   fitness <- function(p){
     x <- p[1]
     y <- p[2]
-    # TODO subject to should include the target_mf
     fsi_eval(fsi, st_point(c(x, y)))
   }
   
@@ -350,7 +349,6 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 5, maxit = 100, populati
       scale = 1
     }
     
-    # TODO apply parallelism it (e.g., one thread for each quadrant)
     for(q in subquadrants) {
       bbox <- st_bbox(q)
       #print(paste0("executing the pso for the quadrant : ", quad, " in depth ", current_depth))
