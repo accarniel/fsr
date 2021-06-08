@@ -320,6 +320,68 @@ fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
   tibble(points = regular_grid_points, inferred_values = qw_inference_grid_output)
 }
 
+#' @noRd
+fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 5, maxit = 100, population = 10, convergence = Inf, 
+                        what = "max", stats_output = FALSE) {
+  pso.env <- new.env()
+  pso.env$count_fitness_function <- 0
+  pso.env$count_iteration <- 0
+  
+  fitness <- function(p){
+    x <- p[1]
+    y <- p[2]
+    # TODO subject to should include the target_mf
+    fsi_eval(fsi, st_point(c(x, y)))
+  }
+  
+  fsi_quadrants_pso <- function(fsi, quadrant, maxit, population, convergence, target_mf, 
+                                current_depth, max_depth, result, what = "max") {
+    if(max_depth == current_depth) {
+      return(result)
+    }
+    
+    subquadrants <- st_make_grid(quadrant, n = c(2, 2))
+    
+    #print(paste0("executing the depth... : ", current_depth))
+    
+    if(what == "max") {
+      scale = -1
+    } else {
+      scale = 1
+    }
+    
+    # TODO apply parallelism it (e.g., one thread for each quadrant)
+    for(q in subquadrants) {
+      bbox <- st_bbox(q)
+      #print(paste0("executing the pso for the quadrant : ", quad, " in depth ", current_depth))
+      pso_result <- psoptim(rep(NA,2), fn = fitness, lower = c(bbox$xmin, bbox$ymin), upper = c(bbox$xmax, bbox$ymax), 
+                            control = list(maxit = maxit, s = population, fnscale = scale, abstol = convergence * scale))
+      pso.env$count_fitness_function <- pso.env$count_fitness_function + as.numeric(pso_result$counts[1])
+      pso.env$count_iteration <- pso.env$count_iteration + as.numeric(pso_result$counts[2])
+      
+      #if(between(pso_result$value * scale, target_range[1], target_range[2])) {
+      if(target_mf(pso_result$value * scale) > 0) {
+        result <- add_row(result, points = list(st_point(pso_result$par)), inferred_values = pso_result$value * scale)
+        
+        result <- fsi_quadrants_pso(fsi, q, maxit, population, convergence, target_mf, 
+                                    current_depth + 1, max_depth, result, what)
+      }
+    }
+    result
+  }
+  
+  pso_result_tbl <- tibble(points = list(), inferred_values = numeric())
+  
+  pso_result_tbl <- fsi_quadrants_pso(fsi, qw, maxit, population, convergence, target_mf, 
+                                      0, max_depth, pso_result_tbl, what = "max")
+  pso_result_tbl$points <- st_as_sfc(pso_result_tbl$points)
+  
+  if(stats_output) {
+    list(iterations = pso.env$count_iteration, fitness_calls = pso.env$count_fitness_function, result = pso_result_tbl)
+  } else {
+    pso_result_tbl
+  }
+}
 
 #' @export
 fsi_qw_eval <- function(fsi, qw, target_lval, approach = "discretization", ...) {
@@ -338,14 +400,13 @@ fsi_qw_eval <- function(fsi, qw, target_lval, approach = "discretization", ...) 
   }
   
   result_qwi <- switch(approach,
-                       discretization = do.call(fsi_qwi_discretization, c(list(fsi, qw), params)),
-                       #include the PSO approach...
+                       discretization = {
+                         qwi_discret <- do.call(fsi_qwi_discretization, c(list(fsi, qw), params))
+                         filter(qwi_discret, target_mf(inferred_values) > 0)
+                       },
+                       pso = do.call(fsi_qwi_pso, c(list(fsi, qw, target_mf), params)),
                        stop("This query window inference approach is not valid.")
   )
   
-  
-  filter(result_qwi, target_mf(inferred_values) > 0)
+  result_qwi
 }
-
-
-
