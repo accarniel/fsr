@@ -8,7 +8,7 @@
 #' @param fsi_type
 #' @param and_method
 #' @param or_method
-#' @param default_conseq optional. If...MUST be a fuzzy set (something returned by genmf)
+#' @param default_conseq optional. If...MUST be a membership function (something returned by genmf)
 #' @imp_method
 #' @agg_method
 #' @defuzz_method
@@ -17,10 +17,10 @@
 #' @examples
 #'
 #' @export
-fsi_create <- function(name, fsi_type = "mamdani", and_method = "min",
+fsi_create <- function(name, and_method = "min",
                     or_method = "max", imp_method = "min", agg_method = "max",
-                    defuzz_method = "centroid", default_conseq=NULL) {
-  fsi <- list(name = name, type = fsi_type,
+                    defuzz_method = "centroid", default_conseq = NULL) {
+  fsi <- list(name = name, type = "mamdani",
               and_method = and_method, or_method = or_method, imp_method = imp_method,
               agg_method = agg_method, defuzz_method = defuzz_method,
               fsa = NULL, cs = NULL, rule = NULL, default_conseq = default_conseq)
@@ -156,13 +156,13 @@ get_consequent <- function(user_rule) {
 #' @examples
 #'
 #' @export
-fsi_add_rules <- function(fsi, user_rules, weights = rep(1, length(user_rules))) {
+fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   #TODO Juliana - check if the rules use valid linguistic variables and linguistic values only
-  if (length(user_rules) != length(weights)) {
-    stop("The lengths of parameters for user_rules and weights should be equal")
+  if (length(rules) != length(weights)) {
+    stop("The lengths of parameters for rules and weights should be equal")
   }
   i <- 1
-  for(ur in user_rules) {
+  for(ur in rules) {
     #TODO Juliana - improve performance
     antecedents <- get_antecedents(ur)
     consequents <- get_consequent(ur)
@@ -186,7 +186,9 @@ fsi_add_rules <- function(fsi, user_rules, weights = rep(1, length(user_rules)))
 #' @examples
 #'
 #' @export
-fsi_eval <- function(fsi, point, discret_by = 0.5, discret_length = NULL) {
+fsi_eval <- function(fsi, point, ...) {
+  discret_by <- 0.5
+  discret_length <- NULL
   
   if(any(is.na(point))){
     stop("'point' should not be NA", call. = FALSE)
