@@ -139,19 +139,9 @@ component_from_sfg <- function(sfg, md){
   if(sfg_type %in% possible_geometries){
     new("component", obj = sfg,md=md)
   } else {
-    stop(paste(sfg_type, "type not allowed to create a component."))
+    stop(paste(sfg_type, "type not allowed to create a component."), call. = FALSE)
   }
 }
-
-
-
-
-
-
-
-
-################################################################################
-
 
 #' @title Create an empty Plateau Geometry object
 #'
@@ -167,9 +157,8 @@ component_from_sfg <- function(sfg, md){
 #' pgeom_point <- create_empty_pgeom("PLATEAUPOINT")
 #' pgeom_line <- create_empty_pgeom("PLATEAULINE")
 #' pgeom_region <- create_empty_pgeom("PLATEAUREGION")
-#'
+#' @import sf
 #' @export
-#'
 create_empty_pgeom <- function(type){
 
   type = toupper(type)
@@ -184,6 +173,8 @@ create_empty_pgeom <- function(type){
     else if(type == "PLATEAUREGION"){
       new("pgeom", component = list(), supp = st_multipolygon(), type = type)
     }
+  } else {
+    stop("Invalid data type", call. = FALSE)
   }
 
 }
@@ -208,23 +199,19 @@ create_pgeom <- function(components, type){
   type = toupper(type)
 
   if(is_pgeom(type)){
-
     if(inherits(components, "list")){
-
       md_value = c()
       for(comp in 1:length(components)){
         md = components[[comp]]@md
         obj_comp = components[[comp]]@obj
 
         if(!is_compatible(obj_comp, type)){
-          stop("Input Component type error. Please verify if your component type is correct")
+          stop("Input Component type error. Please verify if your component type is correct", call. = FALSE)
         }
-
         md_value[comp] <- md
       }
       order_comps = order(md_value)
       new_components <- components[order_comps]
-
 
       obj_sf = list()
       for(comp in 1:length(components)){
@@ -236,34 +223,22 @@ create_pgeom <- function(components, type){
     }
 
     else if(inherits(components, "data.frame") || inherits(df, "tibble")){
-
       new_df <- arrange(components, components[1])
-
       new_components = vector("list", nrow(new_df))
 
-
       for(i in 1:nrow(new_df)){
-
         new_components[[i]] <- new("component", obj = new_df[i,2][[1]], md = new_df[i, 1])
-
         obj_comp = new_components[[i]]@obj
 
         if(!is_compatible(obj_comp, type)){
-          stop("Input Component type error.Please verify if your component type is correct")
+          stop("Input Component type error.Please verify if your component type is correct", call. = FALSE)
         }
-
       }
-
       supp = st_union(new_df[,2])
-
     }
-
     new("pgeom", component = new_components, supp = supp[[1]], type = type)
   }
-
 }
-
-
 
 #' @title Transforms a pgeom object into a tibble object
 #'
@@ -462,7 +437,7 @@ is_compatible <- function(sfg, ptype){
         FALSE
       }
     }} else{
-      stop("Component is not a sfg data type")
+      stop("Component is not a sfg data type", call. = FALSE)
     }
 }
 
@@ -615,8 +590,8 @@ f_symm_diff <- function(x, y){
 #' @noRd
 check_spa_topological_condition <- function(pgeom1, pgeom2){
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.")
+    stop("Different Spatial Plateau Types.", call. = FALSE)
   } else if(pgeom1@type != "PLATEAUREGION"){
-    stop(paste("Operator not implemented to", pgeom1@type))
+    stop(paste("Operator not implemented to", pgeom1@type), call. = FALSE)
   }
 }

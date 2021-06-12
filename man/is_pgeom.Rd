@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility_functions.R
 \name{is_pgeom}
 \alias{is_pgeom}
-\title{is_pgeom}
+\title{Check validity of}
 \usage{
 is_pgeom(type)
 }

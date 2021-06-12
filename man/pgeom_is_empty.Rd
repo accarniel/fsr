@@ -4,7 +4,7 @@
 \alias{pgeom_is_empty}
 \title{pgeom_is_empty}
 \usage{
-pgeom_is_empty(spo)
+pgeom_is_empty(pgeom)
 }
 \arguments{
 \item{spo}{}

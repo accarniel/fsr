@@ -30,15 +30,15 @@
 spa_add_component <- function(pgeom_obj, components) {
   if(is.null(pgeom_obj)){
     stop("pgeom_obj is null. Please use create_pgeom() to
-         create an empty spatial plateau object.")
+         create an empty spatial plateau object.", call. = FALSE)
   }
 
   if(is.null(components)){
-    stop("components is null. It should be a single component or a list of components.")
+    stop("components is null. It should be a single component or a list of components.", call. = FALSE)
   }
 
   if(class(pgeom_obj) != "pgeom"){
-    stop(paste(pgeom_obj, "is not a pgeom object (Spatial Plateau Object.)", sep = ' '))
+    stop(paste(pgeom_obj, "is not a pgeom object (Spatial Plateau Object.)", sep = ' '), call. = FALSE)
   }
 
   if(!inherits(components, "list")) {
@@ -47,7 +47,7 @@ spa_add_component <- function(pgeom_obj, components) {
 
   #should we check all components or just the first one?
   if(class(components[[1]]) != "component"){
-    stop(paste(components, " is not a component object.", sep = ' '))
+    stop(paste(components, " is not a component object.", sep = ' '), call. = FALSE)
   }
 
 
@@ -102,11 +102,11 @@ spa_eval <- function(obj, point = NA){
     obj@md
   } else if(inherits(obj, "pgeom")){
     if(any(is.na(point))){
-      stop("point is NA.")
+      stop("point is NA.", call. = FALSE)
     }
     ret <- 0
     if(class(point)[[2]] != "POINT"){
-      stop("'point' must be a simple point object.")
+      stop("'point' must be a simple point object.", call. = FALSE)
     }
 
     if(st_intersects(point, obj@supp, sparse = FALSE)[1]){
@@ -184,7 +184,7 @@ spa_ncomp <- function(pgeom){
 spa_area <- function(pgeom){
 
   if(pgeom@type!='PLATEAUREGION'){
-    stop("Not PLATEAUREGION pgeom.")
+    stop("Not PLATEAUREGION pgeom.", call. = FALSE)
   }
 
   area_comp <- function(comp){
@@ -213,7 +213,7 @@ spa_area <- function(pgeom){
 spa_length <- function(pgeom){
 
   if(pgeom@type!='PLATEAULINE'){
-    stop("Not PLATEAULINE pgeom.")
+    stop("Not PLATEAULINE pgeom.", call. = FALSE)
   }
 
   length_comp <- function(comp){
@@ -241,7 +241,7 @@ spa_length <- function(pgeom){
 spa_perimeter <- function(pgeom){
 
   if(pgeom@type!='PLATEAUREGION'){
-    stop("Not PLATEAUREGION pgeom.")
+    stop("Not PLATEAUREGION pgeom.", call. = FALSE)
   }
 
   perimeter_comp <- function(comp){
@@ -260,13 +260,6 @@ spa_perimeter <- function(pgeom){
 #' @family Spatial Plateau Set Operations
 #' @description
 #'
-#' \deqn{spaintersection(po_1, po_2, \sigma) = \langle \rangle \odot \bigodot \underset ab}
-# \underset ab}
-# \underset{1 \leq j \leq n_2}}
-# = \newline
-# \langle\rangle \odot \bigodot\underset{1 \leq j \leq n_2}{1 \leq i \leq n_1} \newline
-# (o_1,_i \otimes o_2,_j), \sigma(m_1,_i,m_2,_j)}
-#'
 #' @param pgeom
 #'
 #' @return
@@ -277,7 +270,7 @@ spa_perimeter <- function(pgeom){
 spa_intersection <- function(pgeom1, pgeom2, itype="min"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.")
+    stop("Different Spatial Plateau Types.", call. = FALSE)
   }
 
   sigma <- match.fun(itype)
@@ -326,7 +319,7 @@ spa_intersection <- function(pgeom1, pgeom2, itype="min"){
 spa_union <- function(pgeom1, pgeom2, utype="max"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.")
+    stop("Different Spatial Plateau Types.", call. = FALSE)
   }
 
   tau <- match.fun(utype)
@@ -386,7 +379,7 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
 spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.")
+    stop("Different Spatial Plateau Types.", call. = FALSE)
   }
 
   nu <- match.fun(dtype)
@@ -561,7 +554,7 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
     result <- spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2))
   }
 
-  ret_apply(ret, result, ...)
+  spa_eval_relation(ret, result, ...)
 
 }
 
@@ -577,21 +570,32 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 #'
 #'
 #' @noRd
-ret_apply <- function(ret, result, ...){
+spa_eval_relation <- function(ret, result, ...){
+
+  aux_function <- function(degree){
+    classes <- pkg_env$ftopological_classes
+    mfs <- pkg_env$ftopological_mfs
+
+    values_set <- list()
+    degrees <- lapply(mfs, function(mf) mf(degree))
+    names(degrees) <- classes
+    degrees
+  }
+
   args <- list(...)
   switch(ret,
          degree = return(result),
-         list = return(spa_eval_relation(result)),
+         list = return(aux_function(result)),
          bool = {
-           list_res <- spa_eval_relation(result)
+           list_res <- aux_function(result)
            if(!("eval_mode" %in% names(args) & "lval" %in% names(args))){
-             stop("args not supplied. 'eval_mode' and 'lval' needed for bool result type")
+             stop("args not supplied. 'eval_mode' and 'lval' needed for bool result type", call. = FALSE)
            }
            e_mode <- match.fun(args$eval_mode)
            term <- args$lval
            return(e_mode(list_res[[term]]))
          },
-         stop("Return type does not exist."))
+         stop("Return type does not exist.", call. = FALSE))
 }
 
 
@@ -607,55 +611,70 @@ ret_apply <- function(ret, result, ...){
 #'
 #' @export
 #'
-# spa_meet <- function(pgeom1, pgeom2){
-#
-#   check_spa_topological_condition(pgeom1, pgeom2)
-#
-#   countour_pgeom1 <- spa_contour(pgeom1)
-#   countour_pgeom2 <- spa_contour(pgeom2)
-#
-#   p <- spa_common_points(countour_pgeom1, countour_pgeom2, itype = "min")
-#   c <- spa_intersection(countour_pgeom1, countour_pgeom2, itype = "min")
-#
-#   p_ncomp <- spa_ncomp(p)
-#   c_ncomp <- spa_ncomp(c)
-#   p_core <- spa_core(p)
-#   c_core <- spa_core(c)
-#
-#   if((p_ncomp == 1) & !(st_is_empty(p_core)) ||
-#      (c_ncomp == 1) & !(st_is_empty(c_core))){
-#     return(1)
-#   }
-#
-#   supp_1 <- pgeom1@supp
-#   supp_2 <- pgeom2@supp
-#
-#   pgeom1_core <- spa_core(pgeom1)
-#   pgeom2_core <- spa_core(pgeom2)
-#
-#   if((st_disjoint(supp1, supp2, sparse=FALSE)[1]) ||
-#     !(st_disjoint(pgeom1_core, pgeom2_core, sparse=FALSE)[1]) ||
-#     st_touches(pgeom1_core, pgeom2_core, sparse=FALSE)[1] ||
-#     spa_exact_inside(pgeom1, pgeom2) ||
-#     spa_exact_inside(pgeom2, pgeom1) ||
-#     spa_exact_equal(pgeom1, pgeom2)){
-#
-#     return(0)
-#   }
-#
-#   meet_c <- st_touches(supp1, supp2)
-#
-#   if(#meet em ponto){
-#     return(spa_avg_degree(p))
-# }
-#
-#   if(# meet ponto e linha){
-#
-#
-#   }
-#
-#
-# }
+spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
+
+  check_spa_topological_condition(pgeom1, pgeom2)
+
+  countour_pgeom1 <- spa_contour(pgeom1)
+  countour_pgeom2 <- spa_contour(pgeom2)
+
+  p <- spa_common_points(countour_pgeom1, countour_pgeom2, itype = itype)
+  c <- spa_intersection(countour_pgeom1, countour_pgeom2, itype = itype)
+
+  p_ncomp <- spa_ncomp(p)
+  c_ncomp <- spa_ncomp(c)
+  p_core <- spa_core(p)
+  c_core <- spa_core(c)
+
+  if((p_ncomp == 1) & !(st_is_empty(p_core)) ||
+     (c_ncomp == 1) & !(st_is_empty(c_core))){
+    result <- 1
+  }
+
+  supp_1 <- pgeom1@supp
+  supp_2 <- pgeom2@supp
+
+  pgeom1_core <- spa_core(pgeom1)
+  pgeom2_core <- spa_core(pgeom2)
+
+  if((st_disjoint(supp1, supp2, sparse=FALSE)[1]) ||
+    !(st_disjoint(pgeom1_core, pgeom2_core, sparse=FALSE)[1]) ||
+    st_touches(pgeom1_core, pgeom2_core, sparse=FALSE)[1] ||
+    spa_exact_inside(pgeom1, pgeom2) ||
+    spa_exact_inside(pgeom2, pgeom1) ||
+    spa_exact_equal(pgeom1, pgeom2)){
+
+    result <- 0
+  }
+
+  if(st_relate(supp1, supp2, pattern = "F**0*****") ||
+     st_relate(supp1, supp2, pattern = "F***0****") ||
+     st_relate(supp1, supp2, pattern = "F0*******")){
+    result <- spa_avg_degree(p)
+  } else if (st_relate(supp1, supp2, pattern = "F**1*****") ||
+             st_relate(supp1, supp2, pattern = "F***1****") ||
+             st_relate(supp1, supp2, pattern = "F1*******")){
+    pgeom1_boundary <- spa_boundary_pregion(pgeom1, bound_part = 'line')
+    pgeom2_boundary <- spa_boundary_pregion(pgeom2, bound_part = 'line')
+    bl <- spa_intersection(pgeom1_boundary, pgeom2_boundary, itype = itype)
+
+    plength <- spa_length(bl)
+    length_support <- length(bl@supp)
+
+    result <- plength/length_support
+
+  } else {
+    pgeom1_boundary <- spa_boundary_pregion(pgeom1, bound_part = 'region')
+    pgeom2_boundary <- spa_boundary_pregion(pgeom2, bound_part = 'region')
+    br <- spa_intersection(pgeom1_boundary, pgeom2_boundary, itype = itype)
+    br_area <- spa_area(br)
+    area_support <- st_area(br@supp)
+
+    result <- br_area/area_support
+
+  }
+  spa_eval_relation(ret, result, ...)
+}
 
 #' @title spa_disjoint
 #' @family Spatial Plateau Topological Relationships
@@ -692,7 +711,7 @@ spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
   } else {
     result <- 1 - max(r_overlap, r_meet)
   }
-  ret_apply(ret, result, ...)
+  spa_eval_relation(ret, result, ...)
 }
 
 #' @title spa_equal
@@ -730,7 +749,7 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 
     result <- 1 - (r_spa_area/r_sfg_area)
   }
-  ret_apply(ret, result, ...)
+  spa_eval_relation(ret, result, ...)
 }
 
 #' @title spa_inside
@@ -765,7 +784,7 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 
     result <- 1 - (spa_area(r_diff)/st_area(supp_pgeom1))
   }
-  ret_apply(ret, result, ...)
+  spa_eval_relation(ret, result, ...)
 }
 
 #' @title spa_contains
@@ -797,7 +816,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.")
+    stop("Different Spatial Plateau Types.", call. = FALSE)
   }
 
   sigma <- match.fun(itype)
@@ -850,7 +869,7 @@ spa_contour <- function(pregion){
 
 
   if(pregion@type != "PLATEAUREGION"){
-    stop("pgeom must be a PLATEAUREGION type.")
+    stop("pgeom must be a PLATEAUREGION type.", call. = FALSE)
   }
 
   pregion_tibble <- pgeom_as_tibble(pregion)
@@ -888,42 +907,19 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
 spa_set_classification <- function(classes, mfs){
 
   if(!(length(classes) == length(mfs))){
-    stop("Topological classes and topological_mfs are different length.")
+    stop("Topological classes and topological_mfs are different length.", call. = FALSE)
 
   } else if(class(classes) != "character"){
-    stop("Topological_classes needs to be a 'character' type.")
+    stop("Topological_classes needs to be a 'character' type.", call. = FALSE)
 
   } else if(any(sapply(mfs, function(x) !(is.function(x))))){
-    stop("Topoligcal_mfs needs to be a list of functions.")
+    stop("Topoligcal_mfs needs to be a list of functions.", call. = FALSE)
   }
 
   pkg_env$ftopological_classes <- classes
   pkg_env$ftopological_mfs <- mfs
 }
 
-
-#' @title spa_eval_relation
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
-#' @noRd
-spa_eval_relation <- function(degree){
-
-  classes <- pkg_env$ftopological_classes
-  mfs <- pkg_env$ftopological_mfs
-
-  values_set <- list()
-  degrees <- lapply(mfs, function(mf) mf(degree))
-
-  names(degrees) <- classes
-  degrees
-}
 
 
 #' @title spa_eval_relation
@@ -1001,29 +997,32 @@ soft_alpha_eval <- function(degree, alpha){
 spa_boundary_pregion <- function(pgeom, bound_part = "region"){
 
   if(pgeom@type != "PLATEAUREGION"){
-    stop("pgeom is not a PLATEAUREGION type.")
+    stop("pgeom is not a PLATEAUREGION type.", call. = FALSE)
   }
 
-
-  if(bound_part == "region"){
-    new_pgeom <- create_empty_pgeom("PLATEAUREGION")
+  if(bound_part == "line"){
+    bpl <- create_empty_pgeom("PLATEAULINE")
     last_comp <- tail(pgeom@component)
     if(last_comp@md == 1){
       boundary_component <- st_boundary(last_comp@obj)
-      new_pgeom <- spa_add_component(new_pgeom, boundary_component)
+      comp_line <- new("component", obj = boundary_component, md=1)
+      bpl <- spa_add_component(bpl, comp_line)
     }
-
+    return(bpl)
   }
-  else if(bound_part == "line"){
-    new_pgeom <- create_empty_pgeom("PLATEAULINE")
-
-    bpl
+  else if(bound_part == "region"){
+    bpr <- create_empty_pgeom("PLATEAUREGION")
+    last_comp <- tail(pgeom@component)
+    components <- pgeom@component
+    n_comps <- spa_ncomp(pgeom)
+    if(last_comp@md == 1 && n_comps > 1){
+      bpr <- spa_add_component(bpr, head(components, n=n_comps-1))
+    }
+    return(bpr)
   }
-
   else{
-    stop("Bound part invalid.")
+    stop("Invalid 'bound_part'.", call. = FALSE)
   }
-
 }
 
 

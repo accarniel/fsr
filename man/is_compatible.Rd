@@ -2,12 +2,12 @@
 % Please edit documentation in R/utility_functions.R
 \name{is_compatible}
 \alias{is_compatible}
-\title{is_compatible}
+\title{Check compatibility of sfg object}
 \usage{
-is_compatible(component, type)
+is_compatible(sfg, ptype)
 }
 \arguments{
-\item{high}{}
+\item{type}{}
 }
 \value{
 

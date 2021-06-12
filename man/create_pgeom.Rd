@@ -7,14 +7,19 @@
 create_pgeom(components, type)
 }
 \arguments{
-\item{type}{}
+\item{components}{A list, tibble or dataframe of componenets.}
+
+\item{type}{The type of Spatial Plateau Geometry Object to be created.}
 }
 \value{
-
+An pgeom class object.
 }
 \description{
-
+Create an object of class pgeom (Plateau Geomtry)
 }
 \examples{
 
+}
+\seealso{
+\code{\link{create_component}}
 }

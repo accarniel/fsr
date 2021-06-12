@@ -2,7 +2,7 @@
 #'
 #' @slot obj A sf data type
 #' @slot md A membership degree of the component
-
+#' @import sf
 setClass("component",
          slots = list(
            obj = "XY",

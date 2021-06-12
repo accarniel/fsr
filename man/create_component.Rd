@@ -2,19 +2,72 @@
 % Please edit documentation in R/utility_functions.R
 \name{create_component}
 \alias{create_component}
-\title{create_component}
+\title{Create a Component of Spatial Plateau Geometry}
 \usage{
 create_component(raw_obj, md, type)
 }
 \arguments{
-\item{type}{}
+\item{raw_obj}{Vector, list or matrix containing the points to create a sfg object.}
+
+\item{md}{Component Membership Degree.}
+
+\item{type}{Spatial Feature Geometric to create.}
 }
 \value{
-
+A object of class "component".
 }
 \description{
+Create an object composed by a Spatial Feature Geometry (sfg) and a Membership Degree.
+}
+\details{
+A component class is a object composed by 2 slots: (1) a Crisp spatial object (sfg)
+and a Membership Degree associated to this object, in the interval ]0,1].
 
+The types "POINT", "LINE" and "REGION" are related to Spatial Plateau Point,
+Spatial Plateau Line and Spatial Plateau Region. For each input type, we have the
+following sfg objects created:
+\itemize{
+\item{"POINT"}{ If raw_obj is a vector of single points, }
+\item{"LINE"}{ If raw_obj is a vector of single points, }
+\item{"REGION"}{ If raw_obj is a vector of single points, }
+}
 }
 \examples{
+
+# Creating a POINT component type
+v1 = rbind(c(1,2), c(3,4))
+v2 = rbind(c(1,4), c(2,3),c(4,4))
+
+md1 = 0.2
+md2 = 0.1
+
+comp1 <- create_component(v1, md1, type="POINT")
+comp2 <- create_component(v2, md2, type="POINT")
+
+# Creating a LINE component type
+
+md3 = 0.45
+md4 = 0.32
+
+v3 = rbind(c(2,2), c(3,3))
+v4 = rbind(c(1,1), c(3,2))
+
+comp3 <- create_component(v3, md3, type="LINE")
+comp4 <- create_component(v4, md4, type="LINE")
+
+# Creating a REGION component type
+
+p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+list_pols_1 <- list(p1,p2)
+
+
+p3 <- rbind(c(1,0), c(2,0), c(4,2), c(3,4), c(2,4), c(1,0))
+p4 <- rbind(c(2,2), c(2,3), c(3,4), c(2,2))
+list_pols_2 <- list(p3,p4)
+
+comp_pol1 <- create_component(list_pols_1, 0.4, "REGION")
+comp_pol2 <- create_component(list_pols_2, 0.6, "REGION")
+
 
 }

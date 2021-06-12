@@ -1,5 +1,5 @@
-# SpatialFuzzyR 1.0.0
+# fsr 1.0.0
 
-* Added a `NEWS.md` file to track changes to the package.
+* This is the first release of fsr
 
-* Added the first support for plateau spatial data types and basic operations
+* Added the functions belonging to the Fuzzy Spatial Inference Module

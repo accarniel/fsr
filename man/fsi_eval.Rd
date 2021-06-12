@@ -4,7 +4,7 @@
 \alias{fsi_eval}
 \title{fsi_eval}
 \usage{
-fsi_eval(fsi, p)
+fsi_eval(fsi, point, ...)
 }
 \arguments{
 \item{p}{}
