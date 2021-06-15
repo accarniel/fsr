@@ -40,8 +40,8 @@ setClass("pgeom",
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
-#'
 pgeom_to_pwkt <- function(pgeom) {
 
   if(pgeom_is_empty(pgeom)){

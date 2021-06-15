@@ -222,7 +222,7 @@ spa_length <- function(pgeom){
     length_obj * md_comp
   }
 
-  components_lenghts <- unlist(lapply(spo@component, length_comp))
+  components_lenghts <- unlist(lapply(pgeom@component, length_comp))
   sum(components_lenghts)
 }
 
@@ -236,6 +236,7 @@ spa_length <- function(pgeom){
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
 #'
 spa_perimeter <- function(pgeom){
@@ -265,6 +266,7 @@ spa_perimeter <- function(pgeom){
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
 #'
 spa_intersection <- function(pgeom1, pgeom2, itype="min"){
@@ -313,8 +315,8 @@ spa_intersection <- function(pgeom1, pgeom2, itype="min"){
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
-#'
 #'
 spa_union <- function(pgeom1, pgeom2, utype="max"){
 
@@ -374,8 +376,8 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
-#'
 spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
 
   if(pgeom1@type != pgeom2@type){
@@ -444,8 +446,8 @@ spa_support <- function(pgeom){
 #' @return
 #' @examples
 #'
+#' @import sf utils
 #' @export
-#'
 #'
 spa_core <- function(pgeom){
 
@@ -473,8 +475,8 @@ spa_core <- function(pgeom){
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
-#'
 #'
 spa_exact_equal <- function(pgeom1, pgeom2){
 
@@ -637,7 +639,7 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
   pgeom1_core <- spa_core(pgeom1)
   pgeom2_core <- spa_core(pgeom2)
 
-  if((st_disjoint(supp1, supp2, sparse=FALSE)[1]) ||
+  if((st_disjoint(supp_1, supp_2, sparse=FALSE)[1]) ||
     !(st_disjoint(pgeom1_core, pgeom2_core, sparse=FALSE)[1]) ||
     st_touches(pgeom1_core, pgeom2_core, sparse=FALSE)[1] ||
     spa_exact_inside(pgeom1, pgeom2) ||
@@ -647,13 +649,13 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
     result <- 0
   }
 
-  if(st_relate(supp1, supp2, pattern = "F**0*****") ||
-     st_relate(supp1, supp2, pattern = "F***0****") ||
-     st_relate(supp1, supp2, pattern = "F0*******")){
+  if(st_relate(supp_1, supp_2, pattern = "F**0*****") ||
+     st_relate(supp_1, supp_2, pattern = "F***0****") ||
+     st_relate(supp_1, supp_2, pattern = "F0*******")){
     result <- spa_avg_degree(p)
-  } else if (st_relate(supp1, supp2, pattern = "F**1*****") ||
-             st_relate(supp1, supp2, pattern = "F***1****") ||
-             st_relate(supp1, supp2, pattern = "F1*******")){
+  } else if (st_relate(supp_1, supp_2, pattern = "F**1*****") ||
+             st_relate(supp_1, supp_2, pattern = "F***1****") ||
+             st_relate(supp_1, supp_2, pattern = "F1*******")){
     pgeom1_boundary <- spa_boundary_pregion(pgeom1, bound_part = 'line')
     pgeom2_boundary <- spa_boundary_pregion(pgeom2, bound_part = 'line')
     bl <- spa_intersection(pgeom1_boundary, pgeom2_boundary, itype = itype)
@@ -812,6 +814,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' @return
 #' @examples
 #'
+#' @import sf methods
 #' @export
 spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 
@@ -835,13 +838,12 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
-      # check geom and pgeom
-      if(!st_is_empty(sfg) && st_geometry_type(sfg) %in% c("POINT", "MULTIPOINT")){
-        result_comp <- new("component", obj = sfg, md = md)
+      if(!st_is_empty(sf_result) && st_geometry_type(sf_result) %in% c("POINT", "MULTIPOINT")){
+        result_comp <- new("component", obj = sf_result, md = result_md)
         lcomps <- append(lcomps, result_comp)
-      } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
-        type_geom = get_counter_ctype(pgeom)
-        result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = "POINT"))[[1]], md = md)
+      } else if(!st_is_empty(sf_result) && st_geometry_type(sf_result) == "GEOMETRYCOLLECTION") {
+        type_geom = get_counter_ctype(pgeom1)
+        result_comp <- new("component", obj = st_union(st_collection_extract(sf_result, type = "POINT"))[[1]], md = result_md)
         lcomps <- append(lcomps, result_comp)
       }
     }
@@ -864,6 +866,7 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 #' @return
 #' @examples
 #'
+#' @import  sf
 #' @export
 spa_contour <- function(pregion){
 
@@ -881,8 +884,6 @@ spa_contour <- function(pregion){
 
 
 pkg_env <- new.env()
-
-
 pkg_env$ftopological_classes <- c("a little bit", "somewhat", "slightly", "averagely", "mostly","quite")
 
 pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
@@ -992,8 +993,8 @@ soft_alpha_eval <- function(degree, alpha){
 #' @return
 #' @examples
 #'
+#' @import methods utils
 #' @export
-#'
 spa_boundary_pregion <- function(pgeom, bound_part = "region"){
 
   if(pgeom@type != "PLATEAUREGION"){
