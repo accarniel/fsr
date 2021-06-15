@@ -21,7 +21,7 @@
 #' hot_mf <- genmf("trimf", c(35, 50, 100))
 #' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
 #' fsp
-#'
+#' @import tidyverse
 #' @noRd
 fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
   if(length(classes) != length(mfs)) {
@@ -137,6 +137,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 #' del2 <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = ch)
 #' del2
 #'
+#' @import sf
 #' @noRd
 voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
   # it follows the example in https://r-spatial.github.io/sf/reference/geos_unary.html
@@ -185,6 +186,7 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
 #'
 #' voronoi_diagram_policy(fsp, base_poly = ch)
 #'
+#' @import sf tidyverse
 #' @noRd
 voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
   pts <- st_as_sf(lp, coords = c(1, 2))
@@ -240,6 +242,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #'
 #' delaunay_triangulation_policy(fsp, base_poly = ch)
 #'
+#' @import sf tidyverse methods
 #' @noRd
 delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, ...) {
   #should we validate the possible acceptable functions?

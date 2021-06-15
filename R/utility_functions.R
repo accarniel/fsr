@@ -71,9 +71,8 @@
 #' comp_pol1 <- create_component(list_pols_1, 0.4, "REGION")
 #' comp_pol2 <- create_component(list_pols_2, 0.6, "REGION")
 #'
-#'
+#' @import sf methods
 #' @export
-#'
 create_component <- function(raw_obj, md, type){
 
   if(type=="POINT"){
@@ -123,8 +122,8 @@ create_component <- function(raw_obj, md, type){
 #' pgeom_line <- create_empty_pgeom("PLATEAULINE")
 #' pgeom_region <- create_empty_pgeom("PLATEAUREGION")
 #'
+#' @import sf methods
 #' @export
-#'
 component_from_sfg <- function(sfg, md){
 
   possible_geometries = c("sfc_POINT",
@@ -157,7 +156,7 @@ component_from_sfg <- function(sfg, md){
 #' pgeom_point <- create_empty_pgeom("PLATEAUPOINT")
 #' pgeom_line <- create_empty_pgeom("PLATEAULINE")
 #' pgeom_region <- create_empty_pgeom("PLATEAUREGION")
-#' @import sf
+#' @import sf methods
 #' @export
 create_empty_pgeom <- function(type){
 
@@ -192,8 +191,8 @@ create_empty_pgeom <- function(type){
 #' @examples
 #'
 #' @seealso \code{\link{create_component}}
+#' @import sf tidyverse
 #' @export
-#'
 create_pgeom <- function(components, type){
 
   type = toupper(type)
@@ -222,7 +221,7 @@ create_pgeom <- function(components, type){
       supp = st_union(st_sfc(obj_sf))
     }
 
-    else if(inherits(components, "data.frame") || inherits(df, "tibble")){
+    else if(inherits(components, "data.frame") || inherits(components, "tibble")){
       new_df <- arrange(components, components[1])
       new_components = vector("list", nrow(new_df))
 
@@ -251,8 +250,8 @@ create_pgeom <- function(components, type){
 #' A tibble object with two columns: md and geometry
 #' @examples
 #'
+#' @import sf tidyverse
 #' @export
-#'
 pgeom_as_tibble <- function(pgeom){
 
   get_md <- function(comp){
@@ -291,12 +290,9 @@ pgeom_as_tibble <- function(pgeom){
 #'
 #' @examples
 #'
-#' md_index <- search_by_md(components= toydata, low = 1, high = 10, md=0.4)
 #'
-#'
-#'
+#' @import tidyverse
 #' @export
-#'
 search_by_md <- function(components, low, high, m){
 
 
@@ -304,7 +300,7 @@ search_by_md <- function(components, low, high, m){
 
     mid = floor((low + high)/2)
 
-    if(dplyr::near(m, components[[mid]]@md)){
+    if(near(m, components[[mid]]@md)){
       return(c(TRUE,mid))
     }
 
@@ -321,8 +317,6 @@ search_by_md <- function(components, low, high, m){
 }
 
 
-
-
 #' @title pgeom_plot
 #'
 #' @description
@@ -335,8 +329,8 @@ search_by_md <- function(components, low, high, m){
 #' @return
 #' @examples
 #'
+#' @import sf tidyverse
 #' @export
-#'
 pgeom_plot <- function(pgeom,  base_poly = NULL, low = "white", high = "black", palette = "Greys", m = 10, ...){
 
   pgeom_tibble <- pgeom_as_tibble(pgeom)
@@ -408,6 +402,7 @@ pgeom_plot <- function(pgeom,  base_poly = NULL, low = "white", high = "black", 
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
 #'
 is_compatible <- function(sfg, ptype){
@@ -474,6 +469,7 @@ is_pgeom <- function(type){
 #' @return
 #' @examples
 #'
+#' @import sf
 #' @export
 #'
 pgeom_is_empty <- function(pgeom){
@@ -518,6 +514,7 @@ get_counter_ctype <- function(pgeom){
 #' @return
 #' @examples
 #'
+#' @import sf methods
 #' @noRd
 check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
   if(!st_is_empty(sfg) && is_compatible(sfg, pgeom@type)){
@@ -531,7 +528,6 @@ check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
   lcomps
 }
 
-########################################################################
 
 #' @title f_diff
 #' @family Fuzzy Difference Operators

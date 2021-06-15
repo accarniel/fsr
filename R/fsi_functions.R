@@ -92,6 +92,7 @@ fsi_add_cs <- function(fsi, lvar, lvals, mfs, bounds) {
 #' @param user_rule Input rule specified by the user
 #' @param logical_op_ant Logical operator for antecedents. Default value is NULL (there is only one antecedent)
 #' @return A list of linguistic variable and its value from the antecedent(s) of the rule
+#' @import tidyverse
 #' @noRd
 get_antecedents <- function(user_rule) {
   us_rule <- str_to_lower(user_rule)
@@ -184,6 +185,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' @return
 #' @examples
 #'
+#' @import tidyverse FuzzyR
 #' @export
 fsi_eval <- function(fsi, point, ...) {
   discret_by <- 0.5
@@ -304,7 +306,7 @@ fsi_eval <- function(fsi, point, ...) {
   defuzz(conseq_values, result_fsi, fsi$defuzz_method)
 }
 
-
+#' @import sf tidyverse pso
 #' @noRd
 fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
   if(!(is.null(n_col) && is.null(n_row))) {
@@ -382,6 +384,8 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
   }
 }
 
+
+#' @import tidyverse
 #' @export
 fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
   params <- list(...)

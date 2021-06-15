@@ -8,7 +8,9 @@ Authors@R: c(
     person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("aut")))
 URL: https://github.com/accarniel/fsr
 Depends: R (>= 3.6.0),
-         e1071 (>= 1.7.3)
+         e1071 (>= 1.7.3),
+         utils (>= 3.6.3),
+         lwgeom (>= 0.2.6)
 Imports: methods (>= 2.0.0),
          sf (>= 0.9.4), 
          FuzzyR (>= 2.3.0), 
@@ -16,12 +18,12 @@ Imports: methods (>= 2.0.0),
          pso (>= 1.0.3)
 Description: A package based on Spatial Plateau Algebra concepts(Carniel & Schneider 2017), which 
     applies the Fuzzy Set Logic on spatial data types
-License: GPL 3
+License: GPL-3
 LazyData: TRUE
 RoxygenNote: 7.1.1
 NeedsCompilation: no
 Encoding: UTF-8
 Collate: 'fsr_base.R''utility_functions.R''spa_functions.R''fsi_functions.R''builder_functions.R'
 Suggests: 
-    e1071
-VignetteBuilder: knitr
+    knitr
+
