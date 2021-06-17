@@ -1,7 +1,8 @@
-#' An S4 Class for Spatial Plateau Component
+#' An S4 Class for representing a component of a spatial plateau object
 #'
 #' @slot obj A sf data type
 #' @slot md A membership degree of the component
+#' 
 #' @import sf
 setClass("component",
          slots = list(
@@ -10,12 +11,11 @@ setClass("component",
          )
 )
 
-
-#' An S4 Class for a Spatial Plateau data type
+#' An S4 Class for representing a spatial plateau object
 #'
-#' @slot component A length-one numeric vector
-#' @slot supp A sfc object storing the union of all components
-#' @slot type Plateau Geometry Type
+#' @slot component A list of components
+#' @slot supp An sfg object that stores the union of spatial objects of the components of the spatial plateau object
+#' @slot type The data type of the spatial plateau object
 setClass("pgeom",
          slots = list(
            component = "list",
@@ -24,22 +24,6 @@ setClass("pgeom",
          )
 )
 
-
-##### Funções Modificadoras (redefinem funções do R)
-
-
-
-
-#' @title pgeom_to_pwkt
-#'
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf
 #' @export
 pgeom_to_pwkt <- function(pgeom) {
@@ -58,8 +42,6 @@ pgeom_to_pwkt <- function(pgeom) {
   l
 }
 
-
-
 format.pgeom <- function(x, ...) {
   pgeom_to_pwkt(x)
 }
@@ -72,25 +54,12 @@ setMethod("as.character", "pgeom", function(x, ...) {
   pgeom_to_pwkt(x)
 })
 
-
 setMethod("plot", "pgeom", function(x, ...) {
   pgeom_plot(x, ...)
 })
-
 
 as.data.frame.pgeom <-
   function(x, row.names=NULL, optional=FALSE, ...)
   {
     as.data.frame(pgeom_as_tibble(x))
   }
-
-
-
-
-
-
-
-
-
-
-

@@ -12,7 +12,7 @@
 #'
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
-#' @example
+#' @examples
 #'
 #' set.seed(7)
 #' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
@@ -21,11 +21,12 @@
 #' hot_mf <- genmf("trimf", c(35, 50, 100))
 #' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
 #' fsp
-#' @import tidyverse
+#' 
+#' @import tibble dplyr
 #' @noRd
 fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
   if(length(classes) != length(mfs)) {
-    stop("The length of classes and mfs must be equal.", call. = FALSE)
+    stop("The length of classes and mfs have to be equal.", call. = FALSE)
   }
 
   result <- tibble(x = as.numeric(tbl[[1]]),
@@ -56,7 +57,7 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
 #'
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
-#' @example
+#' @examples
 #'
 #' library(e1071)
 #' set.seed(7)
@@ -65,6 +66,7 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
 #' fcp
 #'
 #' @importFrom e1071 cmeans cshell
+#' @import tibble dplyr
 #' @noRd
 fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALSE, iter = 100, ...) {
   #the needed package (in the future, it is better to implement our own fuzzy clustering algorithms)
@@ -117,7 +119,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 #'
 #' @return an `sfc` object with the generated polygons (voronoi cells or triangles)
 #'
-#' @example
+#' @examples
 #'
 #' set.seed(7)
 #' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
@@ -169,7 +171,7 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
 #'
 #' @return a tibble in the format (classes, pgeoms)
 #'
-#' @example
+#' @examples
 #'
 #' set.seed(7)
 #' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
@@ -186,7 +188,7 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
 #'
 #' voronoi_diagram_policy(fsp, base_poly = ch)
 #'
-#' @import sf tidyverse
+#' @import sf tibble
 #' @noRd
 voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
   pts <- st_as_sf(lp, coords = c(1, 2))
@@ -225,7 +227,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #' @details Note that it is possible to use its own t-norms. A t-norm should has the following signature:
 #' FUN(x) where x is a numeric vector. Such a function should return a single numeric value.
 #'
-#' @example
+#' @examples
 #'
 #' set.seed(7)
 #' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
@@ -242,7 +244,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #'
 #' delaunay_triangulation_policy(fsp, base_poly = ch)
 #'
-#' @import sf tidyverse methods
+#' @import sf methods tibble
 #' @noRd
 delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, ...) {
   #should we validate the possible acceptable functions?
@@ -283,7 +285,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #'
 #' @details
 #'
-#' It follows the two-stage construction systematic approach described in [1].
+#' It follows the two-stage construction systematic approach described [here](https://doi.org/10.1109/FUZZ-IEEE.2019.8858878).
 #'
 #' The input `tbl` is a point dataset where each point represents the location of a phenomenon treated by the application.
 #' Further, each point is annotated with numerical data that describe its meaning in the application.
@@ -324,22 +326,21 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #'
 #' @references
 #'
-#' [1] Carniel, A. C.; Schneider, M.
-#' A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets.
-#' In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.
-#' <https://doi.org/10.1109/FUZZ-IEEE.2019.8858878>
+#' [Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.](https://doi.org/10.1109/FUZZ-IEEE.2019.8858878)
 #'
-#' @seealso
+#' @examples
 #'
-#' create_empty_pgeom
-#'
-#' @example
-#'
+#' library(tibble)
+#' library(FuzzyR)
+#' 
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#'              y = runif(10, min = 0, max = 50), 
+#'              z = runif(10, min = 0, max = 100))
 #' classes <- c("cold", "hot")
 #' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
 #' hot_mf <- genmf("trimf", c(35, 50, 100))
+#' 
 #' spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf))
 #'
 #' spa_creator(tbl, fuzz_policy = "fcp", k = 4)

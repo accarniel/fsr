@@ -3,9 +3,9 @@
 \docType{class}
 \name{component-class}
 \alias{component-class}
-\title{An S4 Class for Spatial Plateau Component}
+\title{An S4 Class for representing a component of a spatial plateau object}
 \description{
-An S4 Class for Spatial Plateau Component
+An S4 Class for representing a component of a spatial plateau object
 }
 \section{Slots}{
 

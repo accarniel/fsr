@@ -1,21 +1,4 @@
 
-#' @title fsi_create
-#'
-#' @description
-#'
-#'
-#' @param name
-#' @param fsi_type
-#' @param and_method
-#' @param or_method
-#' @param default_conseq optional. If...MUST be a membership function (something returned by genmf)
-#' @imp_method
-#' @agg_method
-#' @defuzz_method
-#'
-#' @return
-#' @examples
-#'
 #' @export
 fsi_create <- function(name, and_method = "min",
                     or_method = "max", imp_method = "min", agg_method = "max",
@@ -27,20 +10,6 @@ fsi_create <- function(name, and_method = "min",
   fsi
 }
 
-
-
-#' @title fsi_add_fsa
-#'
-#' @description
-#'
-#'
-#' @param fsi
-#' @param p
-#'
-#'
-#' @return
-#' @examples
-#'
 #' @export
 fsi_add_fsa <- function(fsi, lvar, tbl) {
   if(nrow(tbl) <= 0) {
@@ -56,18 +25,6 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
   fsi
 }
 
-#' @title fsi_add_cs
-#'
-#' @description
-#'
-#'
-#' @param fsi
-#' @param p
-#'
-#'
-#' @return
-#' @examples
-#'
 #' @export
 fsi_add_cs <- function(fsi, lvar, lvals, mfs, bounds) {
   if(length(lvals) != length(mfs)) {
@@ -78,7 +35,7 @@ fsi_add_cs <- function(fsi, lvar, lvals, mfs, bounds) {
   fsi
 }
 
-#' Get antecedent(s) from an input rule specified by the user.
+#' Get each part of the antecedent from a fuzzy rule specified by the user.
 #'
 #' This function extracts the linguistic variable and its value from an input rule.
 #' The rule must be in the following pattern:
@@ -86,13 +43,14 @@ fsi_add_cs <- function(fsi, lvar, lvals, mfs, bounds) {
 #' Example:
 #' IF hotel is affordable AND attraction is free THEN visiting is accessible
 #' Pay attention that there is no punctuation in the rule.
-#' The rule can use only one type of logical operator at a time (e.g. antecedents connected only by AND or only by OR).
-#' A rule can have one or more antecedents.
+#' The rule can use only one type of logical operator at a time (e.g. parts of the antecedents connected either by AND or by OR).
+#' A rule can have one or more parts of antecedents.
 #'
-#' @param user_rule Input rule specified by the user
-#' @param logical_op_ant Logical operator for antecedents. Default value is NULL (there is only one antecedent)
-#' @return A list of linguistic variable and its value from the antecedent(s) of the rule
-#' @import tidyverse
+#' @param user_rule Fuzzy rule specified by the user
+#' @param logical_op_ant Logical operator of the antecedent. Default value is NULL (there is only one antecedent)
+#' @return A list of linguistic variables and their values from the antecedent of the rule
+#' 
+#' @import stringr
 #' @noRd
 get_antecedents <- function(user_rule) {
   us_rule <- str_to_lower(user_rule)
@@ -131,7 +89,7 @@ get_antecedents <- function(user_rule) {
   list(ants=ant, op=lant)
 }
 
-
+#' @import stringr
 #' @noRd
 get_consequent <- function(user_rule) {
   us_rule <- str_to_lower(user_rule)
@@ -143,23 +101,10 @@ get_consequent <- function(user_rule) {
   return(conseq)
 }
 
-
-#' @title fsi_add_rules
-#'
-#' @description
-#'
-#'
-#' @param fsi
-#' @param p
-#'
-#'
-#' @return
-#' @examples
-#'
 #' @export
 fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   if (length(rules) != length(weights)) {
-    stop("The lengths of parameters for rules and weights should be equal", call. = FALSE)
+    stop("The length of parameters for rules and weights have to be equal", call. = FALSE)
   }
   i <- 1
   for(ur in rules) {
@@ -173,19 +118,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   fsi
 }
 
-#' @title fsi_eval
-#'
-#' @description
-#'
-#'
-#' @param fsi
-#' @param p
-#'
-#'
-#' @return
-#' @examples
-#'
-#' @import tidyverse FuzzyR
+#' @import tibble FuzzyR
 #' @export
 fsi_eval <- function(fsi, point, ...) {
   discret_by <- 0.5
@@ -306,7 +239,7 @@ fsi_eval <- function(fsi, point, ...) {
   defuzz(conseq_values, result_fsi, fsi$defuzz_method)
 }
 
-#' @import sf tidyverse pso
+#' @import sf tibble
 #' @noRd
 fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
   if(!(is.null(n_col) && is.null(n_row))) {
@@ -326,6 +259,7 @@ fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
   tibble(points = regular_grid_points, inferred_values = qw_inference_grid_output)
 }
 
+#' @import sf pso tibble
 #' @noRd
 fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, population = 10, convergence = Inf,
                         what = "max", stats_output = FALSE) {
@@ -385,7 +319,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 }
 
 
-#' @import tidyverse
+#' @import utils dplyr
 #' @export
 fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
   params <- list(...)

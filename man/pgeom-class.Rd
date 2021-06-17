@@ -3,17 +3,17 @@
 \docType{class}
 \name{pgeom-class}
 \alias{pgeom-class}
-\title{An S4 Class for a Spatial Plateau data type}
+\title{An S4 Class for representing a spatial plateau object}
 \description{
-An S4 Class for a Spatial Plateau data type
+An S4 Class for representing a spatial plateau object
 }
 \section{Slots}{
 
 \describe{
-\item{\code{component}}{A length-one numeric vector}
+\item{\code{component}}{A list of components}
 
-\item{\code{supp}}{A sfc object storing the union of all components}
+\item{\code{supp}}{An sfg object that stores the union of spatial objects of the components of the spatial plateau object}
 
-\item{\code{type}}{Plateau Geometry Type}
+\item{\code{type}}{The data type of the spatial plateau object}
 }}
 

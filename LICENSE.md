@@ -553,7 +553,7 @@ and each file should have at least the “copyright” line and a pointer to
 where the full notice is found.
 
     <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) 2021 Anderson Chaves Carniel, Felippe Galdino Silva, Juliana Philippsen
+    Copyright (C) 2021 Anderson Chaves Carniel, Felippe Galdino Silva, Juliana Strieder Philippsen
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

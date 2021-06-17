@@ -1,31 +1,4 @@
-#' @title spa_add_component
-#'
-#' @description
-#'
-#' @usage
-#' spa_add_component()
-#' @param spo
-#' @param component
-#'
-#' @details Implementation of \eqn{\alpha}
-#'
-#' @return
-#'
-#'
-#' @references
-#' Carniel, A. C.; Schneider, M.
-#' Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types.
-#' In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems
-#' (FUZZ-IEEE 2018), pp. 1-8, 2018. <https://doi.org/10.1109/FUZZ-IEEE.2018.8491565>
-#'
-#' @seealso
-#'
-#' @examples
-#'
-#' ### exemple 1...
-#'
-#' ### example 2...
-#'
+#' @import sf
 #' @export
 spa_add_component <- function(pgeom_obj, components) {
   if(is.null(pgeom_obj)){
@@ -83,20 +56,8 @@ spa_add_component <- function(pgeom_obj, components) {
   pgeom_obj
 }
 
-
-
-#' @title spa_eval
-#'
-#' @description
-#'
-#'
-#' @param comp
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_eval <- function(obj, point = NA){
   if(inherits(obj, "component")){
     obj@md
@@ -131,20 +92,8 @@ spa_eval <- function(obj, point = NA){
   }
 }
 
-
-#' @title spa_avg_degree
-#' @family Spatial Plateau Metric Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @export
 spa_avg_degree <- function(pgeom){
-
   get_md <- function(comp){
     comp@md
   }
@@ -152,39 +101,17 @@ spa_avg_degree <- function(pgeom){
   mean(mds_vec)
 }
 
-
-#' @title spa_ncomp
-#' @family Spatial Plateau Metric Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @export
-#'
 spa_ncomp <- function(pgeom){
   length(pgeom@component)
 }
 
-#' @title spa_area
-#' @family Spatial Plateau Metric Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_area <- function(pgeom){
 
   if(pgeom@type!='PLATEAUREGION'){
-    stop("Not PLATEAUREGION pgeom.", call. = FALSE)
+    stop("This type is not a PLATEAUREGION object.", call. = FALSE)
   }
 
   area_comp <- function(comp){
@@ -197,23 +124,12 @@ spa_area <- function(pgeom){
   sum(comps_areas)
 }
 
-
-#' @title spa_length
-#' @family Spatial Plateau Metric Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_length <- function(pgeom){
 
   if(pgeom@type!='PLATEAULINE'){
-    stop("Not PLATEAULINE pgeom.", call. = FALSE)
+    stop("This type is not a PLATEAULINE object.", call. = FALSE)
   }
 
   length_comp <- function(comp){
@@ -226,19 +142,8 @@ spa_length <- function(pgeom){
   sum(components_lenghts)
 }
 
-#' @title spa_perimeter
-#' @family Spatial Plateau Metric Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
-#' @import sf
+#' @import sf lwgeom
 #' @export
-#'
 spa_perimeter <- function(pgeom){
 
   if(pgeom@type!='PLATEAUREGION'){
@@ -257,22 +162,12 @@ spa_perimeter <- function(pgeom){
   sum(comps_perimeter)
 }
 
-#' @title spa_intersection
-#' @family Spatial Plateau Set Operations
-#' @description
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf
 #' @export
-#'
 spa_intersection <- function(pgeom1, pgeom2, itype="min"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.", call. = FALSE)
+    stop("Different spatial plateau data types.", call. = FALSE)
   }
 
   sigma <- match.fun(itype)
@@ -303,25 +198,12 @@ spa_intersection <- function(pgeom1, pgeom2, itype="min"){
   }
 }
 
-
-
-#' @title spa_union
-#' @family Spatial Plateau Set Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf
 #' @export
-#'
 spa_union <- function(pgeom1, pgeom2, utype="max"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.", call. = FALSE)
+    stop("Different spatial plateau data types.", call. = FALSE)
   }
 
   tau <- match.fun(utype)
@@ -366,22 +248,12 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
   }
 }
 
-#' @title spa_difference
-#' @family Spatial Plateau Set Operations
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf
 #' @export
 spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
 
   if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.", call. = FALSE)
+    stop("Different spatial plateau data types.", call. = FALSE)
   }
 
   nu <- match.fun(dtype)
@@ -418,37 +290,13 @@ spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
   }
 }
 
-
-#' @title spa_support
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @export
-#'
-#'
 spa_support <- function(pgeom){
   return(pgeom@supp)
 }
 
-#' @title spa_core
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf utils
 #' @export
-#'
 spa_core <- function(pgeom){
 
   last_comp <- tail(pgeom@component)
@@ -465,19 +313,8 @@ spa_core <- function(pgeom){
   sfg_obj
 }
 
-#' @title spa_exact_equal
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf
 #' @export
-#'
 spa_exact_equal <- function(pgeom1, pgeom2){
 
   comp_check <- function(comp1, comp2){
@@ -497,43 +334,46 @@ spa_exact_equal <- function(pgeom1, pgeom2){
         return(FALSE)
       }
     }
-    # to do - improve comparison method
   }
   return(TRUE)
 }
 
-
-#' @title spa_exact_inside
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @export
-#'
-#'
 spa_exact_inside <- function(pgeom1, pgeom2){
   spa_exact_equal(spa_intersection(pgeom1, pgeom2), pgeom1)
 }
 
+#' @noRd
+spa_eval_relation <- function(ret, result, ...){
+  
+  aux_function <- function(degree){
+    classes <- pkg_env$ftopological_classes
+    mfs <- pkg_env$ftopological_mfs
+    
+    values_set <- list()
+    degrees <- lapply(mfs, function(mf) mf(degree))
+    names(degrees) <- classes
+    degrees
+  }
+  
+  args <- list(...)
+  switch(ret,
+         degree = return(result),
+         list = return(aux_function(result)),
+         bool = {
+           list_res <- aux_function(result)
+           if(!("eval_mode" %in% names(args) & "lval" %in% names(args))){
+             stop("args not supplied. 'eval_mode' and 'lval' needed for bool result type", call. = FALSE)
+           }
+           e_mode <- match.fun(args$eval_mode)
+           term <- args$lval
+           return(e_mode(list_res[[term]]))
+         },
+         stop("Return type does not exist.", call. = FALSE))
+}
 
-
-#' @title spa_overlap
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
@@ -560,59 +400,8 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 
 }
 
-#' @title spa_overlap
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
-#'
-#' @noRd
-spa_eval_relation <- function(ret, result, ...){
-
-  aux_function <- function(degree){
-    classes <- pkg_env$ftopological_classes
-    mfs <- pkg_env$ftopological_mfs
-
-    values_set <- list()
-    degrees <- lapply(mfs, function(mf) mf(degree))
-    names(degrees) <- classes
-    degrees
-  }
-
-  args <- list(...)
-  switch(ret,
-         degree = return(result),
-         list = return(aux_function(result)),
-         bool = {
-           list_res <- aux_function(result)
-           if(!("eval_mode" %in% names(args) & "lval" %in% names(args))){
-             stop("args not supplied. 'eval_mode' and 'lval' needed for bool result type", call. = FALSE)
-           }
-           e_mode <- match.fun(args$eval_mode)
-           term <- args$lval
-           return(e_mode(list_res[[term]]))
-         },
-         stop("Return type does not exist.", call. = FALSE))
-}
-
-
-#' @title spa_meet
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
@@ -678,18 +467,8 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
   spa_eval_relation(ret, result, ...)
 }
 
-#' @title spa_disjoint
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
@@ -716,18 +495,8 @@ spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
   spa_eval_relation(ret, result, ...)
 }
 
-#' @title spa_equal
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
-#'
 spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgeom1, pgeom2)
@@ -754,16 +523,7 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   spa_eval_relation(ret, result, ...)
 }
 
-#' @title spa_inside
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
+#' @import sf
 #' @export
 spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 
@@ -789,31 +549,11 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   spa_eval_relation(ret, result, ...)
 }
 
-#' @title spa_contains
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @export
 spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   spa_inside(pgeom2, pgeom1, utype = utype, ret = 'degree', ...)
 }
 
-#' @title spa_common_points
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import sf methods
 #' @export
 spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
@@ -856,21 +596,9 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
   }
 }
 
-#' @title spa_contour
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @import  sf
 #' @export
 spa_contour <- function(pregion){
-
-
   if(pregion@type != "PLATEAUREGION"){
     stop("pgeom must be a PLATEAUREGION type.", call. = FALSE)
   }
@@ -882,7 +610,6 @@ spa_contour <- function(pregion){
   create_pgeom(pregion_df[,c(1,3)], "PLATEAULINE")
 }
 
-
 pkg_env <- new.env()
 pkg_env$ftopological_classes <- c("a little bit", "somewhat", "slightly", "averagely", "mostly","quite")
 
@@ -893,112 +620,47 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
                               FuzzyR::genmf("trapmf", c(2.7, 3.1, 3.6, 3.9)),
                               FuzzyR::genmf("trapmf", c(3.8, 4.1, 4.5, 4.5)))
 
-
-#' @title spa_set_classification
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @export
 spa_set_classification <- function(classes, mfs){
 
   if(!(length(classes) == length(mfs))){
-    stop("Topological classes and topological_mfs are different length.", call. = FALSE)
-
+    stop("Classes and topological_mfs have different lengths.", call. = FALSE)
   } else if(class(classes) != "character"){
-    stop("Topological_classes needs to be a 'character' type.", call. = FALSE)
-
+    stop("Classes need to be a character vector.", call. = FALSE)
   } else if(any(sapply(mfs, function(x) !(is.function(x))))){
-    stop("Topoligcal_mfs needs to be a list of functions.", call. = FALSE)
+    stop("The parameter mfs have to be a list of functions (generated by FuzzyR::genmf).", call. = FALSE)
   }
 
   pkg_env$ftopological_classes <- classes
   pkg_env$ftopological_mfs <- mfs
 }
 
-
-
-#' @title spa_eval_relation
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @noRd
 soft_eval <- function(degree){
   degree > 0
 }
 
-#' @title spa_eval_relation
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @noRd
 strict_eval <- function(degree){
   degree == 1
 }
 
-#' @title alpha_eval
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @noRd
 alpha_eval <- function(degree, alpha){
   degree >= alpha
 }
 
-#' @title spa_eval_relation
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
 #' @noRd
 soft_alpha_eval <- function(degree, alpha){
   degree > alpha
 }
 
-#' @title spa_eval_relation
-#' @family Spatial Plateau Topological Relationships
-#' @description
-#'
-#'
-#' @param pgeom
-#'
-#' @return
-#' @examples
-#'
-#' @import methods utils
+#' @import methods utils sf
 #' @export
 spa_boundary_pregion <- function(pgeom, bound_part = "region"){
 
   if(pgeom@type != "PLATEAUREGION"){
-    stop("pgeom is not a PLATEAUREGION type.", call. = FALSE)
+    stop("pgeom is not a PLATEAUREGION object.", call. = FALSE)
   }
 
   if(bound_part == "line"){
@@ -1022,9 +684,6 @@ spa_boundary_pregion <- function(pgeom, bound_part = "region"){
     return(bpr)
   }
   else{
-    stop("Invalid 'bound_part'.", call. = FALSE)
+    stop("Invalid value for the parameter 'bound_part'.", call. = FALSE)
   }
 }
-
-
-
