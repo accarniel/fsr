@@ -228,7 +228,7 @@ search_by_md <- function(components, low, high, m){
 
 #' @import sf ggplot2
 #' @export
-pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", palette = "Greys", m = 1, ...){
+pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
 
   pgeom_tibble <- pgeom_as_tibble(pgeom)
 
@@ -240,41 +240,20 @@ pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "wh
      inherits(pgeom_tibble$geometry, "sfc_MULTIPOINT")||
      inherits(pgeom_tibble$geometry, "sfc_LINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_POINT")){
-    if(nrow(pgeom_tibble) > m){
       plot <-  ggplot(pgeom_tibble) +
         geom_sf(aes(color = md, geometry=geometry), ...) +
         scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
         theme_classic()
-    } else {
-      pgeom_tibble$md <- as.factor(pgeom_tibble$md)
-      pgeom_tibble$md <- factor(pgeom_tibble$md, levels=c(levels(pgeom_tibble$md), "0"))
-
-      plot <- ggplot(pgeom_tibble) +
-        geom_sf(aes(color = md, geometry = geometry), ...) +
-        scale_colour_brewer(name="", palette = palette) +
-        theme_classic() +
-        theme(legend.position = "none")
-    }
   } else {
-    if(nrow(pgeom_tibble) > m){
       # lwd = 0 ; color = NA in order to remove the border of the components in the plot
       plot <-  ggplot(pgeom_tibble) +
         geom_sf(aes(fill = md, geometry=geometry), ...) +
         scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
         theme_classic()
-    } else {
-      pgeom_tibble$md <- as.factor(pgeom_tibble$md)
-      pgeom_tibble$md <- factor(pgeom_tibble$md, levels=c(levels(pgeom_tibble$md), "0", "1"))
-
-      plot <- ggplot(pgeom_tibble) +
-        geom_sf(aes(fill = md, geometry=geometry), ...) +
-        scale_fill_brewer(name="", palette = palette) +
-        theme_classic()
-    }
   }
   
-  if(add_base_poly) {
-    plot + geom_sf(data = st_as_sf(base_poly), color = high, size = 0.5, aes(geometry = x), fill = "transparent")
+  if(!is.null(base_poly) && add_base_poly) {
+    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly)), color = high, size = 0.5, aes(geometry = x), fill = "transparent")
   }
   
   plot

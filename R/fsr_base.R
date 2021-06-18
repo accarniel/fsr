@@ -3,7 +3,7 @@
 #' @slot obj A sf data type
 #' @slot md A membership degree of the component
 #' 
-#' @import sf
+#' @import methods sf
 setClass("component",
          slots = list(
            obj = "XY",
@@ -16,6 +16,8 @@ setClass("component",
 #' @slot component A list of components
 #' @slot supp An sfg object that stores the union of spatial objects of the components of the spatial plateau object
 #' @slot type The data type of the spatial plateau object
+#' 
+#' @import methods
 setClass("pgeom",
          slots = list(
            component = "list",
@@ -42,22 +44,30 @@ pgeom_to_pwkt <- function(pgeom) {
   l
 }
 
+#' @export
 format.pgeom <- function(x, ...) {
   pgeom_to_pwkt(x)
 }
 
+#' @import methods
+#' @export
 setMethod("show", "pgeom", function(object) {
   print(pgeom_to_pwkt(object))
 })
 
+#' @import methods
+#' @export
 setMethod("as.character", "pgeom", function(x, ...) {
   pgeom_to_pwkt(x)
 })
 
-setMethod("plot", "pgeom", function(x, ...) {
+#' @import methods
+#' @export
+setMethod("plot", signature(x = "pgeom", y = "missing"), function(x, y, ...) {
   pgeom_plot(x, ...)
 })
 
+#' @export
 as.data.frame.pgeom <-
   function(x, row.names=NULL, optional=FALSE, ...)
   {
