@@ -2,8 +2,8 @@
 #'
 #' @description create_component builds a component composed of a Spatial Feature Geometry (sfg) object and its corresponding membership degree.
 #'
-#' @usage 
-#' 
+#' @usage
+#'
 #' create_component(raw_obj, md, type)
 #'
 #' @param raw_obj A vector, list or matrix containing the points to create an sfg object.
@@ -11,16 +11,16 @@
 #' @param type A character value that indicates the type of the desired sfg object. It can be either `"POINT"`, `"LINE"`, or `"REGION"`.
 #'
 #' @details
-#' 
+#'
 #' This function creates an S4 object named `component`, which is a pair of an sfg object and a membership degree in \eqn{]0, 1]}.
-#' 
-#' The spatial data type (i.e., the type of the sfg object) indicated by the parameter `type` groups simple and complex objects. 
+#'
+#' The spatial data type (i.e., the type of the sfg object) indicated by the parameter `type` groups simple and complex objects.
 #' For instance, `"POINT"` refers to simple or complex point objects (internally, we can create a POINT or MULTIPOINT object).
 #'
-#' @return 
-#' 
+#' @return
+#'
 #' A `component` object that can be added to a spatial plateau object.
-#' 
+#'
 #' @examples
 #'
 #' # Creating two components of the type POINT
@@ -61,7 +61,7 @@
 #' @import sf methods
 #' @export
 create_component <- function(raw_obj, md, type){
-
+  
   if(type=="POINT"){
     if(inherits(raw_obj, "numeric")){
       obj_component = st_point(raw_obj)
@@ -86,23 +86,24 @@ create_component <- function(raw_obj, md, type){
   } else {
     stop("Invalid type for the component creation.", call. = FALSE)
   }
-
+  
   new("component", obj = obj_component,md=md)
 }
+
 
 #' @import sf methods
 #' @export
 component_from_sfg <- function(sfg, md){
-
+  
   possible_geometries = c("sfc_POINT",
                           "sfc_MULTIPOINT",
                           "sfc_LINESTRING",
                           "sfc_MULTILINESTRING",
                           "sfc_POLYGON",
                           "sfc_MULTIPOLYGON")
-
+  
   sfg_type = class(st_geometry(sfg))[1]
-
+  
   if(sfg_type %in% possible_geometries){
     new("component", obj = sfg, md = md)
   } else {
@@ -110,6 +111,38 @@ component_from_sfg <- function(sfg, md){
   }
 }
 
+
+#' @title create_empty_pgeom
+#'
+#' @description create_empty_pgeom builds an empty pgeom object of a specific type
+#'
+#' @usage
+#'
+#' create_empty_pgeom(type)
+#'
+#' @param type A character value indicating the data type of the pgeom object.
+#' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"` or `"PLATEAUREGION"`
+#'
+#' @details
+#'
+#' The `create_empty_pgeom` creates a new pgeom object with no components. To add new components to this object, you
+#' should use `spa_add_component`. The components added to this object must be of same type of the empty pgeom object.
+#'
+#' @return
+#'
+#' A pgeom object.
+#'
+#' @examples
+#'
+#' # Creating an Empty Plateau Point object
+#' empty_plateau_point_pgeom <- create_empty_pgeom("PLATEAUPOINT")
+#'
+#' # Creating an Empty Plateau Line object
+#' empty_plateau_line_pgeom <- create_empty_pgeom("PLATEAULINE")
+#'
+#' # Creating an Empty Plateau Region object
+#' empty_plateau_region_pgeom <- create_empty_pgeom("PLATEAUREGION")
+#'
 #' @import sf methods
 #' @export
 create_empty_pgeom <- function(type){
@@ -125,22 +158,22 @@ create_empty_pgeom <- function(type){
   } else {
     stop("Invalid data type", call. = FALSE)
   }
-
+  
 }
 
 #' @import sf dplyr
 #' @export
 create_pgeom <- function(components, type){
-
+  
   type = toupper(type)
-
+  
   if(is_pgeom(type)){
     if(inherits(components, "list")){
       md_value = c()
       for(comp in 1:length(components)){
         md = components[[comp]]@md
         obj_comp = components[[comp]]@obj
-
+        
         if(!is_compatible(obj_comp, type)){
           stop("Input Component type error. Please verify if your component type is correct", call. = FALSE)
         }
@@ -148,24 +181,24 @@ create_pgeom <- function(components, type){
       }
       order_comps = order(md_value)
       new_components <- components[order_comps]
-
+      
       obj_sf = list()
       for(comp in 1:length(components)){
-
+        
         object_sf = components[[comp]]@obj
         obj_sf[[comp]] <- object_sf
       }
       supp = st_union(st_sfc(obj_sf))
     }
-
+    
     else if(inherits(components, "data.frame") || inherits(components, "tibble")){
       new_df <- arrange(components, components[1])
       new_components = vector("list", nrow(new_df))
-
+      
       for(i in 1:nrow(new_df)){
         new_components[[i]] <- new("component", obj = new_df[i,2][[1]], md = new_df[i, 1])
         obj_comp = new_components[[i]]@obj
-
+        
         if(!is_compatible(obj_comp, type)){
           stop("Input Component type error.Please verify if your component type is correct", call. = FALSE)
         }
@@ -179,17 +212,17 @@ create_pgeom <- function(components, type){
 #' @import sf tibble
 #' @export
 pgeom_as_tibble <- function(pgeom){
-
+  
   get_md <- function(comp){
     md <- comp@md
     return(md)
   }
-
+  
   get_obj <- function(comp){
     obj <- comp@obj
     return(obj)
   }
-
+  
   pgeom_tibble <- tibble(
     md <- unlist(lapply(pgeom@component, get_md)),
     points <- st_sfc(lapply(pgeom@component, get_obj))
@@ -229,27 +262,27 @@ search_by_md <- function(components, low, high, m){
 #' @import sf ggplot2
 #' @export
 pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
-
+  
   pgeom_tibble <- pgeom_as_tibble(pgeom)
-
+  
   if(!is.null(base_poly)) {
     pgeom_tibble$geometry <- st_intersection(pgeom_tibble$geometry, base_poly)
   }
-
+  
   if(inherits(pgeom_tibble$geometry, "sfc_MULTILINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_MULTIPOINT")||
      inherits(pgeom_tibble$geometry, "sfc_LINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_POINT")){
-      plot <-  ggplot(pgeom_tibble) +
-        geom_sf(aes(color = md, geometry=geometry), ...) +
-        scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
-        theme_classic()
+    plot <-  ggplot(pgeom_tibble) +
+      geom_sf(aes(color = md, geometry=geometry), ...) +
+      scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
+      theme_classic()
   } else {
-      # lwd = 0 ; color = NA in order to remove the border of the components in the plot
-      plot <-  ggplot(pgeom_tibble) +
-        geom_sf(aes(fill = md, geometry=geometry), ...) +
-        scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
-        theme_classic()
+    # lwd = 0 ; color = NA in order to remove the border of the components in the plot
+    plot <-  ggplot(pgeom_tibble) +
+      geom_sf(aes(fill = md, geometry=geometry), ...) +
+      scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
+      theme_classic()
   }
   
   if(!is.null(base_poly) && add_base_poly) {
@@ -312,12 +345,12 @@ pgeom_is_empty <- function(pgeom){
 #' @noRd
 get_counter_ctype <- function(pgeom){
   ptype <- pgeom@type
-
+  
   type <- switch(ptype,
                  PLATEAUPOINT = "POINT",
                  PLATEAULINE = "LINESTRING",
                  PLATEAUREGION = "POLYGON")
-
+  
   type
 }
 
