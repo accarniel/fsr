@@ -47,6 +47,33 @@ fsi_create <- function(name, and_method = "min",
   fsi
 }
 
+
+
+#' @title fsi_add_fsa
+#' 
+#' @description fsi_add_fsa adds a fuzzy spatial antecedent to the FSI model
+#' 
+#' @usage 
+#' 
+#' fsi_add_fsa(fsi, lvar, tbl)
+#' 
+#' @param fsi The FSI model instantiated with the `fsi_create` function.
+#' @param lvar A character value that represents a linguistic variable of the antecedent.
+#' @param tbl  A tibble with spatial plateau objects annotated with linguistic values of the linguistic variable specified by the above `lvar` parameter.
+#' 
+#' @details 
+#' 
+#' The fuzzy spatial antecedent added by the `fsi_add_fsa` function is composed of a linguistic variable and its corresponding `pgeom objects` annotated by linguistic values. 
+#' The format of the `tbl` parameter is the same as the output of the function `spa_creator`, allowing the user to directly provides plateau region objects as input when designing FSI models.
+#' 
+#' @returns 
+#' 
+#' An FSI model populated with a fuzzy spatial antecedent.
+#' 
+#' @example 
+#' 
+#' fsi <- fsi_add_fsa(fsi, "accommodation price", accom_price_layer)
+#' 
 #' @export
 fsi_add_fsa <- function(fsi, lvar, tbl) {
   if(nrow(tbl) <= 0) {
@@ -62,6 +89,45 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
   fsi
 }
 
+
+
+#' @title fsi_add_cs
+#' 
+#' @description fsi_add_cs adds the consequent to the FSI model
+#' 
+#' @usage 
+#' 
+#' fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
+#' 
+#' @param fsi The FSI model instantiated with the `fsi_create` function.
+#' @param lvar A character value that represents a linguistic variable of the consequent.
+#' @param lvals A character vector that represents linguistic values of the linguistic variable of the consequent.
+#' @param mfs A character vector of corresponding membership functions.
+#' @param bounds A numeric vector that represents the lower and upper bounds of the consequent domain. 
+#' 
+#' @details 
+#' 
+#' 
+#' @returns 
+#' 
+#' An FSI model populated with a consequent.
+#' 
+#' @example 
+#' 
+#' library(FuzzyR)
+#' 
+#' # Create the vector with the linguistic values of the linguistic variable "visiting experience":
+#' lvals_visiting_exp <- c("awful", "average", "great")
+#' 
+#' # Define the membership function for each linguistic value:
+#' awful_mf <- genmf("trimf", c(0, 0, 20))
+#' average_mf <- genmf("trimf", c(10, 30, 60))
+#' great_mf <- genmf("trapmf", c(40, 80, 100, 100))
+#' 
+#' # Add the consequent to the FSI model:
+#' fsi <- fsi_add_cs(fsi, "visiting experience", lvals_visiting_exp,
+#'                   c(awful_mf, average_mf, great_mf), c(0, 100))
+#' 
 #' @export
 fsi_add_cs <- function(fsi, lvar, lvals, mfs, bounds) {
   if(length(lvals) != length(mfs)) {
