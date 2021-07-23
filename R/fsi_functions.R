@@ -34,7 +34,8 @@
 #'
 #' library(FuzzyR)
 #' # Creating the FSI model
-#' fsi <- fsi_create("To visit or not to visit, that is the question", default_conseq = genmf("trimf", c(10, 30, 60))) 
+#' fsi <- fsi_create("To visit or not to visit, that is the question", 
+#'                   default_conseq = genmf("trimf", c(10, 30, 60))) 
 #'
 #' @export
 fsi_create <- function(name, and_method = "min",
@@ -73,7 +74,7 @@ fsi_create <- function(name, and_method = "min",
 #' @examples
 #' 
 #' library(FuzzyR)
-#' library(tidyverse)
+#' library(tibble)
 #' 
 #' # Create spatial plateau objects for the linguistic variable accomodation_price
 #' lvals_accom_price <- c("cut-rate", "affordable", "expensive")
@@ -88,10 +89,12 @@ fsi_create <- function(name, and_method = "min",
 #'                       `review_scores_rating` = c(94, 89, 90)
 #')
 #'  
-#' accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price, mfs = c(cut_rate_mf, affordable_mf, expensive_mf))
+#' accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price, 
+#'                          mfs = c(cut_rate_mf, affordable_mf, expensive_mf))
 #'                          
 #' # Create the fsi_model:
-#' fsi <- fsi_create("To visit or not to visit, that is the question", default_conseq = genmf("trimf", c(10, 30, 60)))
+#' fsi <- fsi_create("To visit or not to visit, that is the question", 
+#'                   default_conseq = genmf("trimf", c(10, 30, 60)))
 #' 
 #' # Add the fuzzy spatial antecedent to the fsi_model:
 #' fsi <- fsi_add_fsa(fsi, "accommodation price", accom_price_layer)
@@ -144,7 +147,8 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
 #' library(FuzzyR)
 #' 
 #' # Create the fsi_model:
-#' fsi <- fsi_create("To visit or not to visit, that is the question", default_conseq = genmf("trimf", c(10, 30, 60)))
+#' fsi <- fsi_create("To visit or not to visit, that is the question", 
+#'                    default_conseq = genmf("trimf", c(10, 30, 60)))
 #' 
 #' # Create the vector with the linguistic values of the linguistic variable "visiting experience":
 #' lvals_visiting_exp <- c("awful", "average", "great")

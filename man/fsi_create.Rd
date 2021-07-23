@@ -42,6 +42,7 @@ After creating an empty FSI model, you have to call the functions \code{fsi_add_
 
 library(FuzzyR)
 # Creating the FSI model
-fsi <- fsi_create("To visit or not to visit, that is the question", default_conseq = genmf("trimf", c(10, 30, 60))) 
+fsi <- fsi_create("To visit or not to visit, that is the question", 
+                  default_conseq = genmf("trimf", c(10, 30, 60))) 
 
 }

@@ -13,7 +13,7 @@ fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
 
 \item{lvals}{A character vector that represents linguistic values of the linguistic variable of the consequent.}
 
-\item{mfs}{A vector of functions created by the genmf of the FuzzyR package.}
+\item{mfs}{A vector of functions created by the \code{genmf} of the FuzzyR package.}
 
 \item{bounds}{A numeric vector that represents the lower and upper bounds of the consequent domain.}
 }
@@ -35,7 +35,8 @@ In \code{bounds}, the lower and upper values correspond to the first and second 
 library(FuzzyR)
 
 # Create the fsi_model:
-fsi <- fsi_create("To visit or not to visit, that is the question", default_conseq = genmf("trimf", c(10, 30, 60)))
+fsi <- fsi_create("To visit or not to visit, that is the question", 
+                   default_conseq = genmf("trimf", c(10, 30, 60)))
 
 # Create the vector with the linguistic values of the linguistic variable "visiting experience":
 lvals_visiting_exp <- c("awful", "average", "great")
