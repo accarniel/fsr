@@ -63,7 +63,7 @@ fsi_create <- function(name, and_method = "min",
 #' 
 #' @details 
 #' 
-#' The fuzzy spatial antecedent added by the `fsi_add_fsa` function is composed of a linguistic variable and its corresponding `pgeom objects` annotated by linguistic values. 
+#' The fuzzy spatial antecedent added by the `fsi_add_fsa` function is composed of a linguistic variable and its corresponding `pgeom` objects annotated by linguistic values. 
 #' The format of the `tbl` parameter is the same as the output of the function `spa_creator`, allowing the user to directly provides plateau region objects as input when designing FSI models.
 #' 
 #' @returns 
@@ -84,7 +84,7 @@ fsi_create <- function(name, and_method = "min",
 #' # Example of dataset
 #' accom_price <- tibble(
 #'                       `longitude` = c(-74.0, -74.0, -74.0), 
-#'                       `latitude` = c(40.8, 40.7, 40.7),
+#'                       `latitude` = c(40.8, 40.7, 40.75),
 #'                       `review_scores_rating` = c(94, 89, 90)
 #')
 #'  
@@ -124,7 +124,7 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
 #' @param fsi The FSI model instantiated with the `fsi_create` function.
 #' @param lvar A character value that represents a linguistic variable of the consequent.
 #' @param lvals A character vector that represents linguistic values of the linguistic variable of the consequent.
-#' @param mfs A vector of functions created by the genmf of the FuzzyR package.
+#' @param mfs A vector of functions created by the `genmf` of the FuzzyR package.
 #' @param bounds A numeric vector that represents the lower and upper bounds of the consequent domain. 
 #' 
 #' @details 
