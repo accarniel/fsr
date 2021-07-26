@@ -85,8 +85,8 @@ fsi_create <- function(name, and_method = "min",
 #' # Example of dataset
 #' accom_price <- tibble(
 #'                       `longitude` = c(-74.0, -74.0, -74.0), 
-#'                       `latitude` = c(40.8, 40.7, 40.75),
-#'                       `review_scores_rating` = c(94, 89, 90)
+#'                       `latitude` = c(40.8, 40.7, 40.7),
+#'                       `price` = c(150, 76, 60)
 #')
 #'  
 #' accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price, 
@@ -238,6 +238,48 @@ get_consequent <- function(user_rule) {
   return(conseq)
 }
 
+
+
+#' @title fsi_add_rules
+#' 
+#' @description fsi_add_rules adds the fuzzy rules set to an FSI model
+#' 
+#' @usage 
+#' 
+#' fsi_add_rules(fsi, rules, weights = rep(1, length(rules)))
+#' 
+#' @param fsi An FSI model instantiated with the function `fsi_create`.
+#' @param rules A character vector containing the rules defined by the user. It follows a specific format, as detailed below.
+#' @param weights A numeric vector of weight values for each rule. Default values are 1.
+#' 
+#' @details 
+#' 
+#' The definition of a fuzzy rule is user-friendly since users can write it by using the _linguistic variables_ and _linguistic values_ previously defined and added to the FSI model. 
+#'  A fuzzy rule has the format `IF A THEN B`, where `A` is called the antecedent and `B` the consequent of the rule such that `A` implies `B`.  Further, `A` and `B` are statements that combine fuzzy propositions by using logical connectives like `AND` or `OR`. Each fuzzy proposition has the format `LVar is LVal` where `LVal` is a linguistic value in the scope of the linguistic variable `LVar`.
+#' To avoid possible contradictions keep in mind the following items when specifying the rules:
+#'  - the order of the statements in the antecedent is not relevant;
+#'  - each linguistic variable has to appear at most one time in each fuzzy rule;
+#’ - only one kind of logical connective (i.e., `AND` or `OR`) must be used in the statements of the antecedent.
+#' 
+#' @return 
+#' 
+#' An FSI model populated with fuzzy rules set.
+#' 
+#' @examples 
+#' 
+#' # Creating the FSI model from an example implemented with the visitation function:
+#' fsi <- visitation()
+#'
+#' # Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
+#' rules <- c("IF accommodation review is reasonable AND food safety is low THEN visiting experience is awful",
+#'            "IF accommodation price is expensive AND accommodation review is reasonable THEN visiting experience is awful",
+#'            "IF accommodation price is affordable AND accommodation review is good AND food safety is medium THEN visiting experience is average",
+#'            "IF accommodation price is affordable AND accommodation review is excellent AND food safety is high THEN visiting experience is great",
+#'            "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high THEN visiting experience is great")
+#' 
+#' # Adding these rules to the FSI model previously instantiated:
+#' fsi <- fsi_add_rules(fsi, rules)
+#' 
 #' @export
 fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   if (length(rules) != length(weights)) {
@@ -255,6 +297,65 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   fsi
 }
 
+
+
+#' @title fsi_eval
+#' 
+#' @description fsi_eval evaluates an FSI model in a given point location
+#' 
+#' @usage 
+#' 
+#' fsi_eval(fsi, point, ...)
+#' 
+#' @param fsi An FSI model builded with the function `fsi_create` that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
+#' @param point An `sfg` object of geometry type `point`, which is created through the function `st_point` of the sf package.
+#' @param ...   Informs the `fsi_eval` how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: `discret_by` is 0.5 and `discret_length` is NULL.
+#'
+#' @details 
+#' 
+#' This function evaluates an FSI model populated with its fuzzy spatial antecedent, consequent, and fuzzy rules set on a specific point location. This evaluation is based on the algorithm specified by [FIFUS](https://ieeexplore.ieee.org/document/8015707). 
+#'
+#' The default behavior of the function `fsi_eval` in the parameter `...` is to consider a discrete interval of values with an increment of 0.5 between lower and upper values for the consequent domain (i.e., defined at `fsi_add_cs` function with the parameter `bounds`).
+#' 
+#' The user can modify the default behavior by using one of the following two ways:
+#' - define a value for the parameter `discret_by` by changing the incremental value.
+#' - define a desired length for the sequence of values domain of the consequent `discret_length`.
+#’ This means that it has the same behavior as the function `seq` of the R base.
+#' 
+#' @return 
+#' 
+#' A numeric value that belongs to the domain of the consequent (i.e., as specified by `fsi_add_cs`) and represents the result of the reasoning process in a particular point location.
+#' 
+#' @references
+#'
+#' [A. C. Carniel and M. Schneider, "Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems", IEEE Int. Conf. on Fuzzy Systems, pp. 1-6, 2017.](https://ieeexplore.ieee.org/document/8015707)
+#'
+#' @examples 
+#'
+#' library(sf)
+#' # Creating the FSI model from an example implemented with the visitation function:
+#' fsi <- visitation()
+#'
+#' # Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
+#' # Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
+#' rules <- c("IF accommodation review is reasonable AND food safety is low THEN visiting experience is awful",
+#'            "IF accommodation price is expensive AND accommodation review is reasonable THEN visiting experience is awful",
+#'            "IF accommodation price is affordable AND accommodation review is good AND food safety is medium THEN visiting experience is average",
+#'            "IF accommodation price is affordable AND accommodation review is excellent AND food safety is high THEN visiting experience is great",
+#'            "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high THEN visiting experience is great")
+#' 
+#' # Adding these rules to the FSI model previously instantiated:
+#' fsi <- fsi_add_rules(fsi, rules)
+#' 
+#' # Using the default configuration:
+#' res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)))
+#' 
+#' # Change the default discretization by modifying the default step value:
+#' res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_by=0.8)
+#' 
+#' # Change the default discretization by choosing the quantity of values between the lower and upper values for the consequent domain:
+#' res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_length=200)
+#' 
 #' @import tibble FuzzyR
 #' @export
 fsi_eval <- function(fsi, point, ...) {
@@ -482,9 +583,114 @@ fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
                            target_mf <- head(fsi$cs[[1]]$mfs, n=1)[[1]]
                          }
                          do.call(fsi_qwi_pso, c(list(fsi, qw, target_mf), params))
-                         },
+                       },
                        stop("This query window inference approach is not valid.", call. = FALSE)
   )
 
   result_qwi
+}
+
+
+
+
+#' @title visitation
+#' 
+#' @description visitation provides an example, without rules, of a fuzzy spatial inference model
+#' 
+#' @usage 
+#' visitation()
+#'
+#' @details 
+#' 
+#' The FSI model implemented with the `visitation` function represents a fuzzy spatial inference model to estimate the visiting experience based on prices and overall ratings of accommodations as well as sanitary conditions of restaurants. The output of such a model infers a value between 0 and 100 that indicates how attractive it is to visit a specific location. For this, the experience can be classified as _awful_, _average_, and _great_. 
+#' 
+#' The linguistic variables and their linguistic values of this FSI model are listed below:
+#' - _accommodation price_, with  _cut-rate_, _affordable_, and _expensive_ as linguistic values;
+#' - _accommodation review_ with _bad_, _good_, and _excellent_ as linguistic values;
+#' - _food safety_ with _low_, _medium_, and _high_ as linguistic values, which represent levels of sanitary conditions.
+#' 
+#' The usage of FSI models is subdivided into a _preparation phase_ and an _evaluation phase_. The preparation phase is responsible for instantiating a new FSI model with the elements of the data source component of FIFUS. For this, the fsr package provides the following functions: `fsi_create`, `fsi_add_fsa`, and `fsi_add_cs`. These functions are employed by `visitation` so that users can add their own fuzzy set rules (by using `fsi_add_rules`) and perform the evaluation phase (by using the functions `fsi_eval` and/or `fsi_qw_eval`).
+#' In this sense, `visitation` performs the following internal actions to return an FSI model:
+#' 1. specify the linguistic variables and their corresponding linguistic values, which are in turn represented by membership functions generated by the function `genmf` of the FuzzyR package. These items are specified according to the context of the running example.
+#' 2. define small point datasets that represent each linguistic variable. Such datasets are `tibble` objects.
+#' 3. build spatial plateau objects by using the function `spa_creator` on the datasets. As a result, we get spatial plateau objects that represent each linguistic value.
+#' 4. create an FSI model with `fsi_create` function.
+#' 5. add fuzzy spatial antecedents with the `fsi_add_fsa` function. Recall that the antecedents are spatial plateau objects previously built.
+#' 6. define the linguistic variable and its linguistic values with membership functions for the consequent.
+#' 7. add the consequent to the FSI model by using the function `fsi_add_cs`.
+#'
+#' @return
+#' 
+#' An example of an FSI model implemented without fuzzy rules set.
+#'
+#' @examples 
+#'
+#' fsi <- visitation()
+#'
+#' @import FuzzyR sf tibble
+#' @export
+visitation <- function() {
+  # Define linguistic values and membership functions for each linguistic variable
+  lvals_accom_price <- c("cut-rate", "affordable", "expensive")
+  cut_rate_mf <- genmf("trapmf", c(0, 0, 10, 48))
+  affordable_mf <- genmf("trapmf", c(10, 48, 80, 115))
+  expensive_mf <- genmf("trapmf", c(80, 115, 10000, 10000))
+  
+  lvals_accom_review <- c("cut-rate", "affordable", "expensive")
+  reasonable_mf <- genmf("trapmf", c(0, 0, 40, 65))
+  good_mf <- genmf("trapmf", c(40, 65, 80, 85))
+  excellent_mf <- genmf("trapmf", c(80, 85, 100, 100))
+  
+  lvals_food_safety <- c("cut-rate", "affordable", "expensive")
+  low_mf <- genmf("trapmf", c(24, 28, 115, 115))
+  medium_mf <- genmf("trapmf", c(10, 14, 24, 28))
+  high_mf <- genmf("trapmf", c(0, 0, 10, 14))
+  
+  # Example of datasets
+  accom_price <- tibble(
+    `longitude` = c(-74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -73.9, -74.0), 
+    `latitude` = c(40.8, 40.7, 40.7, 40.7, 40.8, 40.8, 40.7, 40.7, 40.8, 40.7),
+    `price` = c(150, 76, 60, 175, 79, 75, 92, 109, 62, 196)
+  )
+  
+  accom_review <- tibble(
+    `longitude` = c(-74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -74.0, -74.0), 
+    `latitude` = c(40.8, 40.7, 40.7, 40.7, 40.8, 40.8, 40.7, 40.7, 40.8, 40.7),
+    `review_scores_rating` = c(94, 89, 90, 97, 84, 98, 94, 91, 98, 97)
+  )
+  
+  food_safety <- tibble(
+    `longitude` = c( -74.01291, -73.99912, -73.84201, -73.98959, -73.84348, -73.98704, -73.93084, -73.91315, -73.94999, -73.96237), 
+    `latitude` = c(40.70626, 40.72316, 40.75804, 40.76259, 40.84978, 40.75079, 40.67171, 40.70068, 40.77965, 40.77600),
+    `score` = c(4, 9, 7, 9, 9, 24, 11, 11, 11, 13)
+  )
+  
+  # Building the spatial plateau objects by using the previous datasets
+  accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price, 
+                                   mfs = c(cut_rate_mf, affordable_mf, expensive_mf))
+  accom_review_layer <- spa_creator(accom_review, classes = lvals_accom_review, 
+                                    mfs = c(reasonable_mf, good_mf, excellent_mf))
+  food_safety_layer <- spa_creator(food_safety, classes = lvals_food_safety, 
+                                   mfs = c(low_mf, medium_mf, high_mf))
+  
+  # Creating the FSI model with a name and a default consequent:
+  fsi <- fsi_create("To visit or not to visit, that is the question", default_conseq = genmf("trimf", c(10, 30, 60)))
+  
+  # Adding fuzzy spatial antecedents:
+  fsi <- fsi_add_fsa(fsi, "accommodation price", accom_price_layer)
+  fsi <- fsi_add_fsa(fsi, "accommodation review", accom_review_layer)
+  fsi <- fsi_add_fsa(fsi, "food safety", food_safety_layer)
+  
+  # Defining the linguistic values for the linguistic variable `"visiting experience"`
+  lvals_visiting_exp <- c("awful", "average", "great")
+  
+  # Specifying the membership functions for the linguistic values created on the previous step:
+  awful_mf <- genmf("trimf", c(0, 0, 20))
+  average_mf <- genmf("trimf", c(10, 30, 60))
+  great_mf <- genmf("trapmf", c(40, 80, 100, 100))
+  
+  # Adding the consequent:
+  fsi <- fsi_add_cs(fsi, "visiting experience", lvals_visiting_exp, c(awful_mf, average_mf, great_mf), c(0, 100))
+  
+  fsi
 }

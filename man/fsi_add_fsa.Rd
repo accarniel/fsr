@@ -37,8 +37,8 @@ expensive_mf <- genmf("trapmf", c(80, 115, 10000, 10000))
 # Example of dataset
 accom_price <- tibble(
                       `longitude` = c(-74.0, -74.0, -74.0), 
-                      `latitude` = c(40.8, 40.7, 40.75),
-                      `review_scores_rating` = c(94, 89, 90)
+                      `latitude` = c(40.8, 40.7, 40.7),
+                      `price` = c(150, 76, 60)
 )
  
 accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price, 
