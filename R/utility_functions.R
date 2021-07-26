@@ -209,6 +209,61 @@ create_pgeom <- function(components, type){
   }
 }
 
+#' @title pgeom_as_tibble
+#'
+#' @description pgeom_as_tibble converts a pgeom object into a tibble object.
+#'
+#' @usage
+#' 
+#' pgeom_as_tibble(pgeom)
+#'
+#' @param pgeom A `pgeom` object
+#'
+#' @details
+#' 
+#' The `pgeom_as_tibble` turns a `pgeom` object into a tibble, a data frame with class `tbl_df`.
+#' This allows us to get the internal components of the `pgeom` object 
+#' (i.e., spatial features objects and membership degrees) as a data frame with
+#' two separate columns - called `md` (_membership degree_) and `geometry` (an `sfc` object). 
+#' 
+#' For each component of the `pgeom` object, `pgeom_as_tibble` gets the `md` and `geometry` 
+#' values and allocates them into a row of the new created tibble, in separated columns.
+#' Therefore, each row of this tibble represents a component of the original `pgeom` object.
+#' 
+#' 
+#' @return
+#' 
+#' A tibble object of size `n x 2` where `n` is the number of components of 
+#' the `pgeom` object and two columns in the format `(md, geometry)`.
+#' 
+#' @examples
+#' 
+#' library(sf)
+#' 
+#' # Creating components for our plateau point object
+#' v1 <- rbind(c(1,2), c(3,4))
+#' v2 <- rbind(c(1,4), c(2,3),c(4,4))
+#'
+#' md1 <- 0.2
+#' md2 <- 0.1
+#' md3 <- 0.4
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#'
+#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
+#' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
+#' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+#' 
+#' # Creating the plateau point object as a pgeom object with 3 components
+#' 
+#' plateau_point_pgeom <- create_pgeom(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' 
+#' # Converting the pgeom object into a tibble object
+#' plateau_point_tibble <- pgeom_as_tibble(plateau_point_pgeom)
+#' 
+#' plateau_point_tibble
+#' 
 #' @import sf tibble
 #' @export
 pgeom_as_tibble <- function(pgeom){
