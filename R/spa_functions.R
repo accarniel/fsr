@@ -295,14 +295,63 @@ spa_support <- function(pgeom){
   return(pgeom@supp)
 }
 
+#' @title spa_core
+#'
+#' @description spa_core yields a crisp spatial object (as a `sfg` object) that corresponds to the core of a `pgeom` object given as input
+#'
+#' @usage
+#'
+#' spa_core(pgeom)
+#'
+#' @param pgeom A `pgeom` object (i.e., plateau geometry object) of any type.
+#'
+#' @details
+#'
+#' It employs the classical definition of _core_ from the fuzzy set theory in the context of spatial plateau algebra. 
+#' The _core_ only comprises the points with membership degree equal to 1.
+#' Hence, this operation returns the `sfg` object that represents the component labeled with 
+#' membership degree equal to 1 of the `pgeom` given as input. If the `pgeom` object has no core, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#'
+#' @return
+#'
+#' An `sfg` object that represents the core of `pgeom`. It can be an empty object if `pgeom` has no a component with membership degree 1.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#'
+#' @examples
+#'
+#' library(sf)
+#'
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' 
+#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
+#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
+#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' 
+#' pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp
+#' 
+#' pp_core <- spa_core(pp)
+#' pp_core
+#'
+#' #Creating a pgeom object without core
+#' pp2 <- create_pgeom(list(cp1, cp2), "PLATEAUPOINT")
+#' pp2
+#' 
+#' spa_core(pp2)
+#'
 #' @import sf utils
 #' @export
 spa_core <- function(pgeom){
 
-  last_comp <- tail(pgeom@component)
+  last_comp <- tail(pgeom@component, 1)
 
   if(last_comp[[1]]@md == 1){
-    return(last_comp@obj)
+    return(last_comp[[1]]@obj)
   }
   sf_type <- get_counter_ctype(pgeom)
 
@@ -665,8 +714,8 @@ spa_boundary_pregion <- function(pgeom, bound_part = "region"){
 
   if(bound_part == "line"){
     bpl <- create_empty_pgeom("PLATEAULINE")
-    last_comp <- tail(pgeom@component)
-    if(last_comp@md == 1){
+    last_comp <- tail(pgeom@component, 1)
+    if(last_comp[[1]]@md == 1){
       boundary_component <- st_boundary(last_comp@obj)
       comp_line <- new("component", obj = boundary_component, md=1)
       bpl <- spa_add_component(bpl, comp_line)
@@ -675,10 +724,10 @@ spa_boundary_pregion <- function(pgeom, bound_part = "region"){
   }
   else if(bound_part == "region"){
     bpr <- create_empty_pgeom("PLATEAUREGION")
-    last_comp <- tail(pgeom@component)
+    last_comp <- tail(pgeom@component, 1)
     components <- pgeom@component
     n_comps <- spa_ncomp(pgeom)
-    if(last_comp@md == 1 && n_comps > 1){
+    if(last_comp[[1]]@md == 1 && n_comps > 1){
       bpr <- spa_add_component(bpr, head(components, n=n_comps-1))
     }
     return(bpr)

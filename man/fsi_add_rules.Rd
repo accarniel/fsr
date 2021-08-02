@@ -33,12 +33,20 @@ To avoid possible contradictions keep in mind the following items when specifyin
 # Creating the FSI model from an example implemented with the visitation function:
 fsi <- visitation()
 
-# Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
-rules <- c("IF accommodation review is reasonable AND food safety is low THEN visiting experience is awful",
-           "IF accommodation price is expensive AND accommodation review is reasonable THEN visiting experience is awful",
-           "IF accommodation price is affordable AND accommodation review is good AND food safety is medium THEN visiting experience is average",
-           "IF accommodation price is affordable AND accommodation review is excellent AND food safety is high THEN visiting experience is great",
-           "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high THEN visiting experience is great")
+# Creating a vector of fuzzy rules; 
+## note that we make use of the linguistic variables and linguistic values previously defined:
+rules <- c(
+  "IF accommodation review is reasonable AND food safety is low 
+  THEN visiting experience is awful",
+ "IF accommodation price is expensive AND accommodation review is reasonable 
+   THEN visiting experience is awful",
+ "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
+   THEN visiting experience is average",
+ "IF accommodation price is affordable AND accommodation review is excellent 
+                                                                AND food safety is high 
+   THEN visiting experience is great",
+ "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
+   THEN visiting experience is great")
 
 # Adding these rules to the FSI model previously instantiated:
 fsi <- fsi_add_rules(fsi, rules)

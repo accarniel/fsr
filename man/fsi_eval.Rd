@@ -36,13 +36,20 @@ library(sf)
 # Creating the FSI model from an example implemented with the visitation function:
 fsi <- visitation()
 
-# Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
-# Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
-rules <- c("IF accommodation review is reasonable AND food safety is low THEN visiting experience is awful",
-           "IF accommodation price is expensive AND accommodation review is reasonable THEN visiting experience is awful",
-           "IF accommodation price is affordable AND accommodation review is good AND food safety is medium THEN visiting experience is average",
-           "IF accommodation price is affordable AND accommodation review is excellent AND food safety is high THEN visiting experience is great",
-           "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high THEN visiting experience is great")
+# Creating a vector of fuzzy rules; 
+## note that we make use of the linguistic variables and linguistic values previously defined:
+rules <- c(
+  "IF accommodation review is reasonable AND food safety is low 
+  THEN visiting experience is awful",
+ "IF accommodation price is expensive AND accommodation review is reasonable 
+   THEN visiting experience is awful",
+ "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
+   THEN visiting experience is average",
+ "IF accommodation price is affordable AND accommodation review is excellent 
+                                                                AND food safety is high 
+   THEN visiting experience is great",
+ "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
+   THEN visiting experience is great")
 
 # Adding these rules to the FSI model previously instantiated:
 fsi <- fsi_add_rules(fsi, rules)
@@ -53,7 +60,8 @@ res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)))
 # Change the default discretization by modifying the default step value:
 res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_by=0.8)
 
-# Change the default discretization by choosing the quantity of values between the lower and upper values for the consequent domain:
+# Change the default discretization by choosing the quantity of values 
+## between the lower and upper values for the consequent domain:
 res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_length=200)
 
 }

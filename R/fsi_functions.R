@@ -191,6 +191,7 @@ fsi_add_cs <- function(fsi, lvar, lvals, mfs, bounds) {
 #' @noRd
 get_antecedents <- function(user_rule) {
   us_rule <- str_to_lower(user_rule)
+  us_rule <- str_replace_all(us_rule, "[\r\n]" , " ")
   antecedents <- str_extract(us_rule, "(?<=if )(.*\n?)(?=then)")
 
   if (str_count(antecedents, pattern = " and ") > 0) {
@@ -230,6 +231,7 @@ get_antecedents <- function(user_rule) {
 #' @noRd
 get_consequent <- function(user_rule) {
   us_rule <- str_to_lower(user_rule)
+  us_rule <- str_replace_all(us_rule, "[\r\n]" , " ")
   consequent <- str_extract(us_rule, "(?<=then )(.*\n?)")
   conseq <- vector("list", length = 1)
   tmp_res <- str_split_fixed(consequent, " is ", 2)
@@ -270,12 +272,20 @@ get_consequent <- function(user_rule) {
 #' # Creating the FSI model from an example implemented with the visitation function:
 #' fsi <- visitation()
 #'
-#' # Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
-#' rules <- c("IF accommodation review is reasonable AND food safety is low THEN visiting experience is awful",
-#'            "IF accommodation price is expensive AND accommodation review is reasonable THEN visiting experience is awful",
-#'            "IF accommodation price is affordable AND accommodation review is good AND food safety is medium THEN visiting experience is average",
-#'            "IF accommodation price is affordable AND accommodation review is excellent AND food safety is high THEN visiting experience is great",
-#'            "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high THEN visiting experience is great")
+#' # Creating a vector of fuzzy rules; 
+#' ## note that we make use of the linguistic variables and linguistic values previously defined:
+#' rules <- c(
+#'   "IF accommodation review is reasonable AND food safety is low 
+#'   THEN visiting experience is awful",
+#'  "IF accommodation price is expensive AND accommodation review is reasonable 
+#'    THEN visiting experience is awful",
+#'  "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
+#'    THEN visiting experience is average",
+#'  "IF accommodation price is affordable AND accommodation review is excellent 
+#'                                                                 AND food safety is high 
+#'    THEN visiting experience is great",
+#'  "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
+#'    THEN visiting experience is great")
 #' 
 #' # Adding these rules to the FSI model previously instantiated:
 #' fsi <- fsi_add_rules(fsi, rules)
@@ -336,13 +346,20 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' # Creating the FSI model from an example implemented with the visitation function:
 #' fsi <- visitation()
 #'
-#' # Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
-#' # Creating a vector of fuzzy rules; note that we make use of the linguistic variables and linguistic values previously defined:
-#' rules <- c("IF accommodation review is reasonable AND food safety is low THEN visiting experience is awful",
-#'            "IF accommodation price is expensive AND accommodation review is reasonable THEN visiting experience is awful",
-#'            "IF accommodation price is affordable AND accommodation review is good AND food safety is medium THEN visiting experience is average",
-#'            "IF accommodation price is affordable AND accommodation review is excellent AND food safety is high THEN visiting experience is great",
-#'            "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high THEN visiting experience is great")
+#' # Creating a vector of fuzzy rules; 
+#' ## note that we make use of the linguistic variables and linguistic values previously defined:
+#' rules <- c(
+#'   "IF accommodation review is reasonable AND food safety is low 
+#'   THEN visiting experience is awful",
+#'  "IF accommodation price is expensive AND accommodation review is reasonable 
+#'    THEN visiting experience is awful",
+#'  "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
+#'    THEN visiting experience is average",
+#'  "IF accommodation price is affordable AND accommodation review is excellent 
+#'                                                                 AND food safety is high 
+#'    THEN visiting experience is great",
+#'  "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
+#'    THEN visiting experience is great")
 #' 
 #' # Adding these rules to the FSI model previously instantiated:
 #' fsi <- fsi_add_rules(fsi, rules)
@@ -353,7 +370,8 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' # Change the default discretization by modifying the default step value:
 #' res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_by=0.8)
 #' 
-#' # Change the default discretization by choosing the quantity of values between the lower and upper values for the consequent domain:
+#' # Change the default discretization by choosing the quantity of values 
+#' ## between the lower and upper values for the consequent domain:
 #' res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_length=200)
 #' 
 #' @import tibble FuzzyR
