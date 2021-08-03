@@ -290,6 +290,53 @@ spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
   }
 }
 
+#' @title spa_support
+#'
+#' @description spa_support yields a crisp spatial object (as a `sfg` object) that corresponds to the support of a `pgeom` object given as input
+#'
+#' @usage
+#'
+#' spa_support(pgeom)
+#'
+#' @param pgeom A `pgeom` object (i.e., plateau geometry object) of any type.
+#'
+#' @details
+#'
+#' It employs the classical definition of _support_ from the fuzzy set theory in the context of spatial plateau algebra. 
+#' The _support_ only comprises the points with membership degree greater than or equal to 1.
+#' Hence, this operation returns the `sfg` object that represents the total extent of the `pgeom` given as input. 
+#' If the `pgeom` object has no components, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#'
+#' @return
+#'
+#' An `sfg` object that represents the support of `pgeom`. It can be an empty object if `pgeom` is empty.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#'
+#' @examples
+#'
+#' library(sf)
+#'
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' 
+#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
+#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
+#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' 
+#' pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp
+#' 
+#' pp_supp <- spa_support(pp)
+#' pp_supp
+#' 
+#' pp_empty <- create_empty_pgeom("PLATEAUPOINT")
+#' pp_empty_supp <- spa_support(pp_empty)
+#' pp_empty_supp
+#'
 #' @export
 spa_support <- function(pgeom){
   return(pgeom@supp)
