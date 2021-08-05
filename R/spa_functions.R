@@ -751,6 +751,65 @@ soft_alpha_eval <- function(degree, alpha){
   degree > alpha
 }
 
+#' @title spa_boundary_pregion
+#'
+#' @description spa_boundary_pregion yields a specific part of the fuzzy boundary of a plateau region object.
+#'
+#' @usage
+#'
+#' spa_boundary_pregion(pgeom, bound_part = "region")
+#'
+#' @param pgeom A `pgeom` object (i.e., plateau geometry object) that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
+#' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
+#'
+#' @details
+#'
+#' It employs the definition of _fuzzy boundary_ of a fuzzy region object in the context of spatial plateau algebra (as defined in the references). 
+#' The _fuzzy boundary_ of a fuzzy region object `A` has a heterogeneous nature since it consists of two parts:
+#' - a fuzzy line object that corresponds to the boundary of the core of `A`.
+#' - a fuzzy region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
+#' 
+#' This means that the function `spa_boundary_pregion` can yield one specific part of the fuzzy boundary of a plateau region object (the argument `pgeom`).
+#' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeom` (i.e., returns a `pgeom` object of type `"PLATEAULINE"`).
+#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeom` (i.e., returns a `pgeom` object of type `"PLATEAUREGION"`).
+#' 
+#' @return
+#'
+#' A `pgeom` object that represents a specific part of the fuzzy boundary of `pgeom` object given as input.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(tibble)
+#' library(FuzzyR)
+#' 
+#' set.seed(123)
+#' 
+#' # some random points to create pgeom objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#'              y = runif(10, min = 0, max = 50), 
+#'              z = runif(10, min = 0, max = 100))
+#'
+#' classes <- c("category-1", "category-2")
+#' mf1 <- genmf("trapmf", c(0, 5, 20, 35))
+#' mf2 <- genmf("trimf", c(35, 80, 100))
+#' 
+#' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
+#' pregions$pgeoms[[1]]
+#' pregions$pgeoms[[2]]
+#' 
+#' # capturing and showing the boundary plateau line of each pgeom object previously created
+#' (spa_boundary_pregion(pregions$pgeoms[[1]], bound_part = "line"))
+#' (spa_boundary_pregion(pregions$pgeoms[[2]], bound_part = "line")) # this is empty because there is no core!
+#' 
+#' # capturing and showing the boundary plateau region (this is the default behavior)
+#' (spa_boundary_pregion(pregions$pgeoms[[1]]))
+#' (spa_boundary_pregion(pregions$pgeoms[[2]]))
+#'
 #' @import methods utils sf
 #' @export
 spa_boundary_pregion <- function(pgeom, bound_part = "region"){
@@ -763,21 +822,22 @@ spa_boundary_pregion <- function(pgeom, bound_part = "region"){
     bpl <- create_empty_pgeom("PLATEAULINE")
     last_comp <- tail(pgeom@component, 1)
     if(last_comp[[1]]@md == 1){
-      boundary_component <- st_boundary(last_comp@obj)
+      boundary_component <- st_boundary(last_comp[[1]]@obj)
       comp_line <- new("component", obj = boundary_component, md=1)
       bpl <- spa_add_component(bpl, comp_line)
     }
     return(bpl)
   }
   else if(bound_part == "region"){
-    bpr <- create_empty_pgeom("PLATEAUREGION")
     last_comp <- tail(pgeom@component, 1)
-    components <- pgeom@component
     n_comps <- spa_ncomp(pgeom)
     if(last_comp[[1]]@md == 1 && n_comps > 1){
-      bpr <- spa_add_component(bpr, head(components, n=n_comps-1))
+      bpr <- create_empty_pgeom("PLATEAUREGION")
+      bpr <- spa_add_component(bpr, head(pgeom@component, n=n_comps-1))
+    } else {
+      ret <- new("pgeom", component = pgeom@component, supp = pgeom@supp, type = pgeom@type)
+      return(ret)
     }
-    return(bpr)
   }
   else{
     stop("Invalid value for the parameter 'bound_part'.", call. = FALSE)
