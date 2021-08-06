@@ -586,7 +586,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' @param fsi An FSI model builded with the `fsi_create` function that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
 #' @param qw An `sfg` object storing the query window that is supposed to be used as input for the inference. It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).
 #' @param approach Defines which approach is employed to perform the query window inference: `“discretization”` or `“pso”`. Default value is `"discretization"``
-#' @param …  Different set of parameters required depending on the chosen approach (see more in details below).
+#' @param ...  Different set of parameters required depending on the chosen approach (see more in details below).
 #'
 #' @details 
 #'
@@ -630,14 +630,15 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' fsi <- fsi_add_rules(fsi, rules)
 #' 
 #' # Defining the query window that is defined over an application domain
-#' pts_qw1 <- rbind(c(-73.92, 40.68527), c(-73.75, 40.68527), c(-73.75, 40.75), c(-73.92, 40.75), c(-73.92, 40.68527))
+#' pts_qw1 <- rbind(c(-73.92, 40.68527), c(-73.75, 40.68527), 
+#'                  c(-73.75, 40.75), c(-73.92, 40.75), c(-73.92, 40.68527))
 #' qw1 <- st_polygon(list(pts_qw1))
 #' 
 #' # Example using the discretization approach:
-#' dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 100)
+#' dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 25)
 #'
-#' # Example using the pso approach:
-#' pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
+#' # Example using the pso approach in one level only:
+#' pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 1)
 #' 
 #' @import utils dplyr
 #' @export

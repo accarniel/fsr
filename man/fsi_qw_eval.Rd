@@ -13,7 +13,7 @@ fsi_qw_eval(fsi, qw, approach = "discretization", ...)
 
 \item{approach}{Defines which approach is employed to perform the query window inference: \verb{“discretization”} or \verb{“pso”}. Default value is `"discretization"``}
 
-\item{…}{Different set of parameters required depending on the chosen approach (see more in details below).}
+\item{...}{Different set of parameters required depending on the chosen approach (see more in details below).}
 }
 \value{
 A tibble in the format \verb{(points, inferred_values)}, where \code{points} is an \code{sfc} object (i.e., a list of \code{sfg} objects of geometry type POINT) and \code{inferred_values} are inferred values in the domain of the consequent of the FSI model.
@@ -62,13 +62,14 @@ rules <- c(
 fsi <- fsi_add_rules(fsi, rules)
 
 # Defining the query window that is defined over an application domain
-pts_qw1 <- rbind(c(-73.92, 40.68527), c(-73.75, 40.68527), c(-73.75, 40.75), c(-73.92, 40.75), c(-73.92, 40.68527))
+pts_qw1 <- rbind(c(-73.92, 40.68527), c(-73.75, 40.68527), 
+                 c(-73.75, 40.75), c(-73.92, 40.75), c(-73.92, 40.68527))
 qw1 <- st_polygon(list(pts_qw1))
 
 # Example using the discretization approach:
-dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 100)
+dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 25)
 
-# Example using the pso approach:
-pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
+# Example using the pso approach in one level only:
+pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 1)
 
 }

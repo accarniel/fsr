@@ -50,8 +50,9 @@ pregions$pgeoms[[1]]
 pregions$pgeoms[[2]]
 
 # capturing and showing the boundary plateau line of each pgeom object previously created
-(spa_boundary_pregion(pregions$pgeoms[[1]], bound_part = "line"))
-(spa_boundary_pregion(pregions$pgeoms[[2]], bound_part = "line")) # this is empty because there is no core!
+(spa_boundary_pregion(pregions$pgeoms[[1]], bound_part = "line")) 
+(spa_boundary_pregion(pregions$pgeoms[[2]], bound_part = "line"))
+# the last boundary is empty because there is no core! 
 
 # capturing and showing the boundary plateau region (this is the default behavior)
 (spa_boundary_pregion(pregions$pgeoms[[1]]))
