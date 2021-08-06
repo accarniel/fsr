@@ -497,7 +497,7 @@ fsi_eval <- function(fsi, point, ...) {
 
 #' @import sf tibble
 #' @noRd
-fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL) {
+fsi_qwi_discretization <- function(fsi, qw, k, n_col = NULL, n_row = NULL, ...) {
   if(!(is.null(n_col) && is.null(n_row))) {
     regular_grid_points <- st_make_grid(qw, n = c(n_row, n_col), what = "centers")
   } else {
@@ -575,6 +575,70 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 }
 
 
+
+#' @title fsi_qw_eval
+#' @description fsi_qw_eval implements two approaches for evaluating the query window inference
+#' 
+#' @usage
+#'
+#' fsi_qw_eval(fsi, qw, approach = "discretization", ...) 
+#'
+#' @param fsi An FSI model builded with the `fsi_create` function that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
+#' @param qw An `sfg` object storing the query window that is supposed to be used as input for the inference. It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).
+#' @param approach Defines which approach is employed to perform the query window inference: `“discretization”` or `“pso”`. Default value is `"discretization"``
+#' @param …  Different set of parameters required depending on the chosen approach (see more in details below).
+#'
+#' @details 
+#'
+#' For the _discretization_ approach, two additional parameters are needed and they have to be informed by using the three-dots parameter `...`: 
+#' - `target_lval`: A character value that indicates the target linguistic value from the linguistic variable of the consequent.
+#' - `k`: A numeric value that defines the number of points that will be captured from the query window and evaluated by the function `fsi_eval`. Its square root has to an integer value.   Alternatively, you can inform the number of columns and rows of the regular grid to be performed on the query window by informing numeric values for `n_col` and `n_row`, respectively. Thus, these parameters can be given instead of the number `k`.
+#' 
+#' For the _pso_ approach, it is necessary to set the following parameters:
+#' - `what`: A character value that defines the user's goal, which can be either **maximize** or **minimize** inferred values. Thus, this parameter can be `“max”` and `“min”`, respectively. The default value is `“max”`.
+#' - `max_depth`: A numeric value that refers to the number of times the user wants to split the query window. The default value is equal to 2. For instance, a `max_depth` = 2 results in the query window splitted into four sub quadrants, where the PSO algorithm will be applied to each one as its search space. 
+#' In addition, the PSO algorithm has its own set of parameters:
+#' - `maxit`: A numeric value that defines the maximum number of iterations. Default value is 50.
+#' - `population`: A numeric value that defines the number of particles. Default value is 10.
+#'
+#' @return
+#'
+#' A tibble in the format `(points, inferred_values)`, where `points` is an `sfc` object (i.e., a list of `sfg` objects of geometry type POINT) and `inferred_values` are inferred values in the domain of the consequent of the FSI model.
+#'
+#' @examples 
+#'
+#' library(sf)
+#' # Creating the FSI model from an example implemented with the visitation function:
+#' fsi <- visitation()
+#'
+#' # Creating a vector of fuzzy rules; 
+#' ## note that we make use of the linguistic variables and linguistic values previously defined:
+#' rules <- c(
+#'   "IF accommodation review is reasonable AND food safety is low 
+#'   THEN visiting experience is awful",
+#'  "IF accommodation price is expensive AND accommodation review is reasonable 
+#'    THEN visiting experience is awful",
+#'  "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
+#'    THEN visiting experience is average",
+#'  "IF accommodation price is affordable AND accommodation review is excellent 
+#'                                                                 AND food safety is high 
+#'    THEN visiting experience is great",
+#'  "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
+#'    THEN visiting experience is great")
+#' 
+#' # Adding these rules to the FSI model previously instantiated:
+#' fsi <- fsi_add_rules(fsi, rules)
+#' 
+#' # Defining the query window that is defined over an application domain
+#' pts_qw1 <- rbind(c(-73.92, 40.68527), c(-73.75, 40.68527), c(-73.75, 40.75), c(-73.92, 40.75), c(-73.92, 40.68527))
+#' qw1 <- st_polygon(list(pts_qw1))
+#' 
+#' # Example using the discretization approach:
+#' dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 100)
+#'
+#' # Example using the pso approach:
+#' pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
+#' 
 #' @import utils dplyr
 #' @export
 fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
@@ -595,10 +659,12 @@ fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
                        pso = {
                          target <- params$what
                          target_mf <- NULL
-                         if(target == "max"){
+                         if(is.null(target) || target == "max"){
                            target_mf <- tail(fsi$cs[[1]]$mfs, n=1)[[1]]
-                         } else {
+                         } else if (target == "min") {
                            target_mf <- head(fsi$cs[[1]]$mfs, n=1)[[1]]
+                         } else {
+                           stop("Invalid value for the what parameter.", call. = FALSE)
                          }
                          do.call(fsi_qwi_pso, c(list(fsi, qw, target_mf), params))
                        },
