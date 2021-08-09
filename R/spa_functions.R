@@ -499,7 +499,7 @@ spa_exact_equal <- function(pgeom1, pgeom2){
 #' 
 #' @return
 #'
-#' A Boolean value that indicates if a `pgeom` is completely and certainly inside of `pgeom2`.
+#' A Boolean value that indicates if a `pgeom` is completely and certainly inside `pgeom2`.
 #'
 #' @references
 #'
@@ -522,10 +522,10 @@ spa_exact_equal <- function(pgeom1, pgeom2){
 #' pp2 <- create_pgeom(list(cp2, cp1), "PLATEAUPOINT")
 #' 
 #' # The other of operands after the result
-#' # pp1 is not inside of pp2 since it has one point that is not included in pp2
+#' # pp1 is not inside pp2 since it has one point that is not included in pp2
 #' spa_exact_inside(pp1, pp2)
 #' 
-#' # on the other hand, pp2 is inside of pp1
+#' # on the other hand, pp2 is inside pp1
 #' spa_exact_inside(pp2, pp1)
 #'
 #' @export

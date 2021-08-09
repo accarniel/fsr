@@ -12,7 +12,7 @@ spa_exact_inside(pgeom1, pgeom2)
 \item{pgeom2}{A \code{pgeom} object (i.e., plateau geometry object) of any type.}
 }
 \value{
-A Boolean value that indicates if a \code{pgeom} is completely and certainly inside of \code{pgeom2}.
+A Boolean value that indicates if a \code{pgeom} is completely and certainly inside \code{pgeom2}.
 }
 \description{
 spa_exact_inside checks whether a \code{pgeom} object is completely inside of another \code{pgeom} object.
@@ -42,10 +42,10 @@ pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
 pp2 <- create_pgeom(list(cp2, cp1), "PLATEAUPOINT")
 
 # The other of operands after the result
-# pp1 is not inside of pp2 since it has one point that is not included in pp2
+# pp1 is not inside pp2 since it has one point that is not included in pp2
 spa_exact_inside(pp1, pp2)
 
-# on the other hand, pp2 is inside of pp1
+# on the other hand, pp2 is inside pp1
 spa_exact_inside(pp2, pp1)
 
 }
