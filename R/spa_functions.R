@@ -477,6 +477,57 @@ spa_exact_equal <- function(pgeom1, pgeom2){
   return(TRUE)
 }
 
+#' @title spa_exact_inside
+#'
+#' @description spa_exact_inside checks whether a `pgeom` object is completely inside of another `pgeom` object.
+#'
+#' @usage
+#'
+#' spa_exact_inside(pgeom1, pgeom2)
+#'
+#' @param pgeom1 A `pgeom` object (i.e., plateau geometry object) of any type.
+#' @param pgeom2 A `pgeom` object (i.e., plateau geometry object) of any type.
+#' 
+#' @details
+#'  
+#' It is a Boolean function that checks _fuzzy containment_ in the spatial plateau context. 
+#' 
+#' This Boolean function checks whether the components of `pgeom1` are contained in the components of `pgeom2` 
+#' by considering their membership degrees and geographic positions. That is, it is follows the classical definition of fuzzy containment of the fuzzy set theory.
+#' 
+#' In other words, this function checks if the (standard) intersection of `pgeom1` and `pgeom2` is exactly equal to `pgeom1`. The other of operands affects the result.
+#' 
+#' @return
+#'
+#' A Boolean value that indicates if a `pgeom` is completely and certainly inside of `pgeom2`.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(sf)
+#'
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' 
+#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
+#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
+#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' 
+#' # Creating two spatial plateau objects
+#' pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp2 <- create_pgeom(list(cp2, cp1), "PLATEAUPOINT")
+#' 
+#' # The other of operands after the result
+#' # pp1 is not inside of pp2 since it has one point that is not included in pp2
+#' spa_exact_inside(pp1, pp2)
+#' 
+#' # on the other hand, pp2 is inside of pp1
+#' spa_exact_inside(pp2, pp1)
+#'
 #' @export
 spa_exact_inside <- function(pgeom1, pgeom2){
   spa_exact_equal(spa_intersection(pgeom1, pgeom2), pgeom1)
