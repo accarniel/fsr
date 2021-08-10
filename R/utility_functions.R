@@ -120,21 +120,19 @@ create_component <- function(raw_obj, md, type){
 #' # POINT
 #' md1 <- 0.2
 #' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
-#' 
+#' comp1 <- component_from_sfg(st_multipoint(pts1), md1) 
 #' 
 #' # LINE
 #' md2 <- 0.1
 #' pts2 <- rbind(c(2, 2), c(3, 3))
-#' comp2 <- component_from_sfg(st_linestring(pts2), md2)
-#' 
+#' comp2 <- component_from_sfg(st_linestring(pts2), md2) 
 #'
 #' # REGION
 #' md3 <- 0.4
 #' matrix_object = matrix(c(1,1,8,1,8,8,1,8,1,1),ncol=2, byrow=TRUE)
 #' pts3 = list(matrix_object)
 #' comp3 = component_from_sfg(st_polygon(pts3), md3)
-
+#' 
 #' @import sf methods
 #' @export
 component_from_sfg <- function(sfg, md){
@@ -155,7 +153,6 @@ component_from_sfg <- function(sfg, md){
   }
 }
 
-
 #' @title create_empty_pgeom
 #'
 #' @description create_empty_pgeom builds an empty pgeom object of a specific type
@@ -174,7 +171,7 @@ component_from_sfg <- function(sfg, md){
 #'
 #' @return
 #'
-#' A pgeom object.
+#' A `pgeom` object.
 #'
 #' @examples
 #'
@@ -272,8 +269,7 @@ create_pgeom <- function(components, type){
 #' 
 #' For each component of the `pgeom` object, `pgeom_as_tibble` gets the `md` and `geometry` 
 #' values and allocates them into a row of the new created tibble, in separated columns.
-#' Therefore, each row of this tibble represents a component of the original `pgeom` object.
-#' 
+#' Therefore, each row of this tibble represents a component of the original `pgeom` object. 
 #' 
 #' @return
 #' 
@@ -449,7 +445,6 @@ is_pgeom <- function(type){
 #' @return
 #' 
 #' A Boolean value that indicates if a `pgeom` is empty.
-
 #' 
 #' @examples
 #'

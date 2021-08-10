@@ -11,7 +11,7 @@ create_empty_pgeom(type)
 It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"} or \code{"PLATEAUREGION"}}
 }
 \value{
-A pgeom object.
+A \code{pgeom} object.
 }
 \description{
 create_empty_pgeom builds an empty pgeom object of a specific type
