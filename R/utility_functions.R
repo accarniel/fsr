@@ -1,25 +1,40 @@
-#' @title create_component
+#' @title Create a component for a spatial plateau object from coordinate pairs or a 
+#' single `sfg` object labeled with a membership degree
 #'
-#' @description create_component builds a component composed of a Spatial Feature Geometry (sfg) object and its corresponding membership degree.
+#' @description These functions build a component that can be added to a spatial plateau object. 
+#' A component consists of  an `sfg` object and an associated membership degree.
+#' A component can be built in two different ways. By using the function `create_component`, the component is formed by 
+#' the means of a  numeric vector, list or matrix that represents a pair of coordinates. 
+#' By using the function `component_from_sfg`, the component is created from an `sfg`
+#' object. 
 #'
 #' @usage
 #'
 #' create_component(raw_obj, md, type)
 #'
-#' @param raw_obj A vector, list or matrix containing the points to create an sfg object.
-#' @param md A numeric value indicating the membership degree of the component.
-#' @param type A character value that indicates the type of the desired sfg object. It can be either `"POINT"`, `"LINE"`, or `"REGION"`.
+#' @param raw_obj A vector, list or matrix containing the pairs of coordinates  to create the `sfg` object of the component.
+#' @param md A numeric value indicating the membership degree of the component. It has to be a value in \eqn{]0, 1]}.
+#' @param type A character value that indicates the type of the desired `sfg` object. 
+#' It should be either `"POINT"`, `"LINE"`, or `"REGION"`.
 #'
+#' @name fsr_components
+#' 
 #' @details
 #'
-#' This function creates an S4 object named `component`, which is a pair of an sfg object and a membership degree in \eqn{]0, 1]}.
+#' These functions create a `component` object, which is a pair of an `sfg` object and a membership degree in \eqn{]0, 1]}.
 #'
-#' The spatial data type (i.e., the type of the sfg object) indicated by the parameter `type` groups simple and complex objects.
-#' For instance, `"POINT"` refers to simple or complex point objects (internally, we can create a POINT or MULTIPOINT object).
+#' The function `create_component` receives  three parameters: `raw_obj`, `md` and `type`. The use of `raw_obj` is 
+#' similar to the parameter of the family of functions of the `sf` package (`st` family) that creates spatial objects 
+#' from a numeric vector, matrix or list (e.g., the functions `st_point`, `st_multipoint`, etc.). The spatial data type 
+#' (i.e., the type of the `sfg` object) indicated by the parameter `type` represents simple and complex objects.
+#' For instance, `"POINT"` may refer to simple or complex point objects (internally, we can create a POINT or MULTIPOINT object). 
 #'
+#' The `component_from_sfg` builds a `component` object by using the specification of two parameters that directly represents the 
+#' pair of an `sfg` object and its corresponding membership degree (i.e.,  `md` value).
+#' 
 #' @return
 #'
-#' A `component` object that can be added to a spatial plateau object.
+#' A `component` object that can be added to a spatial plateau object (i.e., a `pgeom` object).
 #'
 #' @examples
 #'
@@ -49,7 +64,6 @@
 #' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 #' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
 #' list_pols_1 <- list(p1,p2)
-#'
 #'
 #' p3 <- rbind(c(1,0), c(2,0), c(4,2), c(3,4), c(2,4), c(1,0))
 #' p4 <- rbind(c(2,2), c(2,3), c(3,4), c(2,2))
@@ -90,6 +104,36 @@ create_component <- function(raw_obj, md, type){
   new("component", obj = obj_component,md=md)
 }
 
+#' @name fsr_components
+#' 
+#' @usage
+#' component_from_sfg(sfg, md) 
+#' 
+#' @param sfg An `sfg` object. It should be either `POINT`, `MULTIPOINT`, `LINESTRING`,
+#'  `MULTILINESTRING`, `POLYGON` or `MULTIPOLYGON` type. Other types of spatial objects are not allowed.
+#'  
+#' @examples
+#' 
+#' # Creating components with an sfg object
+#' library(sf)
+#' 
+#' # POINT
+#' md1 <- 0.2
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
+#' 
+#' 
+#' # LINE
+#' md2 <- 0.1
+#' pts2 <- rbind(c(2, 2), c(3, 3))
+#' comp2 <- component_from_sfg(st_linestring(pts2), md2)
+#' 
+#'
+#' # REGION
+#' md3 <- 0.4
+#' matrix_object = matrix(c(1,1,8,1,8,8,1,8,1,1),ncol=2, byrow=TRUE)
+#' pts3 = list(matrix_object)
+#' comp3 = component_from_sfg(st_polygon(pts3), md3)
 
 #' @import sf methods
 #' @export
