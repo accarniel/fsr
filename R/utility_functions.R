@@ -431,6 +431,48 @@ is_pgeom <- function(type){
   }
 }
 
+#' @title pgeom_is_empty
+#'
+#' @description pgeom_is_empty checks whether a pgeom object is empty..
+#'
+#' @usage
+#' 
+#' pgeom_is_empty(pgeom)
+#'
+#' @param pgeom A `pgeom` object.
+#'
+#' @details
+#' 
+#' It checks if a pgeom object has any component or not. If the number of components of a `pgeom` object is equal to 0, then 
+#' it returns  `TRUE`. Otherwise, it returns `FALSE`. 
+#' 
+#' @return
+#' 
+#' A Boolean value that indicates if a `pgeom` is empty.
+
+#' 
+#' @examples
+#'
+#' # Creating an empty pgeom object 
+#' pgeom_1 <- create_empty_pgeom("PLATEAULINE")
+#' 
+#' # Checking if it is empty
+#' pgeom_is_empty(pgeom_1)
+#' 
+#' # Creating a component to populate the pgeom object
+#' 
+#' library(sf)
+#' md <- 0.4
+#' pts <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' 
+#' comp <- component_from_sfg(st_multipoint(pts), md)
+#' 
+#' # Adding the component to the pgeom object
+#' pgeom_1 <- spa_add_component(pgeom_1, comp)
+#' 
+#' # Checking if it is still empty
+#' pgeom_is_empty(pgeom_1) 
+#' 
 #' @import sf
 #' @export
 pgeom_is_empty <- function(pgeom){
