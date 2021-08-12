@@ -4,10 +4,10 @@
 \alias{spa_boundary_pregion}
 \title{spa_boundary_pregion}
 \usage{
-spa_boundary_pregion(pgeom, bound_part = "region")
+spa_boundary_pregion(pregion, bound_part = "region")
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object (i.e., plateau geometry object) that is a plateau region (i.e., \code{"PLATEAUREGION"}). It throws an error for a different type of \code{pgeom} object.}
+\item{pregion}{A \code{pgeom} object (i.e., plateau geometry object) that is a plateau region (i.e., \code{"PLATEAUREGION"}). It throws an error for a different type of \code{pgeom} object.}
 
 \item{bound_part}{A character value that indicates the part of the fuzzy boundary to be returned. It can be \code{"region"} or \code{"line"}. See below for more details.}
 }
@@ -43,7 +43,7 @@ tbl = tibble(x = runif(10, min= 0, max = 30),
 
 classes <- c("category-1", "category-2")
 mf1 <- genmf("trapmf", c(0, 5, 20, 35))
-mf2 <- genmf("trimf", c(35, 80, 100))
+mf2 <- genmf("trimf", c(20, 80, 100))
 
 pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
 pregions$pgeoms[[1]]

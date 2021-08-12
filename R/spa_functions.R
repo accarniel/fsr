@@ -786,6 +786,65 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
   }
 }
 
+#' @title spa_contour
+#'
+#' @description spa_contour extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
+#'
+#' @usage
+#'
+#' spa_contour(pregion)
+#'
+#' @param pregion A `pgeom` object (i.e., plateau geometry object) that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
+#'
+#' @details
+#'
+#' It employs the definition of _fuzzy frontier_ of a fuzzy region object in the context of spatial plateau algebra (as defined in the references). 
+#' The _fuzzy frontier_ of a fuzzy region object `A` collects all single points of `A`, preserving its membership degrees, that are not in the interior of its support.
+#' 
+#' IMPORTANT NOTE: Fuzzy frontier is different from fuzzy boundary (see `spa_boundary_region`).
+#' 
+#' @return
+#'
+#' A `pgeom` object of type `"PLATEAULINE"` that represents the contour (i.e. frontier) of a plateau region object given as input.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(tibble)
+#' library(sf)
+#' library(FuzzyR)
+#' 
+#' set.seed(123)
+#' 
+#' # some random points to create pgeom objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#'              y = runif(10, min = 0, max = 50), 
+#'              z = runif(10, min = 0, max = 100))
+#'
+#' classes <- c("category-1", "category-2")
+#' mf1 <- genmf("trapmf", c(0, 5, 20, 35))
+#' mf2 <- genmf("trimf", c(35, 80, 100))
+#' 
+#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#' 
+#' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2), base_poly = ch)
+#' 
+#' # capturing and showing the frontier of each pgeom object previously created
+#' frontier_pregion1 <- spa_contour(pregions$pgeoms[[1]]) 
+#' frontier_pregion2 <- spa_contour(pregions$pgeoms[[2]])
+#' 
+#' plot(pregions$pgeoms[[1]])
+#' plot(frontier_pregion1)
+#' 
+#' plot(pregions$pgeoms[[2]])
+#' plot(frontier_pregion2)
+#'
 #' @import  sf
 #' @export
 spa_contour <- function(pregion){
@@ -795,9 +854,13 @@ spa_contour <- function(pregion){
 
   pregion_tibble <- pgeom_as_tibble(pregion)
   pregion_tibble$boundary <- st_boundary(pregion_tibble$geometry)
-
   pregion_df <- as.data.frame(pregion_tibble)
-  create_pgeom(pregion_df[,c(1,3)], "PLATEAULINE")
+  pline <- create_pgeom(pregion_df[,c(1,3)], "PLATEAULINE")
+  
+  crisp_contour <- create_empty_pgeom("PLATEAULINE")
+  crisp_contour <- spa_add_component(crisp_contour, component_from_sfg(st_boundary(pregion@supp), 1))
+  
+  spa_intersection(pline, crisp_contour)
 }
 
 pkg_env <- new.env()
@@ -851,9 +914,9 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' @usage
 #'
-#' spa_boundary_pregion(pgeom, bound_part = "region")
+#' spa_boundary_pregion(pregion, bound_part = "region")
 #'
-#' @param pgeom A `pgeom` object (i.e., plateau geometry object) that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
+#' @param pregion A `pgeom` object (i.e., plateau geometry object) that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
 #' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
 #'
 #' @details
@@ -890,7 +953,7 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' classes <- c("category-1", "category-2")
 #' mf1 <- genmf("trapmf", c(0, 5, 20, 35))
-#' mf2 <- genmf("trimf", c(35, 80, 100))
+#' mf2 <- genmf("trimf", c(20, 80, 100))
 #' 
 #' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
 #' pregions$pgeoms[[1]]
@@ -907,15 +970,15 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' @import methods utils sf
 #' @export
-spa_boundary_pregion <- function(pgeom, bound_part = "region"){
+spa_boundary_pregion <- function(pregion, bound_part = "region"){
 
-  if(pgeom@type != "PLATEAUREGION"){
+  if(pregion@type != "PLATEAUREGION"){
     stop("pgeom is not a PLATEAUREGION object.", call. = FALSE)
   }
 
   if(bound_part == "line"){
     bpl <- create_empty_pgeom("PLATEAULINE")
-    last_comp <- tail(pgeom@component, 1)
+    last_comp <- tail(pregion@component, 1)
     if(last_comp[[1]]@md == 1){
       boundary_component <- st_boundary(last_comp[[1]]@obj)
       comp_line <- new("component", obj = boundary_component, md=1)
@@ -924,13 +987,13 @@ spa_boundary_pregion <- function(pgeom, bound_part = "region"){
     return(bpl)
   }
   else if(bound_part == "region"){
-    last_comp <- tail(pgeom@component, 1)
-    n_comps <- spa_ncomp(pgeom)
+    last_comp <- tail(pregion@component, 1)
+    n_comps <- spa_ncomp(pregion)
     if(last_comp[[1]]@md == 1 && n_comps > 1){
       bpr <- create_empty_pgeom("PLATEAUREGION")
-      bpr <- spa_add_component(bpr, head(pgeom@component, n=n_comps-1))
+      bpr <- spa_add_component(bpr, head(pregion@component, n=n_comps-1))
     } else {
-      ret <- new("pgeom", component = pgeom@component, supp = pgeom@supp, type = pgeom@type)
+      ret <- new("pgeom", component = pregion@component, supp = pregion@supp, type = pregion@type)
       return(ret)
     }
   }
