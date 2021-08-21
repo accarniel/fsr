@@ -56,40 +56,105 @@ spa_add_component <- function(pgeom_obj, components) {
   pgeom_obj
 }
 
-#' @import sf
+#' @title spa_eval
+#'
+#' @description spa_eval evaluates the membership degree of a given point in a plateau region object.
+#'
+#' @usage
+#'
+#' spa_eval(pgeom, point)
+#'
+#' @param pgeom A `pgeom` object of any type.
+#' @param point An `sfg` object of type `"POINT"`.
+#'
+#' @details
+#'
+#' The goal of this function is to return the membership degree of a simple point object (i.e., `sfg` object) in a given spatial plateau object (i.e., `pgeom` object).
+#' This evaluation depends on the following basic cases:
+#' 
+#' - if the simple point object belongs to the interior or boundary of _one_ component of the spatial plateau object, it returns the membership degree of that component.
+#' - if the simple point object intersects more components (e.g., boundaries of region components, or different line components), it returns the maximum membership degree of all intersected components.
+#' - if the simple point object is disjoint to the support of the spatial plateau object, it returns 0.
+#' 
+#' @return
+#'
+#' A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., `sfg` object) in a spatial plateau object (i.e., `pgeom` object).
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(tibble)
+#' library(sf)
+#' library(FuzzyR)
+#' 
+#' # some basic examples 
+#' 
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' 
+#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
+#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
+#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' 
+#' pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' 
+#' spa_eval(pp, st_point(c(1, 2)))
+#' spa_eval(pp, st_point(c(1, 3)))
+#' 
+#' # other examples with plateau regions
+#' 
+#' set.seed(345)
+#' 
+#' # some random points to create plateau region objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 20), 
+#'              y = runif(10, min = 0, max = 30), 
+#'              z = runif(10, min = 0, max = 100))
+#' 
+#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#' 
+#' pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
+#' 
+#' # capturing the membership degree of a specific point in each object
+#' spa_eval(pregions$pgeoms[[1]], st_point(c(5, 15)))
+#' spa_eval(pregions$pgeoms[[2]], st_point(c(5, 15)))
+#'
+#' @import  sf
 #' @export
-spa_eval <- function(obj, point = NA){
-  if(inherits(obj, "component")){
-    obj@md
-  } else if(inherits(obj, "pgeom")){
-    if(any(is.na(point))){
-      stop("point is NA.", call. = FALSE)
-    }
-    ret <- 0
-    if(class(point)[[2]] != "POINT"){
-      stop("'point' must be a simple point object.", call. = FALSE)
-    }
+spa_eval <- function(pgeom, point){
+  if(any(is.na(point))){
+    stop("The parameter 'point' is NA.", call. = FALSE)
+  }
+  
+  if(!(st_is(point, "POINT") && inherits(point, "sfg"))){
+    stop("The parameter 'point' is not a simple point object of class sfg.", call. = FALSE)
+  }
+  
+  ret <- 0
 
-    if(st_intersects(point, obj@supp, sparse = FALSE)[1]){
-      # check in the boundary
-      md_comps <- c()
-      for(component in obj@component){
-        if(st_intersects(point, st_boundary(component@obj), sparse = FALSE)[1]){
+  if(st_intersects(point, pgeom@supp, sparse = FALSE)[1]){
+    # check in the boundary
+    md_comps <- c()
+    for(component in pgeom@component){
+      if(st_intersects(point, st_boundary(component@obj), sparse = FALSE)[1]){
+        md_comps <- append(md_comps, component@md)
+      } #  check in its interior...
+      else if(st_intersects(point, component@obj, sparse = FALSE)[1]){
+        if(pgeom@type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
+          return(component@md)
+        } else{
           md_comps <- append(md_comps, component@md)
-        } #  check in its interior...
-        else if(st_intersects(point, component@obj, sparse = FALSE)[1]){
-          if(obj@type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
-            return(component@md)
-          } else{
-            md_comps <- append(md_comps, component@md)
-          }
-
         }
       }
-      ret <- max(md_comps)
     }
-    ret
+    ret <- max(md_comps)
   }
+  ret
 }
 
 #' @export
@@ -298,7 +363,7 @@ spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
 #'
 #' spa_support(pgeom)
 #'
-#' @param pgeom A `pgeom` object (i.e., plateau geometry object) of any type.
+#' @param pgeom A `pgeom` object of any type.
 #'
 #' @details
 #'
@@ -350,7 +415,7 @@ spa_support <- function(pgeom){
 #'
 #' spa_core(pgeom)
 #'
-#' @param pgeom A `pgeom` object (i.e., plateau geometry object) of any type.
+#' @param pgeom A `pgeom` object of any type.
 #'
 #' @details
 #'
@@ -417,8 +482,8 @@ spa_core <- function(pgeom){
 #'
 #' spa_exact_equal(pgeom1, pgeom2)
 #'
-#' @param pgeom1 A `pgeom` object (i.e., plateau geometry object) of any type.
-#' @param pgeom2 A `pgeom` object (i.e., plateau geometry object) of any type.
+#' @param pgeom1 A `pgeom` object of any type.
+#' @param pgeom2 A `pgeom` object of any type.
 #' 
 #' @details
 #'
@@ -485,8 +550,8 @@ spa_exact_equal <- function(pgeom1, pgeom2){
 #'
 #' spa_exact_inside(pgeom1, pgeom2)
 #'
-#' @param pgeom1 A `pgeom` object (i.e., plateau geometry object) of any type.
-#' @param pgeom2 A `pgeom` object (i.e., plateau geometry object) of any type.
+#' @param pgeom1 A `pgeom` object of any type.
+#' @param pgeom2 A `pgeom` object of any type.
 #' 
 #' @details
 #'  
@@ -794,7 +859,7 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 #'
 #' spa_contour(pregion)
 #'
-#' @param pregion A `pgeom` object (i.e., plateau geometry object) that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
+#' @param pregion A `pgeom` object that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
 #'
 #' @details
 #'
@@ -916,7 +981,7 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' spa_boundary_pregion(pregion, bound_part = "region")
 #'
-#' @param pregion A `pgeom` object (i.e., plateau geometry object) that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
+#' @param pregion A `pgeom` object of type `"PLATEAUREGION"`. It throws an error for a different type of `pgeom` object.
 #' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
 #'
 #' @details

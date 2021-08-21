@@ -7,7 +7,7 @@
 spa_support(pgeom)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object (i.e., plateau geometry object) of any type.}
+\item{pgeom}{A \code{pgeom} object of any type.}
 }
 \value{
 An \code{sfg} object that represents the support of \code{pgeom}. It can be an empty object if \code{pgeom} is empty.

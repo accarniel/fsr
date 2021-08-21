@@ -7,9 +7,9 @@
 spa_exact_equal(pgeom1, pgeom2)
 }
 \arguments{
-\item{pgeom1}{A \code{pgeom} object (i.e., plateau geometry object) of any type.}
+\item{pgeom1}{A \code{pgeom} object of any type.}
 
-\item{pgeom2}{A \code{pgeom} object (i.e., plateau geometry object) of any type.}
+\item{pgeom2}{A \code{pgeom} object of any type.}
 }
 \value{
 A Boolean value that indicates if two \code{pgeom} objects are exactly equal.

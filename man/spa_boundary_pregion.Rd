@@ -7,7 +7,7 @@
 spa_boundary_pregion(pregion, bound_part = "region")
 }
 \arguments{
-\item{pregion}{A \code{pgeom} object (i.e., plateau geometry object) that is a plateau region (i.e., \code{"PLATEAUREGION"}). It throws an error for a different type of \code{pgeom} object.}
+\item{pregion}{A \code{pgeom} object of type \code{"PLATEAUREGION"}. It throws an error for a different type of \code{pgeom} object.}
 
 \item{bound_part}{A character value that indicates the part of the fuzzy boundary to be returned. It can be \code{"region"} or \code{"line"}. See below for more details.}
 }
