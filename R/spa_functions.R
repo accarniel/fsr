@@ -1,8 +1,48 @@
-#' @import sf
+#' @title spa_add_component
+#'
+#' @description spa_add_component adds a component into a spatial plateau object.
+#'
+#' @usage
+#'
+#' spa_add_component(pgeom, components)
+#'
+#' @param pgeom A `pgeom` object of any type.
+#' @param components A `component` object or a list of `component` objects.
+#'
+#' @details
+#'
+#' This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
+#' The goal of this function is to insert a component or a list of components into a `pgeom` object. 
+#' This insertion is based on the membership degree of the component (e.g., created by `component_from_sfg`). Thus, it preserves the properties of a spatial plateau object.
+#' However, this function assumes that a component is compatible with the `pgeom` object and its geometric format is valid (i.e., it does not overlap with existing components).
+#'  
+#' @return
+#'
+#' A `pgeom` object containing the `component` objects.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(sf)
+#'
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
+#' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+#' 
+#' # appending these components into an empty pgeom object
+#' 
+#' pp <- create_empty_pgeom("PLATEAUPOINT")
+#' pp <- spa_add_component(pp, list(comp1, comp2))
+#' pp
+#'
+#' @import  sf
 #' @export
-spa_add_component <- function(pgeom_obj, components) {
-  if(is.null(pgeom_obj)){
-    stop("pgeom_obj is null. Please use create_pgeom() to
+spa_add_component <- function(pgeom, components) {
+  if(is.null(pgeom)){
+    stop("pgeom is null. Please use create_pgeom() to
          create an empty spatial plateau object.", call. = FALSE)
   }
 
@@ -10,8 +50,8 @@ spa_add_component <- function(pgeom_obj, components) {
     stop("components is null. It should be a single component or a list of components.", call. = FALSE)
   }
 
-  if(class(pgeom_obj) != "pgeom"){
-    stop(paste(pgeom_obj, "is not a pgeom object (Spatial Plateau Object.)", sep = ' '), call. = FALSE)
+  if(class(pgeom) != "pgeom"){
+    stop(paste(pgeom, "is not a pgeom object.", sep = ' '), call. = FALSE)
   }
 
   if(!inherits(components, "list")) {
@@ -33,27 +73,27 @@ spa_add_component <- function(pgeom_obj, components) {
       next
     }
 
-    # 2. if the pgeom_obj is empty and the component is not empty and has a membership greater than 0
-    if(pgeom_is_empty(pgeom_obj) && !(is.null(c) || st_is_empty(c)) && m > 0){
-      pgeom_obj@component[[1]] <- component
-      pgeom_obj@supp <- c
+    # 2. if the pgeom is empty and the component is not empty and has a membership greater than 0
+    if(pgeom_is_empty(pgeom) && !(is.null(c) || st_is_empty(c)) && m > 0){
+      pgeom@component[[1]] <- component
+      pgeom@supp <- c
 
     } else if(!is.null(c) & length(c) >= 1){
-      index = search_by_md(pgeom_obj@component, 1, length(pgeom_obj@component), m)
+      index = search_by_md(pgeom@component, 1, length(pgeom@component), m)
 
-      # 3. if the membership degree exists in the pgeom_obj, we should merge it
+      # 3. if the membership degree exists in the pgeom, we should merge it
       if(index[1] == TRUE){
-        pgeom_obj@component[[index[2]]]@obj <- st_union(pgeom_obj@component[[index[2]]]@obj, c)
+        pgeom@component[[index[2]]]@obj <- st_union(pgeom@component[[index[2]]]@obj, c)
       } else {
         #otherwise, we simply append into the correct location
-        pgeom_obj@component <- append(pgeom_obj@component, component, after=index[2]-1)
+        pgeom@component <- append(pgeom@component, component, after=index[2]-1)
       }
       #in both cases we update its support
-      pgeom_obj@supp <- st_union(pgeom_obj@supp, c)
+      pgeom@supp <- st_union(pgeom@supp, c)
     }
   }
 
-  pgeom_obj
+  pgeom
 }
 
 #' @title spa_eval
