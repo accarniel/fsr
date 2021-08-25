@@ -197,6 +197,95 @@ spa_eval <- function(pgeom, point){
   ret
 }
 
+#' @title Fuzzy numerical operations
+#'
+#' @description Fuzzy numerical operations are given as a family of functions that implements spatial plateau metric operations.
+#' These functions extract metric properties from spatial plateau objects, 
+#' such as the area of a plateau region object and the length of a plateau line object.
+#'
+#' @usage
+#'
+#' spa_avg_degree(pgeom)
+#'
+#' @param pgeom A `pgeom` object of any type.
+#' 
+#' @name fsr_numerical_operations
+#'
+#' @details
+#'
+#' These functions calculate numerical properties from spatial plateau objects (i.e., `pgeom` objects). 
+#' Some of them are _type-independent_. This means that the parameter can be a `pgeom` object of any type. 
+#' The type-independent functions are:
+#' 
+#' - `spa_avg_degree` calculates the average membership degree of a spatial plateau object.
+#' - `spa_nofcomp` returns the number of components of a spatial plateau object.
+#' 
+#' The remaining functions are _type-dependent_. This means that the parameter have to be of a specific type.
+#' The type-dependent functions are:
+#' 
+#' - `spa_area` computes the area of a plateau region object. Thus, its parameter has to be a `PLATEAUREGION` object.
+#' - `spa_perimeter` computes the perimeter of a plateau region object. Thus, its parameter has to be a `PLATEAUREGION` object.
+#' - `spa_length` computes the length of a plateau line object. Thus, its parameter has to be a `PLATEAULINE` object.
+#' 
+#' @return
+#'
+#' A numeric value.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(sf)
+#' library(tibble)
+#'
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
+#' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+#' 
+#' pp <- create_pgeom(list(comp1, comp2), "PLATEAUPOINT")
+#' 
+#' # calculating the average degree and number of components of pp
+#' 
+#' spa_avg_degree(pp)
+#' spa_ncomp(pp)
+#' 
+#' # calculating the area and perimeter
+#' 
+#' set.seed(345)
+#' 
+#' # some random points to create plateau region objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 20), 
+#'              y = runif(10, min = 0, max = 30), 
+#'              z = runif(10, min = 0, max = 100))
+#' 
+#' #getting the convex hull on the points to clip the construction of plateau region objects
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#' 
+#' pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
+#' 
+#' spa_area(pregions$pgeoms[[1]])
+#' spa_area(pregions$pgeoms[[2]])
+#' 
+#' spa_perimeter(pregions$pgeoms[[1]])
+#' spa_perimeter(pregions$pgeoms[[2]])
+#' 
+#' # calculating the length of a plateau line object
+#' 
+#' lpts1 <- rbind(c(0, 0), c(1, 1))
+#' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
+#' 
+#' cp1 <- component_from_sfg(st_linestring(lpts1), 0.4)
+#' cp2 <- component_from_sfg(st_linestring(lpts2), 1)
+#' cp3 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#' 
+#' pline <- create_pgeom(list(cp1, cp2, cp3), "PLATEAULINE")
+#' 
+#' spa_length(pline)
+#'
 #' @export
 spa_avg_degree <- function(pgeom){
   get_md <- function(comp){
@@ -206,17 +295,31 @@ spa_avg_degree <- function(pgeom){
   mean(mds_vec)
 }
 
+#' @name fsr_numerical_operations
+#' 
+#' @usage
+#' 
+#' spa_ncomp(pgeom) 
+#'  
 #' @export
 spa_ncomp <- function(pgeom){
   length(pgeom@component)
 }
 
+#' @name fsr_numerical_operations
+#' 
+#' @usage
+#' 
+#' spa_area(pr) 
+#' 
+#' @param pr A `pgeom` object of type `PLATEAUREGION`. It throws an error if a different type is given.
+#'  
 #' @import sf
 #' @export
-spa_area <- function(pgeom){
+spa_area <- function(pr){
 
-  if(pgeom@type!='PLATEAUREGION'){
-    stop("This type is not a PLATEAUREGION object.", call. = FALSE)
+  if(pr@type != "PLATEAUREGION"){
+    stop("The input is not a PLATEAUREGION object.", call. = FALSE)
   }
 
   area_comp <- function(comp){
@@ -225,16 +328,50 @@ spa_area <- function(pgeom){
     area_obj * md_comp
   }
 
-  comps_areas <- unlist(lapply(pgeom@component, area_comp))
+  comps_areas <- unlist(lapply(pr@component, area_comp))
   sum(comps_areas)
 }
 
+#' @name fsr_numerical_operations
+#' 
+#' @usage
+#' 
+#' spa_perimeter(pr) 
+#'  
+#' @import sf lwgeom
+#' @export
+spa_perimeter <- function(pr){
+  
+  if(pr@type != "PLATEAUREGION"){
+    stop("The input is not a PLATEAUREGION object.", call. = FALSE)
+  }
+  
+  perimeter_comp <- function(comp){
+    md_comp = comp@md
+    temp <- st_sfc(comp@obj)
+    st_set_crs(temp, 4326)
+    perimeter_obj = st_perimeter(temp)
+    perimeter_obj * md_comp
+  }
+  
+  comps_perimeter <- unlist(lapply(pr@component, perimeter_comp))
+  sum(comps_perimeter)
+}
+
+#' @name fsr_numerical_operations
+#' 
+#' @usage
+#' 
+#' spa_length(pl) 
+#' 
+#' @param pl A `pgeom` object of type `PLATEAULINE`. It throws an error if a different type is given.
+#'  
 #' @import sf
 #' @export
-spa_length <- function(pgeom){
+spa_length <- function(pl){
 
-  if(pgeom@type!='PLATEAULINE'){
-    stop("This type is not a PLATEAULINE object.", call. = FALSE)
+  if(pl@type != "PLATEAULINE"){
+    stop("The input is not a PLATEAULINE object.", call. = FALSE)
   }
 
   length_comp <- function(comp){
@@ -243,29 +380,11 @@ spa_length <- function(pgeom){
     length_obj * md_comp
   }
 
-  components_lenghts <- unlist(lapply(pgeom@component, length_comp))
+  components_lenghts <- unlist(lapply(pl@component, length_comp))
   sum(components_lenghts)
 }
 
-#' @import sf lwgeom
-#' @export
-spa_perimeter <- function(pgeom){
 
-  if(pgeom@type!='PLATEAUREGION'){
-    stop("Not PLATEAUREGION pgeom.", call. = FALSE)
-  }
-
-  perimeter_comp <- function(comp){
-    md_comp = comp@md
-    temp <- st_sfc(comp@obj)
-    st_set_crs(temp, 4326)
-    perimeter_obj = st_perimeter(temp)
-    perimeter_obj * md_comp
-  }
-
-  comps_perimeter <- unlist(lapply(pgeom@component, perimeter_comp))
-  sum(comps_perimeter)
-}
 
 #' @import sf
 #' @export
@@ -899,7 +1018,7 @@ spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
 #'
 #' spa_contour(pregion)
 #'
-#' @param pregion A `pgeom` object that is a plateau region (i.e., `"PLATEAUREGION"`). It throws an error for a different type of `pgeom` object.
+#' @param pregion A `pgeom` object of type `PLATEAUREGION`. It throws an error if a different type is given.
 #'
 #' @details
 #'
@@ -1021,7 +1140,7 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' spa_boundary_pregion(pregion, bound_part = "region")
 #'
-#' @param pregion A `pgeom` object of type `"PLATEAUREGION"`. It throws an error for a different type of `pgeom` object.
+#' @param pregion A `pgeom` object of type `PLATEAUREGION`. It throws an error if a different type is given.
 #' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
 #'
 #' @details
@@ -1033,7 +1152,7 @@ soft_alpha_eval <- function(degree, alpha){
 #' 
 #' This means that the function `spa_boundary_pregion` can yield one specific part of the fuzzy boundary of a plateau region object (the argument `pgeom`).
 #' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeom` (i.e., returns a `pgeom` object of type `"PLATEAULINE"`).
-#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeom` (i.e., returns a `pgeom` object of type `"PLATEAUREGION"`).
+#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeom` (i.e., returns a `pgeom` object of type `PLATEAUREGION`).
 #' 
 #' @return
 #'

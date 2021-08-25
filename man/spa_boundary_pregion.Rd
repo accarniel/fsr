@@ -7,7 +7,7 @@
 spa_boundary_pregion(pregion, bound_part = "region")
 }
 \arguments{
-\item{pregion}{A \code{pgeom} object of type \code{"PLATEAUREGION"}. It throws an error for a different type of \code{pgeom} object.}
+\item{pregion}{A \code{pgeom} object of type \code{PLATEAUREGION}. It throws an error if a different type is given.}
 
 \item{bound_part}{A character value that indicates the part of the fuzzy boundary to be returned. It can be \code{"region"} or \code{"line"}. See below for more details.}
 }
@@ -27,7 +27,7 @@ The \emph{fuzzy boundary} of a fuzzy region object \code{A} has a heterogeneous 
 
 This means that the function \code{spa_boundary_pregion} can yield one specific part of the fuzzy boundary of a plateau region object (the argument \code{pgeom}).
 If \code{boundary = "line"}, then the function returns the boundary plateau line of \code{pgeom} (i.e., returns a \code{pgeom} object of type \code{"PLATEAULINE"}).
-Else if \code{boundary = "region"} (the default value), then the function returns the boundary plateau region of \code{pgeom} (i.e., returns a \code{pgeom} object of type \code{"PLATEAUREGION"}).
+Else if \code{boundary = "region"} (the default value), then the function returns the boundary plateau region of \code{pgeom} (i.e., returns a \code{pgeom} object of type \code{PLATEAUREGION}).
 }
 \examples{
 
