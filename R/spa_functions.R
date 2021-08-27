@@ -385,10 +385,94 @@ spa_length <- function(pl){
 }
 
 
-
+#' @title Fuzzy geometric set operations
+#'
+#' @description Fuzzy geometric set operations are given as a family of functions that implements spatial plateau set operations.
+#' These functions produces a spatial plateau object from a specific combination of other two spatial plateau objects, 
+#' such as the intersection of two plateau region objects.
+#'
+#' @usage
+#'
+#' spa_intersection(pgeom1, pgeom2, itype = "min")
+#'
+#' @param pgeom1 A `pgeom` object of any type.
+#' @param pgeom2 A `pgeom` object of the same type of `pgeom1`.
+#' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
+#' 
+#' @name fsr_geometric_operations
+#'
+#' @details
+#'
+#' These functions implement geometric operations of the spatial plateau algebra. 
+#' They receive two `pgeom` objects of the _same type_ together with an operation as inputs and yield another `pgeom` object as output. The output object has _the same_ type of the inputs.
+#' The family of fuzzy geometric set operations consists of the following functions:
+#' 
+#' - `spa_intersection` computes the geometric intersection of two spatial plateau objects. 
+#' The membership degree of common points are calculated by using a t-norm operator given by the parameter `itype`. Currently, it can assume `"min"` (default) or `"prod"`.
+#' - `spa_union` computes the geometric union of two spatial plateau objects.
+#' The membership degree of common points are calculated by using a t-conorm operator given by the parameter `utype`. Currently, it can assume `"max"` (default).
+#' - `spa_difference` computes the geometric difference of two spatial plateau objects.
+#' The membership degree of common points are calculated by using a diff operator given by the parameter `dtype`. 
+#' Currently, it can assume `"fdiff"` (default fuzzy difference), `"f_bound_diff"` (fuzzy bounded difference), and `"f_symm_diff"` (fuzzy absolute difference).
+#' 
+#' Another related geometric function is:
+#' 
+#' - `spa_common_points` which gets the common points of two plateau line objects by using a t-norm to compute their membership degrees. 
+#' It is different from the other functions since it gets two plateau line objects as input and yields a plateau point object as output.
+#' 
+#' Other t-norms, t-conorms, and diff operators can be implemented and given as values for the `"itype"`, `"utype"`, and `"dtype"`, respectively. 
+#' For this, the following steps should be performed:
+#' 
+#' 1 - implement your function that accepts two numeric values as inputs and yields another numeric value as output. All values should be between 0 and 1. Recall that t-norms and t-conorms must have some specific properties according to the fuzzy set theory.
+#' 2 - use the name of your function as the character value of the corresponding `"itype"`, `"utype"`, or `"dtype"`.
+#' 
+#' An example of operator is the source code of `f_bound_diff`:
+#' 
+#' `f_bound_diff <- function(x, y) { max(0, (x - y)) }`
+#' 
+#' @return
+#'
+#' A numeric value.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(sf)
+#' 
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#'
+#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
+#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
+#' cp3 <- component_from_sfg(st_multipoint(pts3), 1)
+#' 
+#' pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' 
+#' pts4 <- rbind(c(0, 0), c(1, 1))
+#' pts5 <- rbind(c(2, 3), c(1.2, 1.9), c(2, 1))
+#' pts6 <- rbind(c(3, 1), c(1.5, 0.5))
+#' 
+#' cp4 <- component_from_sfg(st_multipoint(pts4), 0.4)
+#' cp5 <- component_from_sfg(st_multipoint(pts5), 1)
+#' cp6 <- component_from_sfg(st_multipoint(pts6), 0.7)
+#' 
+#' pp2 <- create_pgeom(list(cp4, cp5, cp6), "PLATEAUPOINT")
+#' 
+#' pp1
+#' pp2
+#' 
+#' spa_intersection(pp1, pp2)
+#' spa_intersection(pp1, pp2, itype = "prod") #changing the t-norm
+#' spa_union(pp1, pp2)
+#' spa_difference(pp1, pp2)
+#'
 #' @import sf
 #' @export
-spa_intersection <- function(pgeom1, pgeom2, itype="min"){
+spa_intersection <- function(pgeom1, pgeom2, itype = "min"){
 
   if(pgeom1@type != pgeom2@type){
     stop("Different spatial plateau data types.", call. = FALSE)
@@ -422,9 +506,17 @@ spa_intersection <- function(pgeom1, pgeom2, itype="min"){
   }
 }
 
+#' @name fsr_geometric_operations
+#' 
+#' @usage
+#' 
+#' spa_union(pgeom1, pgeom2, utype = "max")
+#' 
+#' @param utype A character value that refers to a t-conorm. The default value is `"max"`, which is the standard operator of the union.
+#' 
 #' @import sf
 #' @export
-spa_union <- function(pgeom1, pgeom2, utype="max"){
+spa_union <- function(pgeom1, pgeom2, utype = "max"){
 
   if(pgeom1@type != pgeom2@type){
     stop("Different spatial plateau data types.", call. = FALSE)
@@ -472,9 +564,17 @@ spa_union <- function(pgeom1, pgeom2, utype="max"){
   }
 }
 
+#' @name fsr_geometric_operations
+#' 
+#' @usage
+#' 
+#' spa_difference(pgeom1, pgeom2, dtype = "f_diff")
+#' 
+#' @param dtype A character value that indicates the name of a difference operator. The default value is `"f_diff"`, which implements the standard fuzzy difference.
+#' 
 #' @import sf
 #' @export
-spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
+spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
 
   if(pgeom1@type != pgeom2@type){
     stop("Different spatial plateau data types.", call. = FALSE)
@@ -507,6 +607,57 @@ spa_difference <- function(pgeom1, pgeom2, dtype="f_diff"){
     lcomps <- check_geom_sfg_pgeom(sf_diff_1, result, md_comp_p1, lcomps)
   }
 
+  if(length(lcomps) > 0){
+    spa_add_component(result, lcomps)
+  } else {
+    result
+  }
+}
+
+#' @name fsr_geometric_operations
+#' 
+#' @usage
+#' 
+#' spa_common_points(pline1, pline2, itype = "min")
+#' 
+#' @param pline1 A `pgeom` object of type `PLATEAULINE`.
+#' @param pline2 A `pgeom` object of type `PLATEAULINE`.
+#' 
+#' @import sf methods
+#' @export
+spa_common_points <- function(pline1, pline2, itype = "min"){
+  
+  if(pline1@type != pline2@type){
+    stop("Different Spatial Plateau Types.", call. = FALSE)
+  }
+  
+  sigma <- match.fun(itype)
+  result <- create_empty_pgeom(pline1@type)
+  lcomps <- vector("list")
+  
+  for(comp1 in pline1@component){
+    obj_comp_p1 <- comp1@obj
+    md_comp_p1 <- comp1@md
+    
+    for(comp2 in pline2@component){
+      obj_comp_p2 <- comp2@obj
+      md_comp_p2 <- comp2@md
+      
+      result_md = sigma(md_comp_p1, md_comp_p2)
+      
+      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
+      
+      if(!st_is_empty(sf_result) && st_geometry_type(sf_result) %in% c("POINT", "MULTIPOINT")){
+        result_comp <- new("component", obj = sf_result, md = result_md)
+        lcomps <- append(lcomps, result_comp)
+      } else if(!st_is_empty(sf_result) && st_geometry_type(sf_result) == "GEOMETRYCOLLECTION") {
+        type_geom = get_counter_ctype(pline1)
+        result_comp <- new("component", obj = st_union(st_collection_extract(sf_result, type = "POINT"))[[1]], md = result_md)
+        lcomps <- append(lcomps, result_comp)
+      }
+    }
+  }
+  
   if(length(lcomps) > 0){
     spa_add_component(result, lcomps)
   } else {
@@ -966,48 +1117,6 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' @export
 spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   spa_inside(pgeom2, pgeom1, utype = utype, ret = 'degree', ...)
-}
-
-#' @import sf methods
-#' @export
-spa_common_points <- function(pgeom1, pgeom2, itype = "min"){
-
-  if(pgeom1@type != pgeom2@type){
-    stop("Different Spatial Plateau Types.", call. = FALSE)
-  }
-
-  sigma <- match.fun(itype)
-  result <- create_empty_pgeom(pgeom1@type)
-  lcomps <- vector("list")
-
-  for(comp1 in pgeom1@component){
-    obj_comp_p1 <- comp1@obj
-    md_comp_p1 <- comp1@md
-
-    for(comp2 in pgeom2@component){
-      obj_comp_p2 <- comp2@obj
-      md_comp_p2 <- comp2@md
-
-      result_md = sigma(md_comp_p1, md_comp_p2)
-
-      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
-
-      if(!st_is_empty(sf_result) && st_geometry_type(sf_result) %in% c("POINT", "MULTIPOINT")){
-        result_comp <- new("component", obj = sf_result, md = result_md)
-        lcomps <- append(lcomps, result_comp)
-      } else if(!st_is_empty(sf_result) && st_geometry_type(sf_result) == "GEOMETRYCOLLECTION") {
-        type_geom = get_counter_ctype(pgeom1)
-        result_comp <- new("component", obj = st_union(st_collection_extract(sf_result, type = "POINT"))[[1]], md = result_md)
-        lcomps <- append(lcomps, result_comp)
-      }
-    }
-  }
-
-  if(length(lcomps) > 0){
-    spa_add_component(result, lcomps)
-  } else {
-    result
-  }
 }
 
 #' @title spa_contour

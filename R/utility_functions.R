@@ -505,7 +505,7 @@ check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
 }
 
 #' @export
-fdiff <- function(x, y){
+f_diff <- function(x, y){
   min(x, (1 - y))
 }
 
