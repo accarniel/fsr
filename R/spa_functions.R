@@ -1188,7 +1188,7 @@ spa_contour <- function(pregion){
   pregion_tibble <- pgeom_as_tibble(pregion)
   pregion_tibble$boundary <- st_boundary(pregion_tibble$geometry)
   pregion_df <- as.data.frame(pregion_tibble)
-  pline <- create_pgeom(pregion_df[,c(1,3)], "PLATEAULINE")
+  pline <- create_pgeom(pregion_df[,c(3,1)], "PLATEAULINE")
   
   crisp_contour <- create_empty_pgeom("PLATEAULINE")
   crisp_contour <- spa_add_component(crisp_contour, component_from_sfg(st_boundary(pregion@supp), 1))
@@ -1332,5 +1332,29 @@ spa_boundary_pregion <- function(pregion, bound_part = "region"){
   }
   else{
     stop("Invalid value for the parameter 'bound_part'.", call. = FALSE)
+  }
+}
+
+#' @export
+f_diff <- function(x, y){
+  min(x, (1 - y))
+}
+
+#' @export
+f_bound_diff <- function(x, y){
+  max(0, (x - y))
+}
+
+#' @export
+f_symm_diff <- function(x, y){
+  abs(x - y)
+}
+
+#' @noRd
+check_spa_topological_condition <- function(pgeom1, pgeom2){
+  if(pgeom1@type != pgeom2@type){
+    stop("The spatial plateau objects have different types.", call. = FALSE)
+  } else if(pgeom1@type != "PLATEAUREGION" || pgeom2@type != "PLATEAUREGION") {
+    stop(paste0("This operator is not implemented to (", pgeom1@type, " x ", pgeom2@type, ") yet."), call. = FALSE)
   }
 }

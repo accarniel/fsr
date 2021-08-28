@@ -202,6 +202,66 @@ create_empty_pgeom <- function(type){
   
 }
 
+#' @title create_pgeom
+#'
+#' @description create_pgeom creates a pgeom object from a dataframe or list of components.
+#'
+#' @usage
+#' 
+#' create_pgeom(components, type)
+#'
+#' @param components A list of `component` objects or a dataframe. The type of each component must be the same for all components.
+#' @param type A character value that indicates the type of the desired `pgeom` object. 
+#' It should be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, or `"PLATEAUREGION"`. It must be compatible with 
+#' the components given in `components` parameter.
+#'
+#' @details
+#' 
+#' The `create_pgeom` function creates a `pgeom` object of a given type. This object is built by using either a 
+#' list of `component` objects or a dataframe (or tibble). If a dataframe is given, it must have two columns: the first one is 
+#' a `sfc` object and second one indicates the membership degree of each respective object of the `sfc` column.
+#' 
+#' @return
+#' 
+#' A `pgeom` object.
+#' 
+#' @examples
+#'
+#' library(sf)
+#' # Example 1 - Creating an `PLATEAUPOINT` pgeom object.
+#' 
+#' # Creating components for the plateau point object
+#' v1 <- rbind(c(1,2), c(3,4))
+#' v2 <- rbind(c(1,4), c(2,3),c(4,4))
+#'
+#' md1 <- 0.2
+#' md2 <- 0.1
+#' md3 <- 0.4
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#'
+#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
+#' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
+#' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+#' 
+#' # Creating the plateau point object as a pgeom object with 3 components
+#' 
+#' plateau_point_pgeom <- create_pgeom(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' 
+#' # Example 2 - Creating an `PLATEAULINE` pgeom object.
+#' 
+#' lpts1 <- rbind(c(0, 0), c(1, 1))
+#' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
+#'
+#' comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
+#' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
+#' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#'
+#' plateau_line_pgeom<- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
+#' 
+#' 
 #' @import sf dplyr
 #' @export
 create_pgeom <- function(components, type){
@@ -233,18 +293,18 @@ create_pgeom <- function(components, type){
     }
     
     else if(inherits(components, "data.frame") || inherits(components, "tibble")){
-      new_df <- arrange(components, components[1])
+      new_df <- arrange(components, components[2])
       new_components = vector("list", nrow(new_df))
       
       for(i in 1:nrow(new_df)){
-        new_components[[i]] <- new("component", obj = new_df[i,2][[1]], md = new_df[i, 1])
+        new_components[[i]] <- new("component", obj = new_df[i,1][[1]], md = new_df[i, 2])
         obj_comp = new_components[[i]]@obj
         
         if(!is_compatible(obj_comp, type)){
           stop("Input Component type error.Please verify if your component type is correct", call. = FALSE)
         }
       }
-      supp = st_union(new_df[,2])
+      supp = st_union(new_df[,1])
     }
     new("pgeom", component = new_components, supp = supp[[1]], type = type)
   }
@@ -354,6 +414,100 @@ search_by_md <- function(components, low, high, m){
   return(c(FALSE, low))
 }
 
+#' @title pgeom_plot
+#'
+#' @description pgeom_plot plots a pgeom object.
+#'
+#' @usage
+#' 
+#' pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, 
+#'            low = "white", high = "black", ...)
+#'
+#' @param pgeom A `pgeom` object of any type.
+#' @param base_poly A `sfg` object of type `POLYGON` or `MULTIPOLYGON`.
+#' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
+#' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
+#' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
+#' @param ... Optional parameters. They can be the same as the parameters of `geom_sf` function.
+#'
+#' @details
+#' 
+#' The `pgeom_plot` uses a `ggplot` method to construct the plot. It receives a `pgeom` object (if it is empty, an empty graphics
+#'  in obtained). 
+#' 
+#' The `low` and `high` parameters are the colors for the minimum and maximum limits of the membership degrees. The 
+#' default colors are "white" and "black", respectively. Other colors can be given in the same way that colors are informed
+#' to visualizations produced by the `ggplot` package.
+#' 
+#' It is possible to clip the geometric format of the components by using the parameter `base_poly`. The boundaries of this object
+#' can also be included in the visualization if the parameter `add_base_poly` is TRUE.
+#' 
+#' @return
+#' 
+#' A `ggplot` object.
+#' 
+#' @examples
+#' 
+#' library(sf)
+#' 
+#' ### Example 1
+#' 
+#' # Creating components for the plateau point object
+#' v1 <- rbind(c(1,2), c(3,4))
+#' v2 <- rbind(c(1,4), c(2,3),c(4,4))
+#'
+#' md1 <- 0.2
+#' md2 <- 0.1
+#' md3 <- 0.4
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#'
+#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
+#' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
+#' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+#' 
+#' # Creating the plateau point object as a pgeom object with 3 components
+#' 
+#' plateau_point_pgeom <- create_pgeom(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' 
+#' pgeom_plot(plateau_point_pgeom) # with default colors
+#' pgeom_plot(plateau_point_pgeom, low="blue",high = "red") # with custom limit colors
+#' 
+#'# Example 2 - PLATEAULINE PLOT
+#' 
+#' lpts1 <- rbind(c(0, 0), c(1, 1))
+#' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
+#'
+#' comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
+#' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
+#' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#'
+#' plateau_line_pgeom<- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
+#'
+#' pgeom_plot(plateau_line_pgeom) # Default values
+#' pgeom_plot(plateau_line_pgeom, low="green", high="blue") # Custom colors ...
+#'
+#'
+#'# Example 3 - PLATEAUREGION PLOT
+#'
+#' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+#' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+#' pol1 <-st_polygon(list(p1,p2))
+#' p3 <- rbind(c(3,0), c(4,0), c(4,1), c(3,1), c(3,0))
+#' p4 <- rbind(c(3.3,0.3), c(3.8,0.3), c(3.8,0.8), c(3.3,0.8), c(3.3,0.3))[5:1,]
+#' pol2 <- st_polygon(list(p3,p4))
+#' pol3 <- st_polygon(list(rbind(c(3,3), c(4,2), c(4,3), c(3,3))))
+#' 
+#' comp1 <- component_from_sfg(pol1, 0.2)
+#' comp2 <- component_from_sfg(pol2, 0.4)
+#' comp3 <- component_from_sfg(pol3, 0.7)
+#' 
+#' plateau_region_pgeom <- create_pgeom(list(comp1, comp2, comp3), "PLATEAUREGION")
+#' pgeom_plot(plateau_region_pgeom)
+#' pgeom_plot(plateau_region_pgeom, low = "blue", high = "red")
+#' 
 #' @import sf ggplot2
 #' @export
 pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
@@ -504,26 +658,4 @@ check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
   lcomps
 }
 
-#' @export
-f_diff <- function(x, y){
-  min(x, (1 - y))
-}
 
-#' @export
-f_bound_diff <- function(x, y){
-  max(0, (x - y))
-}
-
-#' @export
-f_symm_diff <- function(x, y){
-  abs(x - y)
-}
-
-#' @noRd
-check_spa_topological_condition <- function(pgeom1, pgeom2){
-  if(pgeom1@type != pgeom2@type){
-    stop("The spatial plateau objects have different types.", call. = FALSE)
-  } else if(pgeom1@type != "PLATEAUREGION" || pgeom2@type != "PLATEAUREGION") {
-    stop(paste0("This operator is not implemented to (", pgeom1@type, " x ", pgeom2@type, ") yet."), call. = FALSE)
-  }
-}
