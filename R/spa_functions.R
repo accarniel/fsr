@@ -580,7 +580,7 @@ spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
     stop("Different spatial plateau data types.", call. = FALSE)
   }
 
-  nu <- match.fun(dtype, descend = FALSE)
+  nu <- match.fun(dtype)
   result <- create_empty_pgeom(pgeom1@type)
   lcomps <- vector("list")
 
