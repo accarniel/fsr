@@ -227,6 +227,7 @@ create_empty_pgeom <- function(type){
 #' 
 #' @examples
 #'
+#' library(sf)
 #' # Example 1 - Creating an `PLATEAUPOINT` pgeom object.
 #' 
 #' # Creating components for the plateau point object
@@ -419,7 +420,8 @@ search_by_md <- function(components, low, high, m){
 #'
 #' @usage
 #' 
-#' pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...)
+#' pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, 
+#'            low = "white", high = "black", ...)
 #'
 #' @param pgeom A `pgeom` object of any type.
 #' @param base_poly A `sfg` object of type `POLYGON` or `MULTIPOLYGON`.
@@ -656,26 +658,4 @@ check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
   lcomps
 }
 
-#' @export
-f_diff <- function(x, y){
-  min(x, (1 - y))
-}
 
-#' @export
-f_bound_diff <- function(x, y){
-  max(0, (x - y))
-}
-
-#' @export
-f_symm_diff <- function(x, y){
-  abs(x - y)
-}
-
-#' @noRd
-check_spa_topological_condition <- function(pgeom1, pgeom2){
-  if(pgeom1@type != pgeom2@type){
-    stop("The spatial plateau objects have different types.", call. = FALSE)
-  } else if(pgeom1@type != "PLATEAUREGION" || pgeom2@type != "PLATEAUREGION") {
-    stop(paste0("This operator is not implemented to (", pgeom1@type, " x ", pgeom2@type, ") yet."), call. = FALSE)
-  }
-}
