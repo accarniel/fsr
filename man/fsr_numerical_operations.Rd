@@ -27,7 +27,7 @@ spa_length(pl)
 \item{pl}{A \code{pgeom} object of type \code{PLATEAULINE}. It throws an error if a different type is given.}
 }
 \value{
-A numeric value.
+A numerical value.
 }
 \description{
 Fuzzy numerical operations are given as a family of functions that implements spatial plateau metric operations.

@@ -229,7 +229,7 @@ spa_eval <- function(pgeom, point){
 #' 
 #' @return
 #'
-#' A numeric value.
+#' A numerical value.
 #'
 #' @references
 #'
@@ -413,7 +413,7 @@ spa_length <- function(pl){
 #' The membership degree of common points are calculated by using a t-conorm operator given by the parameter `utype`. Currently, it can assume `"max"` (default).
 #' - `spa_difference` computes the geometric difference of two spatial plateau objects.
 #' The membership degree of common points are calculated by using a diff operator given by the parameter `dtype`. 
-#' Currently, it can assume `"fdiff"` (default fuzzy difference), `"f_bound_diff"` (fuzzy bounded difference), and `"f_symm_diff"` (fuzzy absolute difference).
+#' Currently, it can assume `"f_diff"` (default fuzzy difference), `"f_bound_diff"` (fuzzy bounded difference), `"f_symm_diff"` (fuzzy symmetric difference), and `"f_abs_diff"` (fuzzy absolute difference).
 #' 
 #' Another related geometric function is:
 #' 
@@ -432,7 +432,7 @@ spa_length <- function(pl){
 #' 
 #' @return
 #'
-#' A numeric value.
+#' A `pgeom` object that is the result of the geometric manipulation between two spatial plateau objects.
 #'
 #' @references
 #'
@@ -1077,7 +1077,7 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
      st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
     result <- 0
   } else {
-    r_diff <- spa_difference(pgeom1, pgeom2, dtype="f_symm_diff")
+    r_diff <- spa_difference(pgeom1, pgeom2, dtype="f_abs_diff")
     r_union <- spa_union(pgeom1, pgeom2, utype = utype)
 
     r_spa_area <- spa_area(r_diff)
@@ -1335,18 +1335,66 @@ spa_boundary_pregion <- function(pregion, bound_part = "region"){
   }
 }
 
+#' @title Fuzzy difference operators
+#'
+#' @description Fuzzy difference operations are set operations that generalize Boolean difference operations. 
+#' This family of functions implements some operators that help us to define different fuzzy difference operations.
+#' These operators receive two numerical values in \[0, 1\] as input and calculates another numerical value in \[0, 1\] as output.
+#'
+#' @usage
+#'
+#' f_diff(x, y)
+#'
+#' @param x A numerical vector whose values are in \[0, 1\].
+#' @param y A numerical vector whose values are in \[0, 1\].
+#' 
+#' @name fsr_diff_operators
+#'
+#' @details
+#'
+#' These functions calculate the resulting membership degree of a fuzzy difference operator applied on two numerical values in the interval \[0, 1\]. 
+#' The following fuzzy difference operators are available:
+#' - `f_diff`: The standard _fuzzy set difference_ operator defined as the intersection of `x` and the complement of `y`, that is, `min(x, 1 - y)`.
+#' - `f_bound_diff`: The _fuzzy bounded difference_ operator defined as `x` minus `y` with upper bound equal to 0, that is, `max(0, x - y)`.
+#' - `f_symm_diff`: The _fuzzy symmetric difference_ operator defined as the union of the difference of `x` and `y` and the difference of `y` and `x`, that is, `max(f_diff(x, y), f_diff(y, x))`.
+#' - `f_abs_diff`: The _fuzzy absolute difference_ operator defined as the absolute difference of `x` and `y`, that is, `abs(x - y)`.
+#' 
+#' These operators are useful to process the function `spa_difference` since one of them can be informed as a parameter for this function.
+#' 
+#' @return
+#'
+#' A numerical vector.
+#'
+#' @examples
+#'
+#' x <- c(0.1, 0.3, 0.6, 0.8)
+#' y <- c(0.9, 0.7, 0.4, 0.2)
+#' 
+#' f_diff(x, y)
+#' f_bound_diff(x, y)
+#' f_symm_diff(x, y)
+#' f_abs_diff(x, y)
+#'
 #' @export
 f_diff <- function(x, y){
-  min(x, (1 - y))
+  pmin(x, (1 - y))
 }
 
+#' @name fsr_diff_operators
 #' @export
 f_bound_diff <- function(x, y){
-  max(0, (x - y))
+  pmax(0, (x - y))
 }
 
+#' @name fsr_diff_operators
 #' @export
 f_symm_diff <- function(x, y){
+  pmax(f_diff(x, y), f_diff(y, x))
+}
+
+#' @name fsr_diff_operators
+#' @export
+f_abs_diff <- function(x, y){
   abs(x - y)
 }
 
