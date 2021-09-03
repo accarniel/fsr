@@ -30,4 +30,9 @@ RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: no
 Encoding: UTF-8
-Collate: 'fsr_base.R''utility_functions.R''spa_functions.R''fsi_functions.R''builder_functions.R'
+Collate: 
+    'builder_functions.R'
+    'fsi_functions.R'
+    'utility_functions.R'
+    'fsr_base.R'
+    'spa_functions.R'
