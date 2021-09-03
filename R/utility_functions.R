@@ -414,7 +414,7 @@ search_by_md <- function(components, low, high, m){
   return(c(FALSE, low))
 }
 
-#' @title pgeom_plot
+#' @title Functions to visualize pgeom objects
 #'
 #' @description pgeom_plot plots a pgeom object.
 #'
@@ -429,6 +429,8 @@ search_by_md <- function(components, low, high, m){
 #' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
 #' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
 #' @param ... Optional parameters. They can be the same as the parameters of `geom_sf` function.
+#'
+#' @name pgeom_plot
 #'
 #' @details
 #' 
@@ -657,5 +659,3 @@ check_geom_sfg_pgeom <- function(sfg, pgeom, md, lcomps){
   }
   lcomps
 }
-
-

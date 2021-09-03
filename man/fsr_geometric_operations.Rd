@@ -50,7 +50,7 @@ The membership degree of common points are calculated by using a t-norm operator
 The membership degree of common points are calculated by using a t-conorm operator given by the parameter \code{utype}. Currently, it can assume \code{"max"} (default).
 \item \code{spa_difference} computes the geometric difference of two spatial plateau objects.
 The membership degree of common points are calculated by using a diff operator given by the parameter \code{dtype}.
-Currently, it can assume \code{"f_diff"} (default fuzzy difference), \code{"f_bound_diff"} (fuzzy bounded difference), \code{"f_symm_diff"} (fuzzy symmetric difference) and \code{"f_abs_diff"} (fuzzy absolute difference).
+Currently, it can assume \code{"f_diff"} (default fuzzy difference), \code{"f_bound_diff"} (fuzzy bounded difference), \code{"f_symm_diff"} (fuzzy symmetric difference), and \code{"f_abs_diff"} (fuzzy absolute difference).
 }
 
 Another related geometric function is:
