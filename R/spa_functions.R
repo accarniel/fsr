@@ -937,6 +937,103 @@ spa_eval_relation <- function(ret, result, ...){
          stop("Return type does not exist.", call. = FALSE))
 }
 
+#' @title Fuzzy topological relationships
+#'
+#' @description Fuzzy topological relationships are given as a family of functions that implements spatial plateau topological relationships.
+#' A fuzzy topological relationship expresses a particular relative position of two spatial plateau objects.
+#' Since the spatial objects are fuzzy, their topological relationships are also fuzzy.
+#' Hence, a fuzzy topological relationship determines the degree to which a relation holds for any two spatial plateau objects by a real value in the interval \[0, 1\].
+#' The key idea of these relationships is to consider point subsets resulting from the combination of spatial plateau
+#' set operations and spatial plateau metric operations on the spatial plateau objects for computing the resulting degree.
+#' The resulting degree can be also interpreted as a linguistic value. 
+#'
+#' @usage
+#'
+#' spa_overlap(pgeom1, pgeom2, itype = "min", ret = "degree", ...)
+#'
+#' @param pgeom1 A `pgeom` object of type `PLATEAUREGION`.
+#' @param pgeom2 A `pgeom` object of type `PLATEAUREGION`.
+#' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
+#' @param ret A character value that indicates the return type of the fuzzy topological relationship. The default value is `"degree"` and other possible values are `"list"` and `"bool"`.
+#' @param ... If `ret = "bool"`, two additional parameters have to be informed, as described below.
+#' 
+#' @name fsr_topological_relationships
+#'
+#' @details
+#'
+#' These functions implement topological relationships of the spatial plateau algebra. 
+#' They receive two `pgeom` objects of type `PLATEAUREGION` together with some additional parameters (as detailed below).
+#' The family of fuzzy topological relationships consists of the following functions:
+#' 
+#' - `spa_overlap` computes the overlapping degree of two plateau region objects.
+#' Since it uses the intersection operation, a t-norm operator can be given by the parameter `itype`. Currently, it can assume `"min"` (default) or `"prod"`.
+#' - `spa_meet` computes the meeting degree of two plateau region objects.
+#' Similarly to `spa_overlap`, a t-norm operator can be given by the parameter `itype`.
+#' - `spa_disjoint` computes the disjointedness degree of two plateau region objects.
+#' Similarly to `spa_overlap` and `spa_meet`, a t-norm operator can be given by the parameter `itype`.
+#' - `spa_equal` - computes how equal are two plateau region objects.
+#' Since it uses the union operation, a t-conorm operator can be given by the parameter `utype`. Currently, it can assume `"max"` (default).
+#' - `spa_inside` - computes the containment degree of `pgeom1` in `pgeom2`.
+#' Similarly to `spa_equal`, a t-conorm operator can be given by the parameter `utype`.
+#' - `spa_contains` - it is the same of `spa_inside` but changing the order of the operands `pgeom1` and `pgeom2`.
+#' 
+#' The parameter `ret` determines the returning value of a fuzzy topological relationship. The default value is the following:
+#' 
+#' - `"degree"` (default) - it indicates that the function will return a value in \[0, 1\] that represents the degree of truth of a given topological relationships.
+#' 
+#' For the remainder possible values, the functions make use of a set of linguistic values that characterize the different situations of topological relationships.
+#' Each linguistic value has an associated membership function defined in the domain \[0, 1\].
+#' The `fsr` package has a default set of linguistic values. You can use the function `spa_set_classification` to change this set of linguistic values.
+#' 
+#' The remainder possible values for the parameter `ret` are:
+#' 
+#' - `"list"` - it indicates that the function will return a named list containing how much the result of the predicate belongs to each linguistic value (i.e., it employs the membership functions of the linguistic values).
+#' - `"bool"` - it indicates that the function will return a Boolean value indicating whether the degree returned by the topological relationship matches a given linguistic value according to an _evaluation mode_.
+#' The evaluation mode and the linguistic values have to be informed by using the parameters `eval_mode` and `lval`, respectively.
+#' The possible values for `eval_mode` are: `"soft_eval"`, `"strict_eval"`, `"alpha_eval"`, and `"soft_alpha_eval"`.
+#' They have different behavior in how computing the Boolean value from the membership function of a linguistic value. See their documentations for more details.
+#' Note that the parameter `lval` only accept a character value belonging to the set of linguistic values that characterize the different situations of topological relationships.
+#'   
+#' @return
+#'
+#' The returning value is determined by the parameter `ret`, as described above.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(tibble)
+#' library(sf)
+#' library(FuzzyR)
+#' 
+#' set.seed(456)
+#' 
+#' # some random points to create pgeom objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#'              y = runif(10, min = 0, max = 30), 
+#'              z = runif(10, min = 0, max = 50))
+#' 
+#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#' 
+#' pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
+#' 
+#' # Showing the different types of returning values
+#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]])
+#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "bool", 
+#'            eval_mode = "soft_eval", lval = "mostly")
+#'
+#' # Evaluating the other fuzzy topological relationships
+#' spa_meet(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_disjoint(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_equal(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_inside(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_contains(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#'
 #' @import sf
 #' @export
 spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
@@ -965,6 +1062,12 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 
 }
 
+#' @name fsr_topological_relationships
+#' 
+#' @usage
+#' 
+#' spa_meet(pgeom1, pgeom2, itype = "min", ret = "degree", ...) 
+#' 
 #' @import sf
 #' @export
 spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
@@ -1003,13 +1106,13 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
     result <- 0
   }
 
-  if(st_relate(supp_1, supp_2, pattern = "F**0*****") ||
-     st_relate(supp_1, supp_2, pattern = "F***0****") ||
-     st_relate(supp_1, supp_2, pattern = "F0*******")){
+  if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
+     st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
+     st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
     result <- spa_avg_degree(p)
-  } else if (st_relate(supp_1, supp_2, pattern = "F**1*****") ||
-             st_relate(supp_1, supp_2, pattern = "F***1****") ||
-             st_relate(supp_1, supp_2, pattern = "F1*******")){
+  } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
+             st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
+             st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
     pgeom1_boundary <- spa_boundary_pregion(pgeom1, bound_part = 'line')
     pgeom2_boundary <- spa_boundary_pregion(pgeom2, bound_part = 'line')
     bl <- spa_intersection(pgeom1_boundary, pgeom2_boundary, itype = itype)
@@ -1032,6 +1135,12 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
   spa_eval_relation(ret, result, ...)
 }
 
+#' @name fsr_topological_relationships
+#' 
+#' @usage
+#' 
+#' spa_disjoint(pgeom1, pgeom2, itype = "min", ret = "degree", ...) 
+#' 
 #' @import sf
 #' @export
 spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
@@ -1060,6 +1169,14 @@ spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
   spa_eval_relation(ret, result, ...)
 }
 
+#' @name fsr_topological_relationships
+#' 
+#' @usage
+#' 
+#' spa_equal(pgeom1, pgeom2, utype = "max", ret = 'degree', ...) 
+#' 
+#' @param utype A character value that indicates the name of a function implementing a t-conorm. The default value is `"max"`, which is the standard operator of the union.
+#' 
 #' @import sf
 #' @export
 spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
@@ -1081,13 +1198,19 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
     r_union <- spa_union(pgeom1, pgeom2, utype = utype)
 
     r_spa_area <- spa_area(r_diff)
-    r_sfg_area <- st_area(r_union)
+    r_sfg_area <- st_area(r_union@supp)
 
     result <- 1 - (r_spa_area/r_sfg_area)
   }
   spa_eval_relation(ret, result, ...)
 }
 
+#' @name fsr_topological_relationships
+#' 
+#' @usage
+#' 
+#' spa_inside(pgeom1, pgeom2, utype = "max", ret = 'degree', ...) 
+#' 
 #' @import sf
 #' @export
 spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
@@ -1102,8 +1225,8 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   supp_pgeom2 <- pgeom2@supp
 
   if(spa_equal(pgeom1, pgeom2, utype = utype) == 1 ||
-     st_disjoint(supp_pgeom1, supp_pgeom2) ||
-     st_touches(supp_pgeom1, supp_pgeom2)){
+     st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
+     st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
     result <- 0
   } else {
 
@@ -1114,9 +1237,15 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   spa_eval_relation(ret, result, ...)
 }
 
+#' @name fsr_topological_relationships
+#' 
+#' @usage
+#' 
+#' spa_contains(pgeom1, pgeom2, utype = "max", ret = 'degree', ...) 
+#' 
 #' @export
 spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
-  spa_inside(pgeom2, pgeom1, utype = utype, ret = 'degree', ...)
+  spa_inside(pgeom2, pgeom1, utype = utype, ret = ret, ...)
 }
 
 #' @title spa_contour
@@ -1178,7 +1307,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' plot(pregions$pgeoms[[2]])
 #' plot(frontier_pregion2)
 #'
-#' @import  sf
+#' @import sf
 #' @export
 spa_contour <- function(pregion){
   if(pregion@type != "PLATEAUREGION"){
@@ -1206,6 +1335,60 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
                               FuzzyR::genmf("trapmf", c(2.7, 3.1, 3.6, 3.9)),
                               FuzzyR::genmf("trapmf", c(3.8, 4.1, 4.5, 4.5)))
 
+#' @title spa_set_classification
+#'
+#' @description spa_set_classification configures a new set of linguistic values and their corresponding membership functions to be used by fuzzy topological relationships.
+#'
+#' @usage
+#'
+#' spa_set_classification(classes, mfs)
+#'
+#' @param classes A character vector containing linguistic values that characterizes different situations of fuzzy topological relationships.
+#' @param mfs A vector containing membership functions generated by the function `genmf` of the FuzzyR package. Their domain have to be in \[0, 1\].
+#'
+#' @details
+#'
+#' This function replaces the default linguistic values employed by fuzzy topological relationships.
+#' Each membership function _i_ of the parameter `mfs` represents the class _i_ of the parameter `classes`.
+#' The length of these parameters have to be same.
+#' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#' 
+#' library(tibble)
+#' library(sf)
+#' library(FuzzyR)
+#' 
+#' set.seed(456)
+#' 
+#' # some random points to create pgeom objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#'              y = runif(10, min = 0, max = 30), 
+#'              z = runif(10, min = 0, max = 50))
+#' 
+#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#' 
+#' pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
+#' 
+#' # Showing the default list of classes
+#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#'
+#' # Changing the default classification
+#' 
+#' classes <- c("small", "medium", "large")
+#' small <- genmf("trapmf", c(0, 0.3, 0.4, 0.6))
+#' medium <- genmf("trapmf", c(0.4, 0.6, 0.8, 1))
+#' large <- genmf("trapmf", c(0.6, 0.8, 1, 1))
+#' 
+#' spa_set_classification(classes, c(small, medium, large))
+#' 
+#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#'
 #' @export
 spa_set_classification <- function(classes, mfs){
 
@@ -1221,22 +1404,82 @@ spa_set_classification <- function(classes, mfs){
   pkg_env$ftopological_mfs <- mfs
 }
 
-#' @noRd
+#' @title Evaluation modes
+#'
+#' @description This family of functions implements evaluation modes 
+#' that returns a Boolean value for a given degree in \[0, 1\] obtained from a membership function of a linguistic value.
+#'  
+#' @usage
+#'
+#' soft_eval(degree)
+#'
+#' @param degree A numerical vector whose values are in \[0, 1\].
+#' 
+#' @name fsr_eval_modes
+#'
+#' @details
+#'
+#' These functions yields a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
+#' That is, the parameter `degree` is a value in \[0, 1\] resulting from evaluation a value in a membership degree.
+#' Then, an evaluation mode "translate" the meaning of this degree of truth as a Boolean value.
+#' 
+#' There some different ways to make this kind of translation:
+#' - `soft_eval`: It returns `TRUE` if `degree` is greater than 0.
+#' - `strict_eval`: It returns `TRUE` if `degree` is equal to 0.
+#' - `alpha_eval`: It returns `TRUE` if `degree` is greater than or equal to another value (named `alpha`).
+#' - `soft_alpha_eval`: It returns `TRUE` if `degree` is greater than another value (named `alpha`).
+#' 
+#' These operators are employed to process the evaluation modes of fuzzy topological relationships that are processed as Boolean predicates.
+#' 
+#' @return
+#'
+#' A Boolean vector.
+#'
+#' @examples
+#'
+#' x <- c(0.1, 0.3, 0.6, 0.8)
+#' 
+#' soft_eval(x)
+#' strict_eval(x)
+#' alpha_eval(x, 0.3)
+#' soft_alpha_eval(x, 0.3)
+#'
+#' @export
 soft_eval <- function(degree){
   degree > 0
 }
 
-#' @noRd
+#' @name fsr_eval_modes
+#' 
+#' @usage 
+#' 
+#' strict_eval(degree)
+#' 
+#' @export
 strict_eval <- function(degree){
   degree == 1
 }
 
-#' @noRd
+#' @name fsr_eval_modes
+#' 
+#' @usage 
+#' 
+#' alpha_eval(degree, alpha)
+#' 
+#' @param alpha A single numeric value in \[0, 1\].
+#' 
+#' @export
 alpha_eval <- function(degree, alpha){
   degree >= alpha
 }
 
-#' @noRd
+#' @name fsr_eval_modes
+#' 
+#' @usage 
+#' 
+#' soft_alpha_eval(degree, alpha)
+#'  
+#' @export
 soft_alpha_eval <- function(degree, alpha){
   degree > alpha
 }
