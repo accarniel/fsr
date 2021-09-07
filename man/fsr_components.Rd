@@ -4,8 +4,7 @@
 \alias{fsr_components}
 \alias{create_component}
 \alias{component_from_sfg}
-\title{Create a component for a spatial plateau object from coordinate pairs or a
-single \code{sfg} object labeled with a membership degree}
+\title{Creation of a component}
 \usage{
 create_component(raw_obj, md, type)
 
@@ -26,8 +25,9 @@ It should be either \code{"POINT"}, \code{"LINE"}, or \code{"REGION"}.}
 A \code{component} object that can be added to a spatial plateau object (i.e., a \code{pgeom} object).
 }
 \description{
-These functions build a component that can be added to a spatial plateau object.
-A component consists of  an \code{sfg} object and an associated membership degree.
+These functions build a component from coordinate pairs or a
+single \code{sfg} object labeled with a membership degree. This component can be added to a spatial plateau object.
+A component consists of an \code{sfg} object and an associated membership degree.
 A component can be built in two different ways. By using the function \code{create_component}, the component is formed by
 the means of a  numeric vector, list or matrix that represents a pair of coordinates.
 By using the function \code{component_from_sfg}, the component is created from an \code{sfg}

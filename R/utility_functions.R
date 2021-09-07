@@ -1,8 +1,8 @@
-#' @title Create a component for a spatial plateau object from coordinate pairs or a 
-#' single `sfg` object labeled with a membership degree
+#' @title Creation of a component
 #'
-#' @description These functions build a component that can be added to a spatial plateau object. 
-#' A component consists of  an `sfg` object and an associated membership degree.
+#' @description These functions build a component from coordinate pairs or a 
+#' single `sfg` object labeled with a membership degree. This component can be added to a spatial plateau object. 
+#' A component consists of an `sfg` object and an associated membership degree.
 #' A component can be built in two different ways. By using the function `create_component`, the component is formed by 
 #' the means of a  numeric vector, list or matrix that represents a pair of coordinates. 
 #' By using the function `component_from_sfg`, the component is created from an `sfg`
@@ -414,7 +414,7 @@ search_by_md <- function(components, low, high, m){
   return(c(FALSE, low))
 }
 
-#' @title Functions to visualize pgeom objects
+#' @title Visualization of spatial plateau objects
 #'
 #' @description pgeom_plot plots a pgeom object.
 #'
@@ -511,6 +511,7 @@ search_by_md <- function(components, low, high, m){
 #' pgeom_plot(plateau_region_pgeom, low = "blue", high = "red")
 #' 
 #' @import sf ggplot2
+#' @importFrom rlang .data
 #' @export
 pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
   
@@ -524,20 +525,21 @@ pgeom_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "wh
      inherits(pgeom_tibble$geometry, "sfc_MULTIPOINT")||
      inherits(pgeom_tibble$geometry, "sfc_LINESTRING")||
      inherits(pgeom_tibble$geometry, "sfc_POINT")){
-    plot <-  ggplot(pgeom_tibble) +
-      geom_sf(aes(color = md, geometry=geometry), ...) +
-      scale_colour_gradient(name="", limits = c(0, 1),  low = low, high = high)  +
+    plot <-  ggplot(data = pgeom_tibble) +
+      geom_sf(aes(color = .data$md, geometry = .data$geometry), ...) +
+      scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high)  +
       theme_classic()
   } else {
     # lwd = 0 ; color = NA in order to remove the border of the components in the plot
-    plot <-  ggplot(pgeom_tibble) +
-      geom_sf(aes(fill = md, geometry=geometry), ...) +
+    plot <-  ggplot(data = pgeom_tibble) +
+      geom_sf(aes(fill = .data$md, geometry = .data$geometry), ...) +
       scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
       theme_classic()
   }
   
   if(!is.null(base_poly) && add_base_poly) {
-    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly)), color = high, size = 0.5, aes(geometry = x), fill = "transparent")
+    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly)), 
+                           color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent")
   }
   
   plot

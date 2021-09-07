@@ -1419,7 +1419,7 @@ spa_set_classification <- function(classes, mfs){
 #'
 #' @details
 #'
-#' These functions yields a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
+#' These functions yield a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
 #' That is, the parameter `degree` is a value in \[0, 1\] resulting from evaluation a value in a membership degree.
 #' Then, an evaluation mode "translate" the meaning of this degree of truth as a Boolean value.
 #' 

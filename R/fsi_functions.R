@@ -297,7 +297,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   }
   i <- 1
   for(ur in rules) {
-    #TODO Juliana - improve performance
+    #TODO improve performance
     antecedents <- get_antecedents(ur)
     consequents <- get_consequent(ur)
     fsi$rule <- append(fsi$rule,
@@ -306,8 +306,6 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   }
   fsi
 }
-
-
 
 #' @title fsi_eval
 #' 
@@ -417,16 +415,21 @@ fsi_eval <- function(fsi, point, ...) {
     for(ant_part in rule$ant) {
       #the first position in ant_part is the lvar, the second position is its lval
       degrees <- append(degrees,
-                        tbl_eval[tbl_eval[, 1] == ant_part[1] & tbl_eval[, 2] == ant_part[2], ]$degree)
+                        tbl_eval[tbl_eval$lvar == ant_part[1] & tbl_eval$lval == ant_part[2], ]$degree)
+    }
+    
+    if(length(degrees) == 0) {
+      degrees <- 0  
     }
 
-    if(rule$connective == 'AND') {
+    if(rule$connective == "AND") {
       connective_method <- match.fun(fsi$and_method)
     } else {
       connective_method <- match.fun(fsi$or_method)
     }
-    fire_rules <- add_row(fire_rules, rule_index = i, degree = (connective_method(degrees) * rule$w), consequent = rule$cons)
-
+    fire_rules <- add_row(fire_rules, rule_index = i, 
+                          degree = (connective_method(degrees) * rule$w), 
+                          consequent = rule$cons)
     i <- i + 1
   }
   # Third step: compute the implication of each fired rule
@@ -448,7 +451,7 @@ fsi_eval <- function(fsi, point, ...) {
         mf_conseq <- fsi$cs[[1]]$mfs[[mf_pos]]
 
         #implication here
-        # TODO Juliana - improve a little bit, we can discretize the values here too, instead of calling the tnorm
+        # TODO improve a little bit, we can discretize the values here too, instead of calling the tnorm
         mf_cut <- genmf("trapmf", c(min_conseq, min_conseq, max_conseq, max_conseq, row$degree))
         res_imp <- fuzzy.tnorm(imp_method, mf_conseq, mf_cut)
         results_imp <- append(results_imp, res_imp)
@@ -474,7 +477,6 @@ fsi_eval <- function(fsi, point, ...) {
     agg_method <- match.fun(fsi$agg_method)
   }
 
-
   if(length(results_imp) == 0) {
     db <- fsi$default_conseq
     if(is.null(db)) {
@@ -488,7 +490,7 @@ fsi_eval <- function(fsi, point, ...) {
       for(i in 2:length(results_imp)) {
         result_fsi <- agg_method(evalmf(conseq_values, results_imp[[i]]), result_fsi)
       }
-      ## TODO Juliana - improve this evaluation
+      ## TODO improve this evaluation in terms of performance
     }
   }
 
@@ -641,6 +643,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 1)
 #' 
 #' @import utils dplyr
+#' @importFrom rlang .data
 #' @export
 fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
   params <- list(...)
@@ -655,7 +658,7 @@ fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
                          } else {
                            stop("Invalid target linguistic value.", call. = FALSE)
                          }
-                         filter(qwi_discret, target_mf(inferred_values) > 0)
+                         qwi_discret %>% filter(target_mf(.data$inferred_values) > 0)
                        },
                        pso = {
                          target <- params$what

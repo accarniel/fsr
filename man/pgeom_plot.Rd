@@ -3,7 +3,7 @@
 \name{pgeom_plot}
 \alias{pgeom_plot}
 \alias{plot,pgeom,missing-method}
-\title{Functions to visualize pgeom objects}
+\title{Visualization of spatial plateau objects}
 \usage{
 pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, 
            low = "white", high = "black", ...)

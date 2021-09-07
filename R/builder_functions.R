@@ -13,7 +13,10 @@
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
 #' @examples
-#'
+#' library(rlang)
+#' library(tibble)
+#' library(FuzzyR)
+#' library(dplyr)
 #' set.seed(7)
 #' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
 #' classes <- c("cold", "hot")
@@ -23,6 +26,8 @@
 #' fsp
 #' 
 #' @import tibble dplyr
+#' @importFrom rlang :=
+#' @importFrom rlang .data
 #' @noRd
 fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
   if(length(classes) != length(mfs)) {
@@ -34,8 +39,9 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
                    z = as.numeric(tbl[[3]]))
 
   #adding the new columns
-  for(i in 1:length(classes)){
-    result <- mutate(result, !!classes[i] := as.numeric(evalmf(z, mfs[[i]])))
+  for(i in 1:length(classes)) {
+    result <- result %>% 
+      dplyr::mutate(!!classes[i] := as.numeric(evalmf(.data$z, mfs[[i]])))
   }
 
   result
@@ -65,7 +71,9 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
 #' fcp <- fuzzy_clustering_policy(tbl, 3)
 #' fcp
 #'
-#' @importFrom e1071 cmeans cshell
+#' @importFrom e1071 cmeans
+#' @importFrom e1071 cshell
+#' @importFrom rlang :=
 #' @import tibble dplyr
 #' @noRd
 fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALSE, iter = 100, ...) {
@@ -105,7 +113,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
   #adding the new columns, where each column is a group created by the clustering algorithm
   for(i in 1:k){
     col_name <- paste0("group", i)
-    result <- mutate(result, !!col_name := cm$membership[, i])
+    result <- result %>% mutate(!!col_name := cm$membership[, i])
   }
 
   result

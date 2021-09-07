@@ -29,7 +29,7 @@ This family of functions implements evaluation modes
 that returns a Boolean value for a given degree in [0, 1] obtained from a membership function of a linguistic value.
 }
 \details{
-These functions yields a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
+These functions yield a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
 That is, the parameter \code{degree} is a value in [0, 1] resulting from evaluation a value in a membership degree.
 Then, an evaluation mode "translate" the meaning of this degree of truth as a Boolean value.
 
