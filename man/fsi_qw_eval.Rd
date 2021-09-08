@@ -13,7 +13,7 @@ fsi_qw_eval(fsi, qw, approach = "discretization", ...)
 
 \item{approach}{Defines which approach is employed to perform the query window inference: \verb{“discretization”} or \verb{“pso”}. Default value is `"discretization"``}
 
-\item{...}{Different set of parameters required depending on the chosen approach (see more in details below).}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Different set of parameters required depending on the chosen approach (see more in details below).}
 }
 \value{
 A tibble in the format \verb{(points, inferred_values)}, where \code{points} is an \code{sfc} object (i.e., a list of \code{sfg} objects of geometry type POINT) and \code{inferred_values} are inferred values in the domain of the consequent of the FSI model.

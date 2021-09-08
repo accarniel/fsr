@@ -13,7 +13,7 @@ pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE,
 \arguments{
 \item{pgeom}{A \code{pgeom} object of any type.}
 
-\item{base_poly}{A \code{sfg} object of type \code{POLYGON} or \code{MULTIPOLYGON}.}
+\item{base_poly}{A \code{sfg} object of the type \code{POLYGON} or \code{MULTIPOLYGON}.}
 
 \item{add_base_poly}{A Boolean value that indicates whether \code{base_poly} will added to the visualization.}
 
@@ -21,7 +21,7 @@ pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE,
 
 \item{high}{A character value that indicates the color for the higher \code{md}s limit value (1). Default is \code{"black"}.}
 
-\item{...}{Optional parameters. They can be the same as the parameters of \code{geom_sf} function.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Optional parameters. They can be the same as the parameters of \code{geom_sf} function.}
 
 \item{x}{A \code{pgeom} object of any type.}
 

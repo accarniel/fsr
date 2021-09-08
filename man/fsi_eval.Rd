@@ -11,7 +11,7 @@ fsi_eval(fsi, point, ...)
 
 \item{point}{An \code{sfg} object of geometry type \code{point}, which is created through the function \code{st_point} of the sf package.}
 
-\item{...}{Informs the \code{fsi_eval} how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: \code{discret_by} is 0.5 and \code{discret_length} is NULL.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Informs the \code{fsi_eval} how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: \code{discret_by} is 0.5 and \code{discret_length} is NULL.}
 }
 \value{
 A numeric value that belongs to the domain of the consequent (i.e., as specified by \code{fsi_add_cs}) and represents the result of the reasoning process in a particular point location.

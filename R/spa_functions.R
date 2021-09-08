@@ -105,7 +105,7 @@ spa_add_component <- function(pgeom, components) {
 #' spa_eval(pgeom, point)
 #'
 #' @param pgeom A `pgeom` object of any type.
-#' @param point An `sfg` object of type `"POINT"`.
+#' @param point An `sfg` object of the type `POINT`.
 #'
 #' @details
 #'
@@ -312,7 +312,7 @@ spa_ncomp <- function(pgeom){
 #' 
 #' spa_area(pr) 
 #' 
-#' @param pr A `pgeom` object of type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pr A `pgeom` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
 #'  
 #' @import sf
 #' @export
@@ -364,7 +364,7 @@ spa_perimeter <- function(pr){
 #' 
 #' spa_length(pl) 
 #' 
-#' @param pl A `pgeom` object of type `PLATEAULINE`. It throws an error if a different type is given.
+#' @param pl A `pgeom` object of the type `PLATEAULINE`. It throws an error if a different type is given.
 #'  
 #' @import sf
 #' @export
@@ -620,8 +620,8 @@ spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
 #' 
 #' spa_common_points(pline1, pline2, itype = "min")
 #' 
-#' @param pline1 A `pgeom` object of type `PLATEAULINE`.
-#' @param pline2 A `pgeom` object of type `PLATEAULINE`.
+#' @param pline1 A `pgeom` object of the type `PLATEAULINE`.
+#' @param pline2 A `pgeom` object of the type `PLATEAULINE`.
 #' 
 #' @import sf methods
 #' @export
@@ -951,18 +951,18 @@ spa_eval_relation <- function(ret, result, ...){
 #'
 #' spa_overlap(pgeom1, pgeom2, itype = "min", ret = "degree", ...)
 #'
-#' @param pgeom1 A `pgeom` object of type `PLATEAUREGION`.
-#' @param pgeom2 A `pgeom` object of type `PLATEAUREGION`.
+#' @param pgeom1 A `pgeom` object of the type `PLATEAUREGION`.
+#' @param pgeom2 A `pgeom` object of the type `PLATEAUREGION`.
 #' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
 #' @param ret A character value that indicates the return type of the fuzzy topological relationship. The default value is `"degree"` and other possible values are `"list"` and `"bool"`.
-#' @param ... If `ret = "bool"`, two additional parameters have to be informed, as described below.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> If `ret = "bool"`, two additional parameters have to be informed, as described below.
 #' 
 #' @name fsr_topological_relationships
 #'
 #' @details
 #'
 #' These functions implement topological relationships of the spatial plateau algebra. 
-#' They receive two `pgeom` objects of type `PLATEAUREGION` together with some additional parameters (as detailed below).
+#' They receive two `pgeom` objects of the type `PLATEAUREGION` together with some additional parameters (as detailed below).
 #' The family of fuzzy topological relationships consists of the following functions:
 #' 
 #' - `spa_overlap` computes the overlapping degree of two plateau region objects.
@@ -1256,7 +1256,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #'
 #' spa_contour(pregion)
 #'
-#' @param pregion A `pgeom` object of type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pregion A `pgeom` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
 #'
 #' @details
 #'
@@ -1267,7 +1267,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' 
 #' @return
 #'
-#' A `pgeom` object of type `"PLATEAULINE"` that represents the contour (i.e. frontier) of a plateau region object given as input.
+#' A `pgeom` object of the type `PLATEAULINE` that represents the contour (i.e. frontier) of a plateau region object given as input.
 #'
 #' @references
 #'
@@ -1492,7 +1492,7 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' spa_boundary_pregion(pregion, bound_part = "region")
 #'
-#' @param pregion A `pgeom` object of type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pregion A `pgeom` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
 #' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
 #'
 #' @details
@@ -1503,8 +1503,8 @@ soft_alpha_eval <- function(degree, alpha){
 #' - a fuzzy region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
 #' 
 #' This means that the function `spa_boundary_pregion` can yield one specific part of the fuzzy boundary of a plateau region object (the argument `pgeom`).
-#' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeom` (i.e., returns a `pgeom` object of type `"PLATEAULINE"`).
-#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeom` (i.e., returns a `pgeom` object of type `PLATEAUREGION`).
+#' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeom` (i.e., returns a `pgeom` object of the type `PLATEAULINE`).
+#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeom` (i.e., returns a `pgeom` object of the type `PLATEAUREGION`).
 #' 
 #' @return
 #'

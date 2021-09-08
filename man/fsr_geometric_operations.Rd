@@ -27,9 +27,9 @@ spa_common_points(pline1, pline2, itype = "min")
 
 \item{dtype}{A character value that indicates the name of a difference operator. The default value is \code{"f_diff"}, which implements the standard fuzzy difference.}
 
-\item{pline1}{A \code{pgeom} object of type \code{PLATEAULINE}.}
+\item{pline1}{A \code{pgeom} object of the type \code{PLATEAULINE}.}
 
-\item{pline2}{A \code{pgeom} object of type \code{PLATEAULINE}.}
+\item{pline2}{A \code{pgeom} object of the type \code{PLATEAULINE}.}
 }
 \value{
 A \code{pgeom} object that is the result of the geometric manipulation between two spatial plateau objects.

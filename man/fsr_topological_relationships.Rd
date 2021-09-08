@@ -23,15 +23,15 @@ spa_inside(pgeom1, pgeom2, utype = "max", ret = 'degree', ...)
 spa_contains(pgeom1, pgeom2, utype = "max", ret = 'degree', ...)
 }
 \arguments{
-\item{pgeom1}{A \code{pgeom} object of type \code{PLATEAUREGION}.}
+\item{pgeom1}{A \code{pgeom} object of the type \code{PLATEAUREGION}.}
 
-\item{pgeom2}{A \code{pgeom} object of type \code{PLATEAUREGION}.}
+\item{pgeom2}{A \code{pgeom} object of the type \code{PLATEAUREGION}.}
 
 \item{itype}{A character value that indicates the name of a function implementing a t-norm. The default value is \code{"min"}, which is the standard operator of the intersection.}
 
 \item{ret}{A character value that indicates the return type of the fuzzy topological relationship. The default value is \code{"degree"} and other possible values are \code{"list"} and \code{"bool"}.}
 
-\item{...}{If \code{ret = "bool"}, two additional parameters have to be informed, as described below.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> If \code{ret = "bool"}, two additional parameters have to be informed, as described below.}
 
 \item{utype}{A character value that indicates the name of a function implementing a t-conorm. The default value is \code{"max"}, which is the standard operator of the union.}
 }
@@ -49,7 +49,7 @@ The resulting degree can be also interpreted as a linguistic value.
 }
 \details{
 These functions implement topological relationships of the spatial plateau algebra.
-They receive two \code{pgeom} objects of type \code{PLATEAUREGION} together with some additional parameters (as detailed below).
+They receive two \code{pgeom} objects of the type \code{PLATEAUREGION} together with some additional parameters (as detailed below).
 The family of fuzzy topological relationships consists of the following functions:
 \itemize{
 \item \code{spa_overlap} computes the overlapping degree of two plateau region objects.

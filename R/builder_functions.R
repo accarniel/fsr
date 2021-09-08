@@ -8,7 +8,7 @@
 #' @param tbl A data.frame or tibble with the following format: (x, y, z)
 #' @param classes A character vector containing the class names
 #' @param mfs A vector of membership functions generated from FuzzyR (function `genmf`). Each membership function `i` correpgeom_objnds to the class `i`
-#' @param ... unused
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
@@ -59,7 +59,7 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
 #' @param method A fuzzy clustering method of the package `e1071`, which can be either `"cmeans"` (default) or `"cshell"`
 #' @param use_coords A Boolean value to indicate whether the columns (x, y) should be used in the clustering algorithm (default is FALSE)
 #' @param iter A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
-#' @param ... unused
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
@@ -175,7 +175,7 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
 #'
 #' @param lp A data.frame or tibble with the labeled points in the format: (x, y, z, ...) where ... are attributes added by the fuzzification step
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
-#' @param ... unused
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble in the format (classes, pgeoms)
 #'
@@ -228,7 +228,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #' @param lp A data.frame or tibble with the labeled points in the format: (x, y, z, ...) where ... are attributes added by the fuzzification step
 #' @param tnorm A t-norm used to calculate the membership degree of the triangle. It should be the name of a vector function (e.g., "prod", "min").
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
-#' @param ... unused
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble in the format (classes, pgeoms)
 #'
@@ -289,7 +289,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #' @param tbl A data.frame or tibble with the following format: (x, y, z)
 #' @param fuzz_policy The fuzzification policy to be employed by the algorithm. See details below.
 #' @param const_policy The construction policy to be used by the algorithm. See details below.
-#' @param ... Parameters for the chosen policies. See details below.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Parameters for the chosen policies. See details below.
 #'
 #' @details
 #'

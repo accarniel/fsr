@@ -21,7 +21,7 @@ pgeom_to_pwkt(pgeom)
 
 \item{x}{A \code{pgeom} object of any type.}
 
-\item{...}{unused}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Unused.}
 
 \item{object}{A \code{pgeom} object of any type.}
 }

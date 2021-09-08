@@ -7,10 +7,10 @@
 spa_contour(pregion)
 }
 \arguments{
-\item{pregion}{A \code{pgeom} object of type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pregion}{A \code{pgeom} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
 }
 \value{
-A \code{pgeom} object of type \code{"PLATEAULINE"} that represents the contour (i.e. frontier) of a plateau region object given as input.
+A \code{pgeom} object of the type \code{PLATEAULINE} that represents the contour (i.e. frontier) of a plateau region object given as input.
 }
 \description{
 spa_contour extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.

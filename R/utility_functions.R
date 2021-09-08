@@ -424,11 +424,11 @@ search_by_md <- function(components, low, high, m){
 #'            low = "white", high = "black", ...)
 #'
 #' @param pgeom A `pgeom` object of any type.
-#' @param base_poly A `sfg` object of type `POLYGON` or `MULTIPOLYGON`.
+#' @param base_poly A `sfg` object of the type `POLYGON` or `MULTIPOLYGON`.
 #' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
 #' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
 #' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
-#' @param ... Optional parameters. They can be the same as the parameters of `geom_sf` function.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Optional parameters. They can be the same as the parameters of `geom_sf` function.
 #'
 #' @name pgeom_plot
 #'

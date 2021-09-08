@@ -13,7 +13,7 @@ spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 
 \item{const_policy}{The construction policy to be used by the algorithm. See details below.}
 
-\item{...}{Parameters for the chosen policies. See details below.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Parameters for the chosen policies. See details below.}
 }
 \value{
 A tibble in the format \verb{(classes, pgeoms)}, where \code{classes} is a character column and \code{pgeoms} is a list of \code{pgeom} objects.

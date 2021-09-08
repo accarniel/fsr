@@ -317,7 +317,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' 
 #' @param fsi An FSI model builded with the function `fsi_create` that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
 #' @param point An `sfg` object of geometry type `point`, which is created through the function `st_point` of the sf package.
-#' @param ...   Informs the `fsi_eval` how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: `discret_by` is 0.5 and `discret_length` is NULL.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Informs the `fsi_eval` how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: `discret_by` is 0.5 and `discret_length` is NULL.
 #'
 #' @details 
 #' 
@@ -588,7 +588,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' @param fsi An FSI model builded with the `fsi_create` function that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
 #' @param qw An `sfg` object storing the query window that is supposed to be used as input for the inference. It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).
 #' @param approach Defines which approach is employed to perform the query window inference: `“discretization”` or `“pso”`. Default value is `"discretization"``
-#' @param ...  Different set of parameters required depending on the chosen approach (see more in details below).
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Different set of parameters required depending on the chosen approach (see more in details below).
 #'
 #' @details 
 #'

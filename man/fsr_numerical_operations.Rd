@@ -22,9 +22,9 @@ spa_length(pl)
 \arguments{
 \item{pgeom}{A \code{pgeom} object of any type.}
 
-\item{pr}{A \code{pgeom} object of type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pr}{A \code{pgeom} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
 
-\item{pl}{A \code{pgeom} object of type \code{PLATEAULINE}. It throws an error if a different type is given.}
+\item{pl}{A \code{pgeom} object of the type \code{PLATEAULINE}. It throws an error if a different type is given.}
 }
 \value{
 A numerical value.

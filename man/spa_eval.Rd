@@ -9,7 +9,7 @@ spa_eval(pgeom, point)
 \arguments{
 \item{pgeom}{A \code{pgeom} object of any type.}
 
-\item{point}{An \code{sfg} object of type \code{"POINT"}.}
+\item{point}{An \code{sfg} object of the type \code{POINT}.}
 }
 \value{
 A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., \code{sfg} object) in a spatial plateau object (i.e., \code{pgeom} object).

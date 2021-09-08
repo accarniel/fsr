@@ -117,7 +117,7 @@ pgeom_to_pwkt <- function(pgeom) {
 
 #' @name PWKT
 #' @param x A `pgeom` object of any type.
-#' @param ... unused
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #' @export
 format.pgeom <- function(x, ...) {
   pgeom_to_pwkt(x)
@@ -137,7 +137,7 @@ setMethod("show", "pgeom", function(object) {
 #' @name PWKT
 #' 
 #' @param x A `pgeom` object of any type.
-#' @param ... unused
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #' 
 #' @aliases as.character,pgeom-method
 #' 
