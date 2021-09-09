@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_support}
 \alias{spa_support}
-\title{spa_support}
+\title{Capturing the support of a \code{pgeom} object}
 \usage{
 spa_support(pgeom)
 }
@@ -13,7 +13,7 @@ spa_support(pgeom)
 An \code{sfg} object that represents the support of \code{pgeom}. It can be an empty object if \code{pgeom} is empty.
 }
 \description{
-spa_support yields a crisp spatial object (as a \code{sfg} object) that corresponds to the support of a \code{pgeom} object given as input
+This function yields a crisp spatial object (as an \code{sfg} object) that corresponds to the support of a \code{pgeom} object given as input.
 }
 \details{
 It employs the classical definition of \emph{support} from the fuzzy set theory in the context of spatial plateau algebra.

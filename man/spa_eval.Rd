@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_eval}
 \alias{spa_eval}
-\title{spa_eval}
+\title{Capturing the membership degree of a point}
 \usage{
 spa_eval(pgeom, point)
 }
@@ -15,7 +15,8 @@ spa_eval(pgeom, point)
 A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., \code{sfg} object) in a spatial plateau object (i.e., \code{pgeom} object).
 }
 \description{
-spa_eval evaluates the membership degree of a given point in a plateau region object.
+This function evaluates the membership degree of a given point in a spatial plateau object of any type.
+It returns a value in [0, 1] that indicates to which extent the point belongs to the \code{pgeom} object.
 }
 \details{
 The goal of this function is to return the membership degree of a simple point object (i.e., \code{sfg} object) in a given spatial plateau object (i.e., \code{pgeom} object).

@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_contour}
 \alias{spa_contour}
-\title{spa_contour}
+\title{Capturing the frontier of a plateau region object}
 \usage{
 spa_contour(pregion)
 }
@@ -13,7 +13,7 @@ spa_contour(pregion)
 A \code{pgeom} object of the type \code{PLATEAULINE} that represents the contour (i.e. frontier) of a plateau region object given as input.
 }
 \description{
-spa_contour extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
+This function extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
 }
 \details{
 It employs the definition of \emph{fuzzy frontier} of a fuzzy region object in the context of spatial plateau algebra (as defined in the references).

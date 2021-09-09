@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_exact_inside}
 \alias{spa_exact_inside}
-\title{spa_exact_inside}
+\title{Check exact containment}
 \usage{
 spa_exact_inside(pgeom1, pgeom2)
 }
@@ -15,7 +15,7 @@ spa_exact_inside(pgeom1, pgeom2)
 A Boolean value that indicates if a \code{pgeom} is completely and certainly inside \code{pgeom2}.
 }
 \description{
-spa_exact_inside checks whether a \code{pgeom} object is completely inside of another \code{pgeom} object.
+This function checks whether a \code{pgeom} object is completely inside of another \code{pgeom} object.
 }
 \details{
 It is a Boolean function that checks \emph{fuzzy containment} in the spatial plateau context.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_add_component}
 \alias{spa_add_component}
-\title{spa_add_component}
+\title{Adding components to a \code{pgeom} object}
 \usage{
 spa_add_component(pgeom, components)
 }
@@ -15,7 +15,9 @@ spa_add_component(pgeom, components)
 A \code{pgeom} object containing the \code{component} objects.
 }
 \description{
-spa_add_component adds a component into a spatial plateau object.
+This function adds components to a spatial plateau object (i.e., \code{pgeom} object).
+The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
+For instance, a \code{pgeom} object of the type \code{PLATEAUREGION} accepts only components containing polygons (e.g., \code{POLYGON} or \code{MULTIPOLYGON}).
 }
 \details{
 This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.

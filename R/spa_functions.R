@@ -1,6 +1,8 @@
-#' @title spa_add_component
+#' @title Adding components to a `pgeom` object
 #'
-#' @description spa_add_component adds a component into a spatial plateau object.
+#' @description This function adds components to a spatial plateau object (i.e., `pgeom` object). 
+#' The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
+#' For instance, a `pgeom` object of the type `PLATEAUREGION` accepts only components containing polygons (e.g., `POLYGON` or `MULTIPOLYGON`). 
 #'
 #' @usage
 #'
@@ -96,9 +98,10 @@ spa_add_component <- function(pgeom, components) {
   pgeom
 }
 
-#' @title spa_eval
+#' @title Capturing the membership degree of a point
 #'
-#' @description spa_eval evaluates the membership degree of a given point in a plateau region object.
+#' @description This function evaluates the membership degree of a given point in a spatial plateau object of any type.
+#' It returns a value in \[0, 1\] that indicates to which extent the point belongs to the `pgeom` object.
 #'
 #' @usage
 #'
@@ -665,9 +668,9 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
   }
 }
 
-#' @title spa_support
+#' @title Capturing the support of a `pgeom` object
 #'
-#' @description spa_support yields a crisp spatial object (as a `sfg` object) that corresponds to the support of a `pgeom` object given as input
+#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the support of a `pgeom` object given as input.
 #'
 #' @usage
 #'
@@ -717,9 +720,9 @@ spa_support <- function(pgeom){
   return(pgeom@supp)
 }
 
-#' @title spa_core
+#' @title Capturing the core of a `pgeom` object
 #'
-#' @description spa_core yields a crisp spatial object (as a `sfg` object) that corresponds to the core of a `pgeom` object given as input
+#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the core of a `pgeom` object given as input.
 #'
 #' @usage
 #'
@@ -784,9 +787,9 @@ spa_core <- function(pgeom){
   sfg_obj
 }
 
-#' @title spa_exact_equal
+#' @title Check exact equality
 #'
-#' @description spa_exact_equal checks whether two spatial plateau objects are exactly equal.
+#' @description This function checks whether two spatial plateau objects are exactly equal.
 #'
 #' @usage
 #'
@@ -852,9 +855,9 @@ spa_exact_equal <- function(pgeom1, pgeom2){
   return(TRUE)
 }
 
-#' @title spa_exact_inside
+#' @title Check exact containment
 #'
-#' @description spa_exact_inside checks whether a `pgeom` object is completely inside of another `pgeom` object.
+#' @description This function checks whether a `pgeom` object is completely inside of another `pgeom` object.
 #'
 #' @usage
 #'
@@ -1248,9 +1251,9 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
   spa_inside(pgeom2, pgeom1, utype = utype, ret = ret, ...)
 }
 
-#' @title spa_contour
+#' @title Capturing the frontier of a plateau region object
 #'
-#' @description spa_contour extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
+#' @description This function extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
 #'
 #' @usage
 #'
@@ -1335,9 +1338,9 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
                               FuzzyR::genmf("trapmf", c(2.7, 3.1, 3.6, 3.9)),
                               FuzzyR::genmf("trapmf", c(3.8, 4.1, 4.5, 4.5)))
 
-#' @title spa_set_classification
+#' @title Setting a new classification for fuzzy topological relationships
 #'
-#' @description spa_set_classification configures a new set of linguistic values and their corresponding membership functions to be used by fuzzy topological relationships.
+#' @description This functions configures a new set of linguistic values and their corresponding membership functions to be used by fuzzy topological relationships.
 #'
 #' @usage
 #'
@@ -1484,9 +1487,9 @@ soft_alpha_eval <- function(degree, alpha){
   degree > alpha
 }
 
-#' @title spa_boundary_pregion
+#' @title Capturing the fuzzy boundary of a plateau region object
 #'
-#' @description spa_boundary_pregion yields a specific part of the fuzzy boundary of a plateau region object.
+#' @description This function yields a specific part of the fuzzy boundary of a plateau region object.
 #'
 #' @usage
 #'

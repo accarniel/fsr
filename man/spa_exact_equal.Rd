@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_exact_equal}
 \alias{spa_exact_equal}
-\title{spa_exact_equal}
+\title{Check exact equality}
 \usage{
 spa_exact_equal(pgeom1, pgeom2)
 }
@@ -15,7 +15,7 @@ spa_exact_equal(pgeom1, pgeom2)
 A Boolean value that indicates if two \code{pgeom} objects are exactly equal.
 }
 \description{
-spa_exact_equal checks whether two spatial plateau objects are exactly equal.
+This function checks whether two spatial plateau objects are exactly equal.
 }
 \details{
 It is a Boolean function that checks \emph{fuzzy equality} in the spatial plateau context. Two \code{pgeom} objects are exactly equal if their components are equal.

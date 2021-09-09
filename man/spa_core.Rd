@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_core}
 \alias{spa_core}
-\title{spa_core}
+\title{Capturing the core of a \code{pgeom} object}
 \usage{
 spa_core(pgeom)
 }
@@ -13,7 +13,7 @@ spa_core(pgeom)
 An \code{sfg} object that represents the core of \code{pgeom}. It can be an empty object if \code{pgeom} has no a component with membership degree 1.
 }
 \description{
-spa_core yields a crisp spatial object (as a \code{sfg} object) that corresponds to the core of a \code{pgeom} object given as input
+This function yields a crisp spatial object (as an \code{sfg} object) that corresponds to the core of a \code{pgeom} object given as input.
 }
 \details{
 It employs the classical definition of \emph{core} from the fuzzy set theory in the context of spatial plateau algebra.

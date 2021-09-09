@@ -2,7 +2,7 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_boundary_pregion}
 \alias{spa_boundary_pregion}
-\title{spa_boundary_pregion}
+\title{Capturing the fuzzy boundary of a plateau region object}
 \usage{
 spa_boundary_pregion(pregion, bound_part = "region")
 }
@@ -15,7 +15,7 @@ spa_boundary_pregion(pregion, bound_part = "region")
 A \code{pgeom} object that represents a specific part of the fuzzy boundary of \code{pgeom} object given as input.
 }
 \description{
-spa_boundary_pregion yields a specific part of the fuzzy boundary of a plateau region object.
+This function yields a specific part of the fuzzy boundary of a plateau region object.
 }
 \details{
 It employs the definition of \emph{fuzzy boundary} of a fuzzy region object in the context of spatial plateau algebra (as defined in the references).
