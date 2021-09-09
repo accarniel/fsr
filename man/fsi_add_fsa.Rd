@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_functions.R
 \name{fsi_add_fsa}
 \alias{fsi_add_fsa}
-\title{fsi_add_fsa}
+\title{Adding an antecedent to an FSI model}
 \usage{
 fsi_add_fsa(fsi, lvar, tbl)
 }
@@ -17,7 +17,9 @@ fsi_add_fsa(fsi, lvar, tbl)
 An FSI model populated with a fuzzy spatial antecedent.
 }
 \description{
-fsi_add_fsa adds a fuzzy spatial antecedent to the FSI model
+This function adds a fuzzy spatial antecedent to a fuzzy spatial inference (FSI) model.
+A fuzzy spatial antecedent corresponds to a layer of fuzzy spatial objects that describe the different characteristics of the problem.
+The antecedent has a linguistic variable and its fuzzy spatial objects have linguistic values so that they are used in the IF part of fuzzy rules.
 }
 \details{
 The fuzzy spatial antecedent added by the \code{fsi_add_fsa} function is composed of a linguistic variable and its corresponding \code{pgeom} objects annotated by linguistic values.

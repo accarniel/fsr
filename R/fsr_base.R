@@ -1,7 +1,7 @@
 #' An S4 Class for representing a component of a spatial plateau object
 #'
-#' @slot obj A sf data type
-#' @slot md A membership degree of the component
+#' @slot obj An `sfg` object.
+#' @slot md The membership degree of the component.
 #' 
 #' @import methods sf
 #' @export
@@ -14,9 +14,9 @@ setClass("component",
 
 #' An S4 Class for representing a spatial plateau object
 #'
-#' @slot component A list of components
-#' @slot supp An sfg object that stores the union of spatial objects of the components of the spatial plateau object
-#' @slot type The data type of the spatial plateau object
+#' @slot component A list of components.
+#' @slot supp An `sfg` object that stores the union of the spatial objects of the components of the spatial plateau object.
+#' @slot type The data type of the spatial plateau object.
 #' 
 #' @import methods
 #' @export
@@ -28,10 +28,9 @@ setClass("pgeom",
          )
 )
 
-#' @title pgeom_to_pwkt
+#' @title The PWKT of a spatial plateau object
 #'
-#' @description pgeom_to_pwkt gives the Well-Known Text representation of a pgeom
-#' object. 
+#' @description This function gives the Plateau Well-Known Text (PWKT) representation of a `pgeom` object. 
 #'
 #' @usage
 #'

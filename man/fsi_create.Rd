@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_functions.R
 \name{fsi_create}
 \alias{fsi_create}
-\title{fsi_create}
+\title{Creation of an empty fuzzy spatial inference model}
 \usage{
 fsi_create(name, and_method = "min", or_method = "max",
            imp_method = "min", agg_method = "max", 
@@ -27,7 +27,7 @@ fsi_create(name, and_method = "min", or_method = "max",
 An empty named FSI model that is ready to be populated with fuzzy rules representing the antecedents and the consequent.
 }
 \description{
-fsi_create builds an FSI model without elements of the data source component (spatial plateau objects, fuzzy rules set, and fuzzy sets)
+This function builds a fuzzy spatial inference (FSI) model without elements of the data source component (i.e., spatial plateau objects, fuzzy rules set, and fuzzy sets).
 }
 \details{
 The FSI model created with the function \code{fsi_create} and its default parameter values will implement a model using Mamdani's method.

@@ -6,7 +6,7 @@
 \alias{format.pgeom}
 \alias{show,pgeom-method}
 \alias{as.character,pgeom-method}
-\title{pgeom_to_pwkt}
+\title{The PWKT of a spatial plateau object}
 \usage{
 pgeom_to_pwkt(pgeom)
 
@@ -29,8 +29,7 @@ pgeom_to_pwkt(pgeom)
 A character value with the textual representation of a given \code{pgeom} object.
 }
 \description{
-pgeom_to_pwkt gives the Well-Known Text representation of a pgeom
-object.
+This function gives the Plateau Well-Known Text (PWKT) representation of a \code{pgeom} object.
 }
 \details{
 It gives the textual representation for a \code{pgeom} object,

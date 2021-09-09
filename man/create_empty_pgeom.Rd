@@ -2,19 +2,19 @@
 % Please edit documentation in R/utility_functions.R
 \name{create_empty_pgeom}
 \alias{create_empty_pgeom}
-\title{create_empty_pgeom}
+\title{Creation of an empty \code{pgeom} object}
 \usage{
 create_empty_pgeom(type)
 }
 \arguments{
-\item{type}{A character value indicating the data type of the pgeom object.
-It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"} or \code{"PLATEAUREGION"}}
+\item{type}{A character value indicating the data type of the \code{pgeom} object.
+It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"} or \code{"PLATEAUREGION"}.}
 }
 \value{
 A \code{pgeom} object.
 }
 \description{
-create_empty_pgeom builds an empty pgeom object of a specific type
+This function builds an empty \code{pgeom} object of a specific type.
 }
 \details{
 The \code{create_empty_pgeom} creates a new pgeom object with no components. To add new components to this object, you

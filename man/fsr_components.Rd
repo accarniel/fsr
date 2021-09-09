@@ -25,7 +25,7 @@ It should be either \code{"POINT"}, \code{"LINE"}, or \code{"REGION"}.}
 A \code{component} object that can be added to a spatial plateau object (i.e., a \code{pgeom} object).
 }
 \description{
-These functions build a component from coordinate pairs or a
+There are two functions that build a component from coordinate pairs or a
 single \code{sfg} object labeled with a membership degree. This component can be added to a spatial plateau object.
 A component consists of an \code{sfg} object and an associated membership degree.
 A component can be built in two different ways. By using the function \code{create_component}, the component is formed by

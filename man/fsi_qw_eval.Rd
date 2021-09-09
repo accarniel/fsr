@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_functions.R
 \name{fsi_qw_eval}
 \alias{fsi_qw_eval}
-\title{fsi_qw_eval}
+\title{Evaluating a query window inference}
 \usage{
 fsi_qw_eval(fsi, qw, approach = "discretization", ...)
 }
@@ -19,7 +19,9 @@ fsi_qw_eval(fsi, qw, approach = "discretization", ...)
 A tibble in the format \verb{(points, inferred_values)}, where \code{points} is an \code{sfc} object (i.e., a list of \code{sfg} objects of geometry type POINT) and \code{inferred_values} are inferred values in the domain of the consequent of the FSI model.
 }
 \description{
-fsi_qw_eval implements two approaches for evaluating the query window inference
+This function implements two approaches for evaluating the query window inference on a fuzzy spatial inference (FSI) model.
+Given a query window (i.e., a rectangular object), it returns a set of inferred points inside this window
+that satisfy a specific condition (e.g., target linguistic value, or maximum/minimum inferred values).
 }
 \details{
 For the \emph{discretization} approach, two additional parameters are needed and they have to be informed by using the three-dots parameter \code{...}:

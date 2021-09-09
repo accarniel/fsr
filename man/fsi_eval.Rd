@@ -2,12 +2,12 @@
 % Please edit documentation in R/fsi_functions.R
 \name{fsi_eval}
 \alias{fsi_eval}
-\title{fsi_eval}
+\title{Evaluating an FSI model for a given point location}
 \usage{
 fsi_eval(fsi, point, ...)
 }
 \arguments{
-\item{fsi}{An FSI model builded with the function \code{fsi_create} that is populated by the following functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
+\item{fsi}{An FSI model builded with the function \code{fsi_create} and populated by the functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
 
 \item{point}{An \code{sfg} object of geometry type \code{point}, which is created through the function \code{st_point} of the sf package.}
 
@@ -17,7 +17,8 @@ fsi_eval(fsi, point, ...)
 A numeric value that belongs to the domain of the consequent (i.e., as specified by \code{fsi_add_cs}) and represents the result of the reasoning process in a particular point location.
 }
 \description{
-fsi_eval evaluates an FSI model in a given point location
+This function executes the reasoning process of a fuzzy spatial inference (FSI) model
+for a given point location (i.e., \code{sfg} object of the type \code{POINT}).
 }
 \details{
 This function evaluates an FSI model populated with its fuzzy spatial antecedent, consequent, and fuzzy rules set on a specific point location. This evaluation is based on the algorithm specified by \href{https://ieeexplore.ieee.org/document/8015707}{FIFUS}.

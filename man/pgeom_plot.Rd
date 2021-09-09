@@ -3,7 +3,7 @@
 \name{pgeom_plot}
 \alias{pgeom_plot}
 \alias{plot,pgeom,missing-method}
-\title{Visualization of spatial plateau objects}
+\title{Visualization of \code{pgeom} objects}
 \usage{
 pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, 
            low = "white", high = "black", ...)
@@ -31,7 +31,7 @@ pgeom_plot(pgeom, base_poly = NULL, add_base_poly = TRUE,
 A \code{ggplot} object.
 }
 \description{
-pgeom_plot plots a pgeom object.
+This function plots a \code{pgeom} object.
 }
 \details{
 The \code{pgeom_plot} uses a \code{ggplot} method to construct the plot. It receives a \code{pgeom} object (if it is empty, an empty graphics

@@ -2,19 +2,19 @@
 % Please edit documentation in R/utility_functions.R
 \name{pgeom_as_tibble}
 \alias{pgeom_as_tibble}
-\title{pgeom_as_tibble}
+\title{Converting a \code{pgeom} object into a \code{tibble}}
 \usage{
 pgeom_as_tibble(pgeom)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object}
+\item{pgeom}{A \code{pgeom} object.}
 }
 \value{
 A tibble object of size \verb{n x 2} where \code{n} is the number of components of
 the \code{pgeom} object and two columns in the format \verb{(md, geometry)}.
 }
 \description{
-pgeom_as_tibble converts a pgeom object into a tibble object.
+This function converts a \code{pgeom} object into a \code{tibble} object so that its components are rows of the table.
 }
 \details{
 The \code{pgeom_as_tibble} turns a \code{pgeom} object into a tibble, a data frame with class \code{tbl_df}.

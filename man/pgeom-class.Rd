@@ -10,10 +10,10 @@ An S4 Class for representing a spatial plateau object
 \section{Slots}{
 
 \describe{
-\item{\code{component}}{A list of components}
+\item{\code{component}}{A list of components.}
 
-\item{\code{supp}}{An sfg object that stores the union of spatial objects of the components of the spatial plateau object}
+\item{\code{supp}}{An \code{sfg} object that stores the union of the spatial objects of the components of the spatial plateau object.}
 
-\item{\code{type}}{The data type of the spatial plateau object}
+\item{\code{type}}{The data type of the spatial plateau object.}
 }}
 

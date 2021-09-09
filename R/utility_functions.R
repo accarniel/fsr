@@ -1,6 +1,6 @@
 #' @title Creation of a component
 #'
-#' @description These functions build a component from coordinate pairs or a 
+#' @description There are two functions that build a component from coordinate pairs or a 
 #' single `sfg` object labeled with a membership degree. This component can be added to a spatial plateau object. 
 #' A component consists of an `sfg` object and an associated membership degree.
 #' A component can be built in two different ways. By using the function `create_component`, the component is formed by 
@@ -153,16 +153,16 @@ component_from_sfg <- function(sfg, md){
   }
 }
 
-#' @title create_empty_pgeom
+#' @title Creation of an empty `pgeom` object
 #'
-#' @description create_empty_pgeom builds an empty pgeom object of a specific type
+#' @description This function builds an empty `pgeom` object of a specific type.
 #'
 #' @usage
 #'
 #' create_empty_pgeom(type)
 #'
-#' @param type A character value indicating the data type of the pgeom object.
-#' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"` or `"PLATEAUREGION"`
+#' @param type A character value indicating the data type of the `pgeom` object.
+#' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"` or `"PLATEAUREGION"`.
 #'
 #' @details
 #'
@@ -202,15 +202,15 @@ create_empty_pgeom <- function(type){
   
 }
 
-#' @title create_pgeom
+#' @title Creation of a `pgeom` object with components
 #'
-#' @description create_pgeom creates a pgeom object from a dataframe or list of components.
+#' @description This function creates a `pgeom` object from a `data.frame` or a list of components.
 #'
 #' @usage
 #' 
 #' create_pgeom(components, type)
 #'
-#' @param components A list of `component` objects or a dataframe. The type of each component must be the same for all components.
+#' @param components A list of `component` objects or a `data.frame`. The type of each component must be the same for all components.
 #' @param type A character value that indicates the type of the desired `pgeom` object. 
 #' It should be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, or `"PLATEAUREGION"`. It must be compatible with 
 #' the components given in `components` parameter.
@@ -259,7 +259,7 @@ create_empty_pgeom <- function(type){
 #' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 #' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 #'
-#' plateau_line_pgeom<- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
+#' plateau_line_pgeom <- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
 #' 
 #' @import sf dplyr
@@ -310,15 +310,15 @@ create_pgeom <- function(components, type){
   }
 }
 
-#' @title pgeom_as_tibble
+#' @title Converting a `pgeom` object into a `tibble`
 #'
-#' @description pgeom_as_tibble converts a pgeom object into a tibble object.
+#' @description This function converts a `pgeom` object into a `tibble` object so that its components are rows of the table.
 #'
 #' @usage
 #' 
 #' pgeom_as_tibble(pgeom)
 #'
-#' @param pgeom A `pgeom` object
+#' @param pgeom A `pgeom` object.
 #'
 #' @details
 #' 
@@ -414,9 +414,9 @@ search_by_md <- function(components, low, high, m){
   return(c(FALSE, low))
 }
 
-#' @title Visualization of spatial plateau objects
+#' @title Visualization of `pgeom` objects
 #'
-#' @description pgeom_plot plots a pgeom object.
+#' @description This function plots a `pgeom` object.
 #'
 #' @usage
 #' 
@@ -585,9 +585,9 @@ is_pgeom <- function(type){
   }
 }
 
-#' @title pgeom_is_empty
+#' @title Checking whether a `pgeom` object is empty
 #'
-#' @description pgeom_is_empty checks whether a pgeom object is empty..
+#' @description This function checks whether a `pgeom` object is empty (i.e., if it does not contain components).
 #'
 #' @usage
 #' 

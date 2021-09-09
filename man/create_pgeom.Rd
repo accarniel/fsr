@@ -2,12 +2,12 @@
 % Please edit documentation in R/utility_functions.R
 \name{create_pgeom}
 \alias{create_pgeom}
-\title{create_pgeom}
+\title{Creation of a \code{pgeom} object with components}
 \usage{
 create_pgeom(components, type)
 }
 \arguments{
-\item{components}{A list of \code{component} objects or a dataframe. The type of each component must be the same for all components.}
+\item{components}{A list of \code{component} objects or a \code{data.frame}. The type of each component must be the same for all components.}
 
 \item{type}{A character value that indicates the type of the desired \code{pgeom} object.
 It should be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"}, or \code{"PLATEAUREGION"}. It must be compatible with
@@ -17,7 +17,7 @@ the components given in \code{components} parameter.}
 A \code{pgeom} object.
 }
 \description{
-create_pgeom creates a pgeom object from a dataframe or list of components.
+This function creates a \code{pgeom} object from a \code{data.frame} or a list of components.
 }
 \details{
 The \code{create_pgeom} function creates a \code{pgeom} object of a given type. This object is built by using either a
@@ -58,7 +58,7 @@ comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
 comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 
-plateau_line_pgeom<- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
+plateau_line_pgeom <- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
 
 
 }

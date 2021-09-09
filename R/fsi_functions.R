@@ -1,6 +1,6 @@
-#' @title fsi_create
+#' @title Creation of an empty fuzzy spatial inference model
 #'
-#' @description fsi_create builds an FSI model without elements of the data source component (spatial plateau objects, fuzzy rules set, and fuzzy sets)
+#' @description This function builds a fuzzy spatial inference (FSI) model without elements of the data source component (i.e., spatial plateau objects, fuzzy rules set, and fuzzy sets).
 #'
 #' @usage
 #'
@@ -50,9 +50,11 @@ fsi_create <- function(name, and_method = "min",
 
 
 
-#' @title fsi_add_fsa
+#' @title Adding an antecedent to an FSI model
 #' 
-#' @description fsi_add_fsa adds a fuzzy spatial antecedent to the FSI model
+#' @description This function adds a fuzzy spatial antecedent to a fuzzy spatial inference (FSI) model. 
+#' A fuzzy spatial antecedent corresponds to a layer of fuzzy spatial objects that describe the different characteristics of the problem.
+#' The antecedent has a linguistic variable and its fuzzy spatial objects have linguistic values so that they are used in the IF part of fuzzy rules.
 #' 
 #' @usage 
 #' 
@@ -116,9 +118,9 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
 
 
 
-#' @title fsi_add_cs
+#' @title Adding the consequent to an FSI model
 #' 
-#' @description fsi_add_cs adds the consequent to the FSI model
+#' @description This function adds the consequent to a fuzzy spatial inference (FSI) model. It consists of a set of membership functions labeled with linguistic values.
 #' 
 #' @usage 
 #' 
@@ -240,11 +242,9 @@ get_consequent <- function(user_rule) {
   return(conseq)
 }
 
-
-
-#' @title fsi_add_rules
+#' @title Adding fuzzy rules to an FSI model
 #' 
-#' @description fsi_add_rules adds the fuzzy rules set to an FSI model
+#' @description This function adds the fuzzy rules set to a fuzzy spatial inference (FSI) model. A fuzzy rule must contain only linguistic variables and values employed by the added antecedent parts and consequent.
 #' 
 #' @usage 
 #' 
@@ -307,15 +307,16 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
   fsi
 }
 
-#' @title fsi_eval
+#' @title Evaluating an FSI model for a given point location
 #' 
-#' @description fsi_eval evaluates an FSI model in a given point location
+#' @description This function executes the reasoning process of a fuzzy spatial inference (FSI) model 
+#' for a given point location (i.e., `sfg` object of the type `POINT`).
 #' 
 #' @usage 
 #' 
 #' fsi_eval(fsi, point, ...)
 #' 
-#' @param fsi An FSI model builded with the function `fsi_create` that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
+#' @param fsi An FSI model builded with the function `fsi_create` and populated by the functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
 #' @param point An `sfg` object of geometry type `point`, which is created through the function `st_point` of the sf package.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Informs the `fsi_eval` how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: `discret_by` is 0.5 and `discret_length` is NULL.
 #'
@@ -578,8 +579,11 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 
 
 
-#' @title fsi_qw_eval
-#' @description fsi_qw_eval implements two approaches for evaluating the query window inference
+#' @title Evaluating a query window inference
+#' 
+#' @description This function implements two approaches for evaluating the query window inference on a fuzzy spatial inference (FSI) model.
+#' Given a query window (i.e., a rectangular object), it returns a set of inferred points inside this window
+#' that satisfy a specific condition (e.g., target linguistic value, or maximum/minimum inferred values).
 #' 
 #' @usage
 #'
@@ -679,18 +683,16 @@ fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
 }
 
 
-
-
-#' @title visitation
+#' @title Visitation: An example of FSI model
 #' 
-#' @description visitation provides an example, without rules, of a fuzzy spatial inference model
+#' @description This function provides an example, without rules, of a fuzzy spatial inference (FSI) model.
 #' 
 #' @usage 
 #' visitation()
 #'
 #' @details 
 #' 
-#' The FSI model implemented with the `visitation` function represents a fuzzy spatial inference model to estimate the visiting experience based on prices and overall ratings of accommodations as well as sanitary conditions of restaurants. The output of such a model infers a value between 0 and 100 that indicates how attractive it is to visit a specific location. For this, the experience can be classified as _awful_, _average_, and _great_. 
+#' The FSI model provided by this function represents an FSI model to estimate the visiting experience based on prices and overall ratings of accommodations as well as sanitary conditions of restaurants. The output of such a model infers a value between 0 and 100 that indicates how attractive it is to visit a specific location. For this, the experience can be classified as _awful_, _average_, and _great_. 
 #' 
 #' The linguistic variables and their linguistic values of this FSI model are listed below:
 #' - _accommodation price_, with  _cut-rate_, _affordable_, and _expensive_ as linguistic values;

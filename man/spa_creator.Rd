@@ -2,7 +2,7 @@
 % Please edit documentation in R/builder_functions.R
 \name{spa_creator}
 \alias{spa_creator}
-\title{spa_creator}
+\title{Building \code{pgeom} objects from a point dataset}
 \usage{
 spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 }
@@ -20,7 +20,7 @@ A tibble in the format \verb{(classes, pgeoms)}, where \code{classes} is a chara
 This means that a spatial plateau object is created for representing a specific class of the point dataset.
 }
 \description{
-spa_creator builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values
+This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
 }
 \details{
 It follows the two-stage construction systematic approach described \href{https://doi.org/10.1109/FUZZ-IEEE.2019.8858878}{here}.

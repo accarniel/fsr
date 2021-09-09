@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_functions.R
 \name{fsi_add_cs}
 \alias{fsi_add_cs}
-\title{fsi_add_cs}
+\title{Adding the consequent to an FSI model}
 \usage{
 fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
 }
@@ -21,7 +21,7 @@ fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
 An FSI model populated with a consequent.
 }
 \description{
-fsi_add_cs adds the consequent to the FSI model
+This function adds the consequent to a fuzzy spatial inference (FSI) model. It consists of a set of membership functions labeled with linguistic values.
 }
 \details{
 Each linguistic value defined at the \code{lvals} parameter has a membership function defined at the \code{mfs} parameter.

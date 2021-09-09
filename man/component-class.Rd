@@ -10,8 +10,8 @@ An S4 Class for representing a component of a spatial plateau object
 \section{Slots}{
 
 \describe{
-\item{\code{obj}}{A sf data type}
+\item{\code{obj}}{An \code{sfg} object.}
 
-\item{\code{md}}{A membership degree of the component}
+\item{\code{md}}{The membership degree of the component.}
 }}
 

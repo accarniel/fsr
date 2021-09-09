@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_functions.R
 \name{visitation}
 \alias{visitation}
-\title{visitation}
+\title{Visitation: An example of FSI model}
 \usage{
 visitation()
 }
@@ -10,10 +10,10 @@ visitation()
 An example of an FSI model implemented without fuzzy rules set.
 }
 \description{
-visitation provides an example, without rules, of a fuzzy spatial inference model
+This function provides an example, without rules, of a fuzzy spatial inference (FSI) model.
 }
 \details{
-The FSI model implemented with the \code{visitation} function represents a fuzzy spatial inference model to estimate the visiting experience based on prices and overall ratings of accommodations as well as sanitary conditions of restaurants. The output of such a model infers a value between 0 and 100 that indicates how attractive it is to visit a specific location. For this, the experience can be classified as \emph{awful}, \emph{average}, and \emph{great}.
+The FSI model provided by this function represents an FSI model to estimate the visiting experience based on prices and overall ratings of accommodations as well as sanitary conditions of restaurants. The output of such a model infers a value between 0 and 100 that indicates how attractive it is to visit a specific location. For this, the experience can be classified as \emph{awful}, \emph{average}, and \emph{great}.
 
 The linguistic variables and their linguistic values of this FSI model are listed below:
 \itemize{

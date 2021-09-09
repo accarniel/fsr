@@ -121,7 +121,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 
 #' Auxiliary function to process and return a list containing either Voronoi cells or triangles from the Delaunay triangulation
 #'
-#' @param sf An sf object containing point objects. This sf object should be created from the tibble resulted from the fuzzification stage
+#' @param sf An `sf` object containing point objects. This sf object should be created from the tibble resulted from the fuzzification stage
 #' @param op The name of function that should be evaluated: either `st_voronoi` (default) or `st_triangulate`
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
 #'
@@ -278,9 +278,9 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
   tibble(classes = cls, pgeoms = pgeom_objs)
 }
 
-#' @title spa_creator
+#' @title Building `pgeom` objects from a point dataset
 #'
-#' @description spa_creator builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values
+#' @description This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
 #'
 #' @usage
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_functions.R
 \name{fsi_add_rules}
 \alias{fsi_add_rules}
-\title{fsi_add_rules}
+\title{Adding fuzzy rules to an FSI model}
 \usage{
 fsi_add_rules(fsi, rules, weights = rep(1, length(rules)))
 }
@@ -17,7 +17,7 @@ fsi_add_rules(fsi, rules, weights = rep(1, length(rules)))
 An FSI model populated with fuzzy rules set.
 }
 \description{
-fsi_add_rules adds the fuzzy rules set to an FSI model
+This function adds the fuzzy rules set to a fuzzy spatial inference (FSI) model. A fuzzy rule must contain only linguistic variables and values employed by the added antecedent parts and consequent.
 }
 \details{
 The definition of a fuzzy rule is user-friendly since users can write it by using the \emph{linguistic variables} and \emph{linguistic values} previously defined and added to the FSI model.

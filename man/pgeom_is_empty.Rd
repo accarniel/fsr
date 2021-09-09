@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility_functions.R
 \name{pgeom_is_empty}
 \alias{pgeom_is_empty}
-\title{pgeom_is_empty}
+\title{Checking whether a \code{pgeom} object is empty}
 \usage{
 pgeom_is_empty(pgeom)
 }
@@ -13,7 +13,7 @@ pgeom_is_empty(pgeom)
 A Boolean value that indicates if a \code{pgeom} is empty.
 }
 \description{
-pgeom_is_empty checks whether a pgeom object is empty..
+This function checks whether a \code{pgeom} object is empty (i.e., if it does not contain components).
 }
 \details{
 It checks if a pgeom object has any component or not. If the number of components of a \code{pgeom} object is equal to 0, then
