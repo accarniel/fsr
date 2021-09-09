@@ -7,6 +7,10 @@
 \description{
 An S4 Class for representing a component of a spatial plateau object
 }
+\details{
+A \code{component} object is composed of two attributes. The first one is a crisp spatial
+object and the second one a membership degree in ]0, 1] of this  \code{component}.
+}
 \section{Slots}{
 
 \describe{
@@ -15,3 +19,6 @@ An S4 Class for representing a component of a spatial plateau object
 \item{\code{md}}{The membership degree of the component.}
 }}
 
+\references{
+\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+}
