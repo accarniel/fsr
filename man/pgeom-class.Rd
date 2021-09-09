@@ -7,6 +7,11 @@
 \description{
 An S4 Class for representing a spatial plateau object
 }
+\details{
+A \code{pgeom} object is composed of a list of \code{component} objects, an \code{sfg} object that represents
+the union of all crisp spatial objects of its components (i.e., the support), and its data
+type, which can be either \code{PLATEAUPOINT}, \code{PLATEAULINE}, or \code{PLATEAUREGION}.
+}
 \section{Slots}{
 
 \describe{
@@ -17,3 +22,6 @@ An S4 Class for representing a spatial plateau object
 \item{\code{type}}{The data type of the spatial plateau object.}
 }}
 
+\references{
+\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+}
