@@ -29,7 +29,7 @@ setClass("component",
 #' 
 #' @details 
 #' 
-#' A `pgeom` object is composed of a list of `component` objects, an `sfg` object that represents 
+#' A `pgeometry` object is composed of a list of `component` objects, an `sfg` object that represents 
 #' the union of all crisp spatial objects of its components (i.e., the support), and its data
 #' type, which can be either `PLATEAUPOINT`, `PLATEAULINE`, or `PLATEAUREGION`.
 #' 
@@ -39,7 +39,7 @@ setClass("component",
 #' 
 #' @import methods
 #' @export
-setClass("pgeom",
+setClass("pgeometry",
          slots = list(
            component = "list",
            supp = "XY",
@@ -49,26 +49,26 @@ setClass("pgeom",
 
 #' @title The PWKT of a spatial plateau object
 #'
-#' @description This function gives the Plateau Well-Known Text (PWKT) representation of a `pgeom` object. 
+#' @description This function gives the Plateau Well-Known Text (PWKT) representation of a `pgeometry` object. 
 #'
 #' @usage
 #'
-#' spa_pwkt(pgeom)
+#' spa_pwkt(pgo)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #' 
 #' @name PWKT
 #'
 #' @details
 #'
-#' It gives the textual representation for a `pgeom` object, 
+#' It gives the textual representation for a `pgeometry` object, 
 #' combining the Well-Known Text (WKT) representation for crisp vector geometry
 #' objects and the formal definitions of the tree spatial plateau data types.
 #' (i.e. `PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`).
 #'
 #' @return
 #'
-#' A character value with the textual representation of a given `pgeom` object.
+#' A character value with the textual representation of a given `pgeometry` object.
 #'
 #' @references
 #'
@@ -78,16 +78,16 @@ setClass("pgeom",
 #'
 #' library(sf)
 #'
-#' # For a `PLATEAUPOINT` pgeom object.
+#' # For a `PLATEAUPOINT` object.
 #' pts1 <- rbind(c(1, 2), c(3, 2))
 #' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 #' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 #' 
-#' plateau_point_pgeom <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
+#' ppoint <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 #' 
-#' spa_pwkt(plateau_point_pgeom)
+#' spa_pwkt(ppoint)
 #' 
-#' # For a `PLATEAULINE` pgeom object.
+#' # For a `PLATEAULINE` object.
 #' 
 #' lpts1 <- rbind(c(0, 0), c(1, 1))
 #' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
@@ -97,11 +97,11 @@ setClass("pgeom",
 #' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 #' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 #'
-#' plateau_line_pgeom<- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+#' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
-#' spa_pwkt(plateau_line_pgeom)
+#' spa_pwkt(pline)
 #'
-#' # For a `PLATEAUREGION` pgeom object.
+#' # For a `PLATEAUREGION` object.
 #' 
 #' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 #' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
@@ -109,79 +109,81 @@ setClass("pgeom",
 #' 
 #' comp1 <- component_from_sfg(pol1, 0.2)
 #' 
-#' plateau_region_pgeom <- create_pgeometry(list(comp1), "PLATEAUREGION")
+#' pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 #' 
-#' spa_pwkt(plateau_region_pgeom)
+#' spa_pwkt(pregion)
 #' 
 #' 
 #' @import sf
 #' @export
-spa_pwkt <- function(pgeom) {
+spa_pwkt <- function(pgo) {
 
-  if(fsr_is_empty(pgeom)){
-    return(paste0(pgeom@type, " EMPTY"))
+  if(fsr_is_empty(pgo)){
+    return(paste0(pgo@type, " EMPTY"))
   }
 
   component_to_text <- function(comp) {
     paste0("(", st_as_text(comp@obj), ", ", comp@md, ")")
   }
 
-  l <- unlist(lapply(pgeom@component, component_to_text))
+  l <- unlist(lapply(pgo@component, component_to_text))
 
-  l <- paste(pgeom@type," (", paste(l, collapse = ", "), ")", sep="")
+  l <- paste(pgo@type," (", paste(l, collapse = ", "), ")", sep="")
   l
 }
 
 
 #' @name PWKT
-#' @param x A `pgeom` object of any type.
+#' @param x A `pgeometry` object of any type.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #' @export
-format.pgeom <- function(x, ...) {
+format.pgeometry <- function(x, ...) {
   spa_pwkt(x)
 }
 
 #' @name PWKT
 #' 
-#' @param object A `pgeom` object of any type.
-#' @aliases show,pgeom-method
+#' @param object A `pgeometry` object of any type.
+#' @aliases show,pgeometry-method
 #' 
 #' @import methods
 #' @export
-setMethod("show", "pgeom", function(object) {
+setMethod("show", "pgeometry", function(object) {
   print(spa_pwkt(object))
 })
 
 #' @name PWKT
 #' 
-#' @param x A `pgeom` object of any type.
+#' @param x A `pgeometry` object of any type.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #' 
-#' @aliases as.character,pgeom-method
+#' @aliases as.character,pgeometry-method
 #' 
 #' @import methods
 #' @export
-setMethod("as.character", "pgeom", function(x, ...) {
+setMethod("as.character", "pgeometry", function(x, ...) {
   spa_pwkt(x)
 })
 
 
 #' @name plot
 #' 
-#' @param x A `pgeom` object of any type.
+#' @param x A `pgeometry` object of any type.
 #' @param y Not applicable.
 #' 
-#' @aliases plot,pgeom,missing-method
+#' @aliases plot,pgeometry,missing-method
 #'   
 #' @import methods
 #' @export
-setMethod("plot", signature(x = "pgeom", y = "missing"), function(x, y, ...) {
+setMethod("plot", signature(x = "pgeometry", y = "missing"), function(x, y, ...) {
   fsr_plot(x, ...)
 })
 
+#' @method as.data.frame pgeometry
+#' @name as_tibble.pgeometry
 #' @export
-as.data.frame.pgeom <-
-  function(x, row.names=NULL, optional=FALSE, ...)
+as.data.frame.pgeometry <-
+  function(x, ...)
   {
     as.data.frame(as_tibble(x))
   }

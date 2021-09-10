@@ -22,7 +22,7 @@ It should be either \code{"POINT"}, \code{"LINE"}, or \code{"REGION"}.}
 \code{MULTILINESTRING}, \code{POLYGON} or \code{MULTIPOLYGON} type. Other types of spatial objects are not allowed.}
 }
 \value{
-A \code{component} object that can be added to a spatial plateau object (i.e., a \code{pgeom} object).
+A \code{component} object that can be added to a spatial plateau object (i.e., a \code{pgeometry} object).
 }
 \description{
 There are two functions that build a component from coordinate pairs or a

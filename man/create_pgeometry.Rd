@@ -2,32 +2,32 @@
 % Please edit documentation in R/utility_functions.R
 \name{create_pgeometry}
 \alias{create_pgeometry}
-\title{Creation of a \code{pgeom} object with components}
+\title{Creation of a \code{pgeometry} object with components}
 \usage{
 create_pgeometry(components, type)
 }
 \arguments{
 \item{components}{A list of \code{component} objects or a \code{data.frame}. The type of each component must be the same for all components.}
 
-\item{type}{A character value that indicates the type of the desired \code{pgeom} object.
+\item{type}{A character value that indicates the type of the desired \code{pgeometry} object.
 It should be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"}, or \code{"PLATEAUREGION"}. It must be compatible with
 the components given in \code{components} parameter.}
 }
 \value{
-A \code{pgeom} object.
+A \code{pgeometry} object.
 }
 \description{
-This function creates a \code{pgeom} object from a \code{data.frame} or a list of components.
+This function creates a \code{pgeometry} object from a \code{data.frame} or a list of components.
 }
 \details{
-The \code{create_pgeometry} function creates a \code{pgeom} object of a given type. This object is built by using either a
+The \code{create_pgeometry} function creates a \code{pgeometry} object of a given type. This object is built by using either a
 list of \code{component} objects or a dataframe (or tibble). If a dataframe is given, it must have two columns: the first one is
 a \code{sfc} object and second one indicates the membership degree of each respective object of the \code{sfc} column.
 }
 \examples{
 
 library(sf)
-# Example 1 - Creating an `PLATEAUPOINT` pgeom object.
+# Example 1 - Creating an `PLATEAUPOINT` object.
 
 # Creating components for the plateau point object
 v1 <- rbind(c(1,2), c(3,4))
@@ -44,11 +44,11 @@ comp1 <- component_from_sfg(st_multipoint(pts1), md1)
 comp2 <- component_from_sfg(st_multipoint(pts2), md2)
 comp3 <- component_from_sfg(st_multipoint(pts3), md3)
 
-# Creating the plateau point object as a pgeom object with 3 components
+# Creating the plateau point object as a pgeometry object with 3 components
 
 plateau_point_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 
-# Example 2 - Creating an `PLATEAULINE` pgeom object.
+# Example 2 - Creating an `PLATEAULINE` object.
 
 lpts1 <- rbind(c(0, 0), c(1, 1))
 lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
@@ -58,7 +58,7 @@ comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
 comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 
-plateau_line_pgeom <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+plateau_line <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
 
 }

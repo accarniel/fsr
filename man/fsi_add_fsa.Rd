@@ -22,7 +22,7 @@ A fuzzy spatial antecedent corresponds to a layer of fuzzy spatial objects that 
 The antecedent has a linguistic variable and its fuzzy spatial objects have linguistic values so that they are used in the IF part of fuzzy rules.
 }
 \details{
-The fuzzy spatial antecedent added by the \code{fsi_add_fsa} function is composed of a linguistic variable and its corresponding \code{pgeom} objects annotated by linguistic values.
+The fuzzy spatial antecedent added by the \code{fsi_add_fsa} function is composed of a linguistic variable and its corresponding \code{pgeometry} objects annotated by linguistic values.
 The format of the \code{tbl} parameter is the same as the output of the function \code{spa_creator}, allowing the user to directly provides plateau region objects as input when designing FSI models.
 }
 \examples{

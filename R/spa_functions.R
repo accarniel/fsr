@@ -1,26 +1,26 @@
-#' @title Adding components to a `pgeom` object
+#' @title Adding components to a `pgeometry` object
 #'
-#' @description This function adds components to a spatial plateau object (i.e., `pgeom` object). 
+#' @description This function adds components to a spatial plateau object (i.e., `pgeometry` object). 
 #' The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
-#' For instance, a `pgeom` object of the type `PLATEAUREGION` accepts only components containing polygons (e.g., `POLYGON` or `MULTIPOLYGON`). 
+#' For instance, a `pgeometry` object of the type `PLATEAUREGION` accepts only components containing polygons (e.g., `POLYGON` or `MULTIPOLYGON`). 
 #'
 #' @usage
 #'
-#' spa_add_component(pgeom, components)
+#' spa_add_component(pgo, components)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #' @param components A `component` object or a list of `component` objects.
 #'
 #' @details
 #'
 #' This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
-#' The goal of this function is to insert a component or a list of components into a `pgeom` object. 
+#' The goal of this function is to insert a component or a list of components into a `pgeometry` object. 
 #' This insertion is based on the membership degree of the component (e.g., created by `component_from_sfg`). Thus, it preserves the properties of a spatial plateau object.
-#' However, this function assumes that a component is compatible with the `pgeom` object and its geometric format is valid (i.e., it does not overlap with existing components).
+#' However, this function assumes that a component is compatible with the `pgeometry` object and its geometric format is valid (i.e., it does not overlap with existing components).
 #'  
 #' @return
 #'
-#' A `pgeom` object containing the `component` objects.
+#' A `pgeometry` object containing the `component` objects.
 #'
 #' @references
 #'
@@ -34,7 +34,7 @@
 #' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 #' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 #' 
-#' # appending these components into an empty pgeom object
+#' # appending these components into an empty pgeometry object
 #' 
 #' pp <- create_empty_pgeometry("PLATEAUPOINT")
 #' pp <- spa_add_component(pp, list(comp1, comp2))
@@ -42,9 +42,9 @@
 #'
 #' @import  sf
 #' @export
-spa_add_component <- function(pgeom, components) {
-  if(is.null(pgeom)){
-    stop("pgeom is null. Please use create_pgeometry() to
+spa_add_component <- function(pgo, components) {
+  if(is.null(pgo)){
+    stop("pgo is null. Please use create_pgeometry() to
          create an empty spatial plateau object.", call. = FALSE)
   }
 
@@ -52,8 +52,8 @@ spa_add_component <- function(pgeom, components) {
     stop("components is null. It should be a single component or a list of components.", call. = FALSE)
   }
 
-  if(class(pgeom) != "pgeom"){
-    stop(paste(pgeom, "is not a pgeom object.", sep = ' '), call. = FALSE)
+  if(class(pgo) != "pgeometry"){
+    stop(paste(pgo, "is not a pgeometry object.", sep = ' '), call. = FALSE)
   }
 
   if(!inherits(components, "list")) {
@@ -75,44 +75,44 @@ spa_add_component <- function(pgeom, components) {
       next
     }
 
-    # 2. if the pgeom is empty and the component is not empty and has a membership greater than 0
-    if(fsr_is_empty(pgeom) && !(is.null(c) || st_is_empty(c)) && m > 0){
-      pgeom@component[[1]] <- component
-      pgeom@supp <- c
+    # 2. if the pgo is empty and the component is not empty and has a membership greater than 0
+    if(fsr_is_empty(pgo) && !(is.null(c) || st_is_empty(c)) && m > 0){
+      pgo@component[[1]] <- component
+      pgo@supp <- c
 
     } else if(!is.null(c) & length(c) >= 1){
-      index = search_by_md(pgeom@component, 1, length(pgeom@component), m)
+      index = search_by_md(pgo@component, 1, length(pgo@component), m)
 
-      # 3. if the membership degree exists in the pgeom, we should merge it
+      # 3. if the membership degree exists in the pgo, we should merge it
       if(index[1] == TRUE){
-        pgeom@component[[index[2]]]@obj <- st_union(pgeom@component[[index[2]]]@obj, c)
+        pgo@component[[index[2]]]@obj <- st_union(pgo@component[[index[2]]]@obj, c)
       } else {
         #otherwise, we simply append into the correct location
-        pgeom@component <- append(pgeom@component, component, after=index[2]-1)
+        pgo@component <- append(pgo@component, component, after=index[2]-1)
       }
       #in both cases we update its support
-      pgeom@supp <- st_union(pgeom@supp, c)
+      pgo@supp <- st_union(pgo@supp, c)
     }
   }
 
-  pgeom
+  pgo
 }
 
 #' @title Capturing the membership degree of a point
 #'
 #' @description This function evaluates the membership degree of a given point in a spatial plateau object of any type.
-#' It returns a value in \[0, 1\] that indicates to which extent the point belongs to the `pgeom` object.
+#' It returns a value in \[0, 1\] that indicates to which extent the point belongs to the `pgeometry` object.
 #'
 #' @usage
 #'
-#' spa_eval(pgeom, point)
+#' spa_eval(pgo, point)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #' @param point An `sfg` object of the type `POINT`.
 #'
 #' @details
 #'
-#' The goal of this function is to return the membership degree of a simple point object (i.e., `sfg` object) in a given spatial plateau object (i.e., `pgeom` object).
+#' The goal of this function is to return the membership degree of a simple point object (i.e., `sfg` object) in a given spatial plateau object (i.e., `pgeometry` object).
 #' This evaluation depends on the following basic cases:
 #' 
 #' - if the simple point object belongs to the interior or boundary of _one_ component of the spatial plateau object, it returns the membership degree of that component.
@@ -121,7 +121,7 @@ spa_add_component <- function(pgeom, components) {
 #' 
 #' @return
 #'
-#' A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., `sfg` object) in a spatial plateau object (i.e., `pgeom` object).
+#' A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., `sfg` object) in a spatial plateau object (i.e., `pgeometry` object).
 #'
 #' @references
 #'
@@ -164,12 +164,12 @@ spa_add_component <- function(pgeom, components) {
 #' pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
 #' 
 #' # capturing the membership degree of a specific point in each object
-#' spa_eval(pregions$pgeoms[[1]], st_point(c(5, 15)))
-#' spa_eval(pregions$pgeoms[[2]], st_point(c(5, 15)))
+#' spa_eval(pregions$pgeometry[[1]], st_point(c(5, 15)))
+#' spa_eval(pregions$pgeometry[[2]], st_point(c(5, 15)))
 #'
 #' @import  sf
 #' @export
-spa_eval <- function(pgeom, point){
+spa_eval <- function(pgo, point){
   if(any(is.na(point))){
     stop("The parameter 'point' is NA.", call. = FALSE)
   }
@@ -180,15 +180,15 @@ spa_eval <- function(pgeom, point){
   
   ret <- 0
 
-  if(st_intersects(point, pgeom@supp, sparse = FALSE)[1]){
+  if(st_intersects(point, pgo@supp, sparse = FALSE)[1]){
     # check in the boundary
     md_comps <- c()
-    for(component in pgeom@component){
+    for(component in pgo@component){
       if(st_intersects(point, st_boundary(component@obj), sparse = FALSE)[1]){
         md_comps <- append(md_comps, component@md)
       } #  check in its interior...
       else if(st_intersects(point, component@obj, sparse = FALSE)[1]){
-        if(pgeom@type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
+        if(pgo@type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
           return(component@md)
         } else{
           md_comps <- append(md_comps, component@md)
@@ -208,16 +208,16 @@ spa_eval <- function(pgeom, point){
 #'
 #' @usage
 #'
-#' spa_avg_degree(pgeom)
+#' spa_avg_degree(pgo)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #' 
 #' @name fsr_numerical_operations
 #'
 #' @details
 #'
-#' These functions calculate numerical properties from spatial plateau objects (i.e., `pgeom` objects). 
-#' Some of them are _type-independent_. This means that the parameter can be a `pgeom` object of any type. 
+#' These functions calculate numerical properties from spatial plateau objects (i.e., `pgeometry` objects). 
+#' Some of them are _type-independent_. This means that the parameter can be a `pgeometry` object of any type. 
 #' The type-independent functions are:
 #' 
 #' - `spa_avg_degree` calculates the average membership degree of a spatial plateau object.
@@ -269,11 +269,11 @@ spa_eval <- function(pgeom, point){
 #' 
 #' pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
 #' 
-#' spa_area(pregions$pgeoms[[1]])
-#' spa_area(pregions$pgeoms[[2]])
+#' spa_area(pregions$pgeometry[[1]])
+#' spa_area(pregions$pgeometry[[2]])
 #' 
-#' spa_perimeter(pregions$pgeoms[[1]])
-#' spa_perimeter(pregions$pgeoms[[2]])
+#' spa_perimeter(pregions$pgeometry[[1]])
+#' spa_perimeter(pregions$pgeometry[[2]])
 #' 
 #' # calculating the length of a plateau line object
 #' 
@@ -290,11 +290,11 @@ spa_eval <- function(pgeom, point){
 #' spa_length(pline)
 #'
 #' @export
-spa_avg_degree <- function(pgeom){
+spa_avg_degree <- function(pgo){
   get_md <- function(comp){
     comp@md
   }
-  mds_vec <- unlist(lapply(pgeom@component, get_md))
+  mds_vec <- unlist(lapply(pgo@component, get_md))
   mean(mds_vec)
 }
 
@@ -302,11 +302,11 @@ spa_avg_degree <- function(pgeom){
 #' 
 #' @usage
 #' 
-#' spa_ncomp(pgeom) 
+#' spa_ncomp(pgo) 
 #'  
 #' @export
-spa_ncomp <- function(pgeom){
-  length(pgeom@component)
+spa_ncomp <- function(pgo){
+  length(pgo@component)
 }
 
 #' @name fsr_numerical_operations
@@ -315,7 +315,7 @@ spa_ncomp <- function(pgeom){
 #' 
 #' spa_area(pr) 
 #' 
-#' @param pr A `pgeom` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pr A `pgeometry` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
 #'  
 #' @import sf
 #' @export
@@ -367,7 +367,7 @@ spa_perimeter <- function(pr){
 #' 
 #' spa_length(pl) 
 #' 
-#' @param pl A `pgeom` object of the type `PLATEAULINE`. It throws an error if a different type is given.
+#' @param pl A `pgeometry` object of the type `PLATEAULINE`. It throws an error if a different type is given.
 #'  
 #' @import sf
 #' @export
@@ -396,10 +396,10 @@ spa_length <- function(pl){
 #'
 #' @usage
 #'
-#' spa_intersection(pgeom1, pgeom2, itype = "min")
+#' spa_intersection(pgo1, pgo2, itype = "min")
 #'
-#' @param pgeom1 A `pgeom` object of any type.
-#' @param pgeom2 A `pgeom` object of the same type of `pgeom1`.
+#' @param pgo1 A `pgeometry` object of any type.
+#' @param pgo2 A `pgeometry` object of the same type of `pgo1`.
 #' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
 #' 
 #' @name fsr_geometric_operations
@@ -407,7 +407,7 @@ spa_length <- function(pl){
 #' @details
 #'
 #' These functions implement geometric operations of the spatial plateau algebra. 
-#' They receive two `pgeom` objects of the _same type_ together with an operation as inputs and yield another `pgeom` object as output. The output object has _the same_ type of the inputs.
+#' They receive two `pgeometry` objects of the _same type_ together with an operation as inputs and yield another `pgeometry` object as output. The output object has _the same_ type of the inputs.
 #' The family of fuzzy geometric set operations consists of the following functions:
 #' 
 #' - `spa_intersection` computes the geometric intersection of two spatial plateau objects. 
@@ -435,7 +435,7 @@ spa_length <- function(pl){
 #' 
 #' @return
 #'
-#' A `pgeom` object that is the result of the geometric manipulation between two spatial plateau objects.
+#' A `pgeometry` object that is the result of the geometric manipulation between two spatial plateau objects.
 #'
 #' @references
 #'
@@ -475,21 +475,21 @@ spa_length <- function(pl){
 #'
 #' @import sf
 #' @export
-spa_intersection <- function(pgeom1, pgeom2, itype = "min"){
+spa_intersection <- function(pgo1, pgo2, itype = "min"){
 
-  if(pgeom1@type != pgeom2@type){
+  if(pgo1@type != pgo2@type){
     stop("Different spatial plateau data types.", call. = FALSE)
   }
 
   sigma <- match.fun(itype)
-  result <- create_empty_pgeometry(pgeom1@type)
+  result <- create_empty_pgeometry(pgo1@type)
   lcomps <- vector("list")
 
-  for(comp1 in pgeom1@component){
+  for(comp1 in pgo1@component){
     obj_comp_p1 <- comp1@obj
     md_comp_p1 <- comp1@md
 
-    for(comp2 in pgeom2@component){
+    for(comp2 in pgo2@component){
       obj_comp_p2 <- comp2@obj
       md_comp_p2 <- comp2@md
 
@@ -497,7 +497,7 @@ spa_intersection <- function(pgeom1, pgeom2, itype = "min"){
 
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
-      # check geom and pgeom
+      # check geom and pgo
       lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
       }
   }
@@ -513,29 +513,29 @@ spa_intersection <- function(pgeom1, pgeom2, itype = "min"){
 #' 
 #' @usage
 #' 
-#' spa_union(pgeom1, pgeom2, utype = "max")
+#' spa_union(pgo1, pgo2, utype = "max")
 #' 
 #' @param utype A character value that refers to a t-conorm. The default value is `"max"`, which is the standard operator of the union.
 #' 
 #' @import sf
 #' @export
-spa_union <- function(pgeom1, pgeom2, utype = "max"){
+spa_union <- function(pgo1, pgo2, utype = "max"){
 
-  if(pgeom1@type != pgeom2@type){
+  if(pgo1@type != pgo2@type){
     stop("Different spatial plateau data types.", call. = FALSE)
   }
 
   tau <- match.fun(utype)
-  result <- create_empty_pgeometry(pgeom1@type)
+  result <- create_empty_pgeometry(pgo1@type)
   lcomps <- vector("list")
 
-  supp_intersected <- st_intersection(pgeom1@supp, pgeom2@supp)
+  supp_intersected <- st_intersection(pgo1@supp, pgo2@supp)
 
-  for(comp1 in pgeom1@component){
+  for(comp1 in pgo1@component){
     obj_comp_p1 <- comp1@obj
     md_comp_p1 <- comp1@md
 
-    for(comp2 in pgeom2@component){
+    for(comp2 in pgo2@component){
       obj_comp_p2 <- comp2@obj
       md_comp_p2 <- comp2@md
 
@@ -551,7 +551,7 @@ spa_union <- function(pgeom1, pgeom2, utype = "max"){
     lcomps <- append_valid_comps(sf_diff_1, result, md_comp_p1, lcomps)
   }
 
-  for(comp2 in pgeom2@component){
+  for(comp2 in pgo2@component){
     obj_comp_p2 <- comp2@obj
     md_comp_p2 <- comp2@md
 
@@ -571,29 +571,29 @@ spa_union <- function(pgeom1, pgeom2, utype = "max"){
 #' 
 #' @usage
 #' 
-#' spa_difference(pgeom1, pgeom2, dtype = "f_diff")
+#' spa_difference(pgo1, pgo2, dtype = "f_diff")
 #' 
 #' @param dtype A character value that indicates the name of a difference operator. The default value is `"f_diff"`, which implements the standard fuzzy difference.
 #' 
 #' @import sf
 #' @export
-spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
+spa_difference <- function(pgo1, pgo2, dtype = "f_diff"){
 
-  if(pgeom1@type != pgeom2@type){
+  if(pgo1@type != pgo2@type){
     stop("Different spatial plateau data types.", call. = FALSE)
   }
 
   nu <- match.fun(dtype)
-  result <- create_empty_pgeometry(pgeom1@type)
+  result <- create_empty_pgeometry(pgo1@type)
   lcomps <- vector("list")
 
-  supp_intersected <- st_intersection(pgeom1@supp, pgeom2@supp)
+  supp_intersected <- st_intersection(pgo1@supp, pgo2@supp)
 
-  for(comp1 in pgeom1@component){
+  for(comp1 in pgo1@component){
     obj_comp_p1 <- comp1@obj
     md_comp_p1 <- comp1@md
 
-    for(comp2 in pgeom2@component){
+    for(comp2 in pgo2@component){
       obj_comp_p2 <- comp2@obj
       md_comp_p2 <- comp2@md
 
@@ -623,8 +623,8 @@ spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
 #' 
 #' spa_common_points(pline1, pline2, itype = "min")
 #' 
-#' @param pline1 A `pgeom` object of the type `PLATEAULINE`.
-#' @param pline2 A `pgeom` object of the type `PLATEAULINE`.
+#' @param pline1 A `pgeometry` object of the type `PLATEAULINE`.
+#' @param pline2 A `pgeometry` object of the type `PLATEAULINE`.
 #' 
 #' @import sf methods
 #' @export
@@ -668,26 +668,26 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
   }
 }
 
-#' @title Capturing the support of a `pgeom` object
+#' @title Capturing the support of a `pgeometry` object
 #'
-#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the support of a `pgeom` object given as input.
+#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the support of a `pgeometry` object given as input.
 #'
 #' @usage
 #'
-#' spa_support(pgeom)
+#' spa_support(pgo)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #'
 #' @details
 #'
 #' It employs the classical definition of _support_ from the fuzzy set theory in the context of spatial plateau algebra. 
 #' The _support_ only comprises the points with membership degree greater than or equal to 1.
-#' Hence, this operation returns the `sfg` object that represents the total extent of the `pgeom` given as input. 
-#' If the `pgeom` object has no components, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#' Hence, this operation returns the `sfg` object that represents the total extent of the `pgeometry` given as input. 
+#' If the `pgeometry` object has no components, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
 #'
 #' @return
 #'
-#' An `sfg` object that represents the support of `pgeom`. It can be an empty object if `pgeom` is empty.
+#' An `sfg` object that represents the support of `pgeometry`. It can be an empty object if `pgeometry` is empty.
 #'
 #' @references
 #'
@@ -716,30 +716,30 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
 #' pp_empty_supp
 #'
 #' @export
-spa_support <- function(pgeom){
-  return(pgeom@supp)
+spa_support <- function(pgo){
+  return(pgo@supp)
 }
 
-#' @title Capturing the core of a `pgeom` object
+#' @title Capturing the core of a `pgeometry` object
 #'
-#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the core of a `pgeom` object given as input.
+#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the core of a `pgeometry` object given as input.
 #'
 #' @usage
 #'
-#' spa_core(pgeom)
+#' spa_core(pgo)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #'
 #' @details
 #'
 #' It employs the classical definition of _core_ from the fuzzy set theory in the context of spatial plateau algebra. 
 #' The _core_ only comprises the points with membership degree equal to 1.
 #' Hence, this operation returns the `sfg` object that represents the component labeled with 
-#' membership degree equal to 1 of the `pgeom` given as input. If the `pgeom` object has no core, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#' membership degree equal to 1 of the `pgeometry` given as input. If the `pgeometry` object has no core, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
 #'
 #' @return
 #'
-#' An `sfg` object that represents the core of `pgeom`. It can be an empty object if `pgeom` has no a component with membership degree 1.
+#' An `sfg` object that represents the core of `pgeometry`. It can be an empty object if `pgeometry` has no a component with membership degree 1.
 #'
 #' @references
 #'
@@ -763,7 +763,7 @@ spa_support <- function(pgeom){
 #' pp_core <- spa_core(pp)
 #' pp_core
 #'
-#' #Creating a pgeom object without core
+#' #Creating a pgeometry object without core
 #' pp2 <- create_pgeometry(list(cp1, cp2), "PLATEAUPOINT")
 #' pp2
 #' 
@@ -771,14 +771,14 @@ spa_support <- function(pgeom){
 #'
 #' @import sf utils
 #' @export
-spa_core <- function(pgeom){
+spa_core <- function(pgo){
 
-  last_comp <- tail(pgeom@component, 1)
+  last_comp <- tail(pgo@component, 1)
 
   if(last_comp[[1]]@md == 1){
     return(last_comp[[1]]@obj)
   }
-  sf_type <- get_counter_ctype(pgeom)
+  sf_type <- get_counter_ctype(pgo)
 
   sfg_obj <- switch(sf_type,
                     POINT = st_point(),
@@ -793,19 +793,19 @@ spa_core <- function(pgeom){
 #'
 #' @usage
 #'
-#' spa_exact_equal(pgeom1, pgeom2)
+#' spa_exact_equal(pgo1, pgo2)
 #'
-#' @param pgeom1 A `pgeom` object of any type.
-#' @param pgeom2 A `pgeom` object of any type.
+#' @param pgo1 A `pgeometry` object of any type.
+#' @param pgo2 A `pgeometry` object of any type.
 #' 
 #' @details
 #'
-#' It is a Boolean function that checks _fuzzy equality_ in the spatial plateau context. Two `pgeom` objects are exactly equal if their components are equal. 
+#' It is a Boolean function that checks _fuzzy equality_ in the spatial plateau context. Two `pgeometry` objects are exactly equal if their components are equal. 
 #' Two components are equal if they have the same membership degree and they are (spatially) equal (i.e., their `sfg` objects have the same geometric format - this means that the order of the points can be different).
 #'   
 #' @return
 #'
-#' A Boolean value that indicates if two `pgeom` objects are exactly equal.
+#' A Boolean value that indicates if two `pgeometry` objects are exactly equal.
 #'
 #' @references
 #'
@@ -832,7 +832,7 @@ spa_core <- function(pgeom){
 #'
 #' @import sf
 #' @export
-spa_exact_equal <- function(pgeom1, pgeom2){
+spa_exact_equal <- function(pgo1, pgo2){
 
   comp_check <- function(comp1, comp2){
     if(st_equals(comp1@obj, comp2@obj, sparse=FALSE)[1] && (comp1@md == comp2@md)){
@@ -841,13 +841,13 @@ spa_exact_equal <- function(pgeom1, pgeom2){
     return(FALSE)
   }
 
-  if((pgeom1@type != pgeom2@type) ||
-     (spa_ncomp(pgeom1) != spa_ncomp(pgeom2)) ||
-     (!(st_equals(pgeom1@supp, pgeom2@supp, sparse=FALSE)[1]))){
+  if((pgo1@type != pgo2@type) ||
+     (spa_ncomp(pgo1) != spa_ncomp(pgo2)) ||
+     (!(st_equals(pgo1@supp, pgo2@supp, sparse=FALSE)[1]))){
     return(FALSE)
   } else {
-    for(i in 1:spa_ncomp(pgeom1)){
-      if(!(comp_check(pgeom1@component[[i]], pgeom2@component[[i]]))){
+    for(i in 1:spa_ncomp(pgo1)){
+      if(!(comp_check(pgo1@component[[i]], pgo2@component[[i]]))){
         return(FALSE)
       }
     }
@@ -857,27 +857,27 @@ spa_exact_equal <- function(pgeom1, pgeom2){
 
 #' @title Check exact containment
 #'
-#' @description This function checks whether a `pgeom` object is completely inside of another `pgeom` object.
+#' @description This function checks whether a `pgeometry` object is completely inside of another `pgeometry` object.
 #'
 #' @usage
 #'
-#' spa_exact_inside(pgeom1, pgeom2)
+#' spa_exact_inside(pgo1, pgo2)
 #'
-#' @param pgeom1 A `pgeom` object of any type.
-#' @param pgeom2 A `pgeom` object of any type.
+#' @param pgo1 A `pgeometry` object of any type.
+#' @param pgo2 A `pgeometry` object of any type.
 #' 
 #' @details
 #'  
 #' It is a Boolean function that checks _fuzzy containment_ in the spatial plateau context. 
 #' 
-#' This Boolean function checks whether the components of `pgeom1` are contained in the components of `pgeom2` 
+#' This Boolean function checks whether the components of `pgo1` are contained in the components of `pgo2` 
 #' by considering their membership degrees and geographic positions. That is, it is follows the classical definition of fuzzy containment of the fuzzy set theory.
 #' 
-#' In other words, this function checks if the (standard) intersection of `pgeom1` and `pgeom2` is exactly equal to `pgeom1`. The other of operands affects the result.
+#' In other words, this function checks if the (standard) intersection of `pgo1` and `pgo2` is exactly equal to `pgo1`. The other of operands affects the result.
 #' 
 #' @return
 #'
-#' A Boolean value that indicates if a `pgeom` is completely and certainly inside `pgeom2`.
+#' A Boolean value that indicates if a `pgeometry` is completely and certainly inside `pgo2`.
 #'
 #' @references
 #'
@@ -907,8 +907,8 @@ spa_exact_equal <- function(pgeom1, pgeom2){
 #' spa_exact_inside(pp2, pp1)
 #'
 #' @export
-spa_exact_inside <- function(pgeom1, pgeom2){
-  spa_exact_equal(spa_intersection(pgeom1, pgeom2), pgeom1)
+spa_exact_inside <- function(pgo1, pgo2){
+  spa_exact_equal(spa_intersection(pgo1, pgo2), pgo1)
 }
 
 #' @noRd
@@ -952,10 +952,10 @@ spa_eval_relation <- function(ret, result, ...){
 #'
 #' @usage
 #'
-#' spa_overlap(pgeom1, pgeom2, itype = "min", ret = "degree", ...)
+#' spa_overlap(pgo1, pgo2, itype = "min", ret = "degree", ...)
 #'
-#' @param pgeom1 A `pgeom` object of the type `PLATEAUREGION`.
-#' @param pgeom2 A `pgeom` object of the type `PLATEAUREGION`.
+#' @param pgo1 A `pgeometry` object of the type `PLATEAUREGION`.
+#' @param pgo2 A `pgeometry` object of the type `PLATEAUREGION`.
 #' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
 #' @param ret A character value that indicates the return type of the fuzzy topological relationship. The default value is `"degree"` and other possible values are `"list"` and `"bool"`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> If `ret = "bool"`, two additional parameters have to be informed, as described below.
@@ -965,7 +965,7 @@ spa_eval_relation <- function(ret, result, ...){
 #' @details
 #'
 #' These functions implement topological relationships of the spatial plateau algebra. 
-#' They receive two `pgeom` objects of the type `PLATEAUREGION` together with some additional parameters (as detailed below).
+#' They receive two `pgeometry` objects of the type `PLATEAUREGION` together with some additional parameters (as detailed below).
 #' The family of fuzzy topological relationships consists of the following functions:
 #' 
 #' - `spa_overlap` computes the overlapping degree of two plateau region objects.
@@ -976,9 +976,9 @@ spa_eval_relation <- function(ret, result, ...){
 #' Similarly to `spa_overlap` and `spa_meet`, a t-norm operator can be given by the parameter `itype`.
 #' - `spa_equal` - computes how equal are two plateau region objects.
 #' Since it uses the union operation, a t-conorm operator can be given by the parameter `utype`. Currently, it can assume `"max"` (default).
-#' - `spa_inside` - computes the containment degree of `pgeom1` in `pgeom2`.
+#' - `spa_inside` - computes the containment degree of `pgo1` in `pgo2`.
 #' Similarly to `spa_equal`, a t-conorm operator can be given by the parameter `utype`.
-#' - `spa_contains` - it is the same of `spa_inside` but changing the order of the operands `pgeom1` and `pgeom2`.
+#' - `spa_contains` - it is the same of `spa_inside` but changing the order of the operands `pgo1` and `pgo2`.
 #' 
 #' The parameter `ret` determines the returning value of a fuzzy topological relationship. The default value is the following:
 #' 
@@ -1013,7 +1013,7 @@ spa_eval_relation <- function(ret, result, ...){
 #' 
 #' set.seed(456)
 #' 
-#' # some random points to create pgeom objects by using the function spa_creator
+#' # some random points to create pgeometry objects by using the function spa_creator
 #' tbl = tibble(x = runif(10, min= 0, max = 30), 
 #'              y = runif(10, min = 0, max = 30), 
 #'              z = runif(10, min = 0, max = 50))
@@ -1025,40 +1025,40 @@ spa_eval_relation <- function(ret, result, ...){
 #' pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 #' 
 #' # Showing the different types of returning values
-#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]])
-#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "bool", 
+#' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]])
+#' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "bool", 
 #'            eval_mode = "soft_eval", lval = "mostly")
 #'
 #' # Evaluating the other fuzzy topological relationships
-#' spa_meet(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-#' spa_disjoint(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-#' spa_equal(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-#' spa_inside(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-#' spa_contains(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #'
 #' @import sf
 #' @export
-spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
+spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
 
-  check_spa_topological_condition(pgeom1, pgeom2)
+  check_spa_topological_condition(pgo1, pgo2)
 
-  r = spa_intersection(pgeom1, pgeom2, itype = itype)
-  supp_pgeom1 <- pgeom1@supp
-  supp_pgeom2 <- pgeom2@supp
+  r = spa_intersection(pgo1, pgo2, itype = itype)
+  supp_pgo1 <- pgo1@supp
+  supp_pgo2 <- pgo2@supp
 
   result <- 0
 
   if(spa_ncomp(r) == 1 && !(st_is_empty(spa_core(r)))){
     result <- 1
-  } else if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
-            st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
-            spa_exact_inside(pgeom1, pgeom2) ||
-            spa_exact_inside(pgeom2, pgeom1) ||
-            spa_exact_equal(pgeom2, pgeom1)) {
+  } else if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+            st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+            spa_exact_inside(pgo1, pgo2) ||
+            spa_exact_inside(pgo2, pgo1) ||
+            spa_exact_equal(pgo2, pgo1)) {
     result <- 0
   } else {
-    result <- spa_area(r)/st_area(st_intersection(supp_pgeom1, supp_pgeom2))
+    result <- spa_area(r)/st_area(st_intersection(supp_pgo1, supp_pgo2))
   }
 
   spa_eval_relation(ret, result, ...)
@@ -1069,19 +1069,19 @@ spa_overlap <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 #' 
 #' @usage
 #' 
-#' spa_meet(pgeom1, pgeom2, itype = "min", ret = "degree", ...) 
+#' spa_meet(pgo1, pgo2, itype = "min", ret = "degree", ...) 
 #' 
 #' @import sf
 #' @export
-spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
+spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
 
-  check_spa_topological_condition(pgeom1, pgeom2)
+  check_spa_topological_condition(pgo1, pgo2)
 
-  countour_pgeom1 <- spa_contour(pgeom1)
-  countour_pgeom2 <- spa_contour(pgeom2)
+  countour_pgo1 <- spa_contour(pgo1)
+  countour_pgo2 <- spa_contour(pgo2)
 
-  p <- spa_common_points(countour_pgeom1, countour_pgeom2, itype = itype)
-  c <- spa_intersection(countour_pgeom1, countour_pgeom2, itype = itype)
+  p <- spa_common_points(countour_pgo1, countour_pgo2, itype = itype)
+  c <- spa_intersection(countour_pgo1, countour_pgo2, itype = itype)
 
   p_ncomp <- spa_ncomp(p)
   c_ncomp <- spa_ncomp(c)
@@ -1093,18 +1093,18 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
     result <- 1
   }
 
-  supp_1 <- pgeom1@supp
-  supp_2 <- pgeom2@supp
+  supp_1 <- pgo1@supp
+  supp_2 <- pgo2@supp
 
-  pgeom1_core <- spa_core(pgeom1)
-  pgeom2_core <- spa_core(pgeom2)
+  pgo1_core <- spa_core(pgo1)
+  pgo2_core <- spa_core(pgo2)
 
   if((st_disjoint(supp_1, supp_2, sparse=FALSE)[1]) ||
-    !(st_disjoint(pgeom1_core, pgeom2_core, sparse=FALSE)[1]) ||
-    st_touches(pgeom1_core, pgeom2_core, sparse=FALSE)[1] ||
-    spa_exact_inside(pgeom1, pgeom2) ||
-    spa_exact_inside(pgeom2, pgeom1) ||
-    spa_exact_equal(pgeom1, pgeom2)){
+    !(st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1]) ||
+    st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
+    spa_exact_inside(pgo1, pgo2) ||
+    spa_exact_inside(pgo2, pgo1) ||
+    spa_exact_equal(pgo1, pgo2)){
 
     result <- 0
   }
@@ -1116,9 +1116,9 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
   } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
              st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
              st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
-    pgeom1_boundary <- spa_boundary_pregion(pgeom1, bound_part = 'line')
-    pgeom2_boundary <- spa_boundary_pregion(pgeom2, bound_part = 'line')
-    bl <- spa_intersection(pgeom1_boundary, pgeom2_boundary, itype = itype)
+    pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = 'line')
+    pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = 'line')
+    bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
 
     plength <- spa_length(bl)
     length_support <- length(bl@supp)
@@ -1126,9 +1126,9 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
     result <- plength/length_support
 
   } else {
-    pgeom1_boundary <- spa_boundary_pregion(pgeom1, bound_part = 'region')
-    pgeom2_boundary <- spa_boundary_pregion(pgeom2, bound_part = 'region')
-    br <- spa_intersection(pgeom1_boundary, pgeom2_boundary, itype = itype)
+    pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = 'region')
+    pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = 'region')
+    br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
     br_area <- spa_area(br)
     area_support <- st_area(br@supp)
 
@@ -1142,29 +1142,29 @@ spa_meet <- function(pgeom1, pgeom2, itype = "min", ret = "degree", ...){
 #' 
 #' @usage
 #' 
-#' spa_disjoint(pgeom1, pgeom2, itype = "min", ret = "degree", ...) 
+#' spa_disjoint(pgo1, pgo2, itype = "min", ret = "degree", ...) 
 #' 
 #' @import sf
 #' @export
-spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
+spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 
-  check_spa_topological_condition(pgeom1, pgeom2)
+  check_spa_topological_condition(pgo1, pgo2)
 
-  supp_pgeom1 <- pgeom1@supp
-  supp_pgeom2 <- pgeom2@supp
+  supp_pgo1 <- pgo1@supp
+  supp_pgo2 <- pgo2@supp
   result <- 0
 
-  if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
+  if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
     result <- 1
   }
 
-  r_overlap <- spa_overlap(pgeom1, pgeom2, itype = itype)
-  r_meet <- spa_meet(pgeom1, pgeom2)
+  r_overlap <- spa_overlap(pgo1, pgo2, itype = itype)
+  r_meet <- spa_meet(pgo1, pgo2)
 
   if((r_overlap == 1) || (r_meet == 1) ||
-      spa_exact_inside(pgeom1, pgeom2) ||
-      spa_exact_inside(pgeom2, pgeom1) ||
-      spa_exact_equal(pgeom2, pgeom1))  {
+      spa_exact_inside(pgo1, pgo2) ||
+      spa_exact_inside(pgo2, pgo1) ||
+      spa_exact_equal(pgo2, pgo1))  {
     result <- 0
   } else {
     result <- 1 - max(r_overlap, r_meet)
@@ -1176,29 +1176,29 @@ spa_disjoint <- function(pgeom1, pgeom2, itype="min", ret = "degree", ...){
 #' 
 #' @usage
 #' 
-#' spa_equal(pgeom1, pgeom2, utype = "max", ret = 'degree', ...) 
+#' spa_equal(pgo1, pgo2, utype = "max", ret = 'degree', ...) 
 #' 
 #' @param utype A character value that indicates the name of a function implementing a t-conorm. The default value is `"max"`, which is the standard operator of the union.
 #' 
 #' @import sf
 #' @export
-spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
+spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
-  check_spa_topological_condition(pgeom1, pgeom2)
+  check_spa_topological_condition(pgo1, pgo2)
 
-  if(spa_exact_equal(pgeom1, pgeom2)){
+  if(spa_exact_equal(pgo1, pgo2)){
     result <- 1
   }
 
-  supp_pgeom1 <- pgeom1@supp
-  supp_pgeom2 <- pgeom2@supp
+  supp_pgo1 <- pgo1@supp
+  supp_pgo2 <- pgo2@supp
 
-  if(st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
-     st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
+  if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+     st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
     result <- 0
   } else {
-    r_diff <- spa_difference(pgeom1, pgeom2, dtype="f_abs_diff")
-    r_union <- spa_union(pgeom1, pgeom2, utype = utype)
+    r_diff <- spa_difference(pgo1, pgo2, dtype="f_abs_diff")
+    r_union <- spa_union(pgo1, pgo2, utype = utype)
 
     r_spa_area <- spa_area(r_diff)
     r_sfg_area <- st_area(r_union@supp)
@@ -1212,30 +1212,30 @@ spa_equal <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' 
 #' @usage
 #' 
-#' spa_inside(pgeom1, pgeom2, utype = "max", ret = 'degree', ...) 
+#' spa_inside(pgo1, pgo2, utype = "max", ret = 'degree', ...) 
 #' 
 #' @import sf
 #' @export
-spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
+spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
-  check_spa_topological_condition(pgeom1, pgeom2)
+  check_spa_topological_condition(pgo1, pgo2)
 
-  if(spa_exact_inside(pgeom1, pgeom2)){
+  if(spa_exact_inside(pgo1, pgo2)){
     result <- 1
   }
 
-  supp_pgeom1 <- pgeom1@supp
-  supp_pgeom2 <- pgeom2@supp
+  supp_pgo1 <- pgo1@supp
+  supp_pgo2 <- pgo2@supp
 
-  if(spa_equal(pgeom1, pgeom2, utype = utype) == 1 ||
-     st_disjoint(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1] ||
-     st_touches(supp_pgeom1, supp_pgeom2, sparse=FALSE)[1]){
+  if(spa_equal(pgo1, pgo2, utype = utype) == 1 ||
+     st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+     st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
     result <- 0
   } else {
 
-    r_diff <- spa_difference(pgeom1, pgeom2, dtype = "f_bound_diff")
+    r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff")
 
-    result <- 1 - (spa_area(r_diff)/st_area(supp_pgeom1))
+    result <- 1 - (spa_area(r_diff)/st_area(supp_pgo1))
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1244,11 +1244,11 @@ spa_inside <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' 
 #' @usage
 #' 
-#' spa_contains(pgeom1, pgeom2, utype = "max", ret = 'degree', ...) 
+#' spa_contains(pgo1, pgo2, utype = "max", ret = 'degree', ...) 
 #' 
 #' @export
-spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
-  spa_inside(pgeom2, pgeom1, utype = utype, ret = ret, ...)
+spa_contains <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
+  spa_inside(pgo2, pgo1, utype = utype, ret = ret, ...)
 }
 
 #' @title Capturing the frontier of a plateau region object
@@ -1259,7 +1259,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #'
 #' spa_contour(pregion)
 #'
-#' @param pregion A `pgeom` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pregion A `pgeometry` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
 #'
 #' @details
 #'
@@ -1270,7 +1270,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' 
 #' @return
 #'
-#' A `pgeom` object of the type `PLATEAULINE` that represents the contour (i.e. frontier) of a plateau region object given as input.
+#' A `pgeometry` object of the type `PLATEAULINE` that represents the contour (i.e. frontier) of a plateau region object given as input.
 #'
 #' @references
 #'
@@ -1285,7 +1285,7 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' 
 #' set.seed(123)
 #' 
-#' # some random points to create pgeom objects by using the function spa_creator
+#' # some random points to create pgeometry objects by using the function spa_creator
 #' tbl = tibble(x = runif(10, min= 0, max = 30), 
 #'              y = runif(10, min = 0, max = 50), 
 #'              z = runif(10, min = 0, max = 100))
@@ -1300,21 +1300,21 @@ spa_contains <- function(pgeom1, pgeom2, utype = "max", ret = 'degree', ...){
 #' 
 #' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2), base_poly = ch)
 #' 
-#' # capturing and showing the frontier of each pgeom object previously created
-#' frontier_pregion1 <- spa_contour(pregions$pgeoms[[1]]) 
-#' frontier_pregion2 <- spa_contour(pregions$pgeoms[[2]])
+#' # capturing and showing the frontier of each pgeometry object previously created
+#' frontier_pregion1 <- spa_contour(pregions$pgeometry[[1]]) 
+#' frontier_pregion2 <- spa_contour(pregions$pgeometry[[2]])
 #' 
-#' plot(pregions$pgeoms[[1]])
+#' plot(pregions$pgeometry[[1]])
 #' plot(frontier_pregion1)
 #' 
-#' plot(pregions$pgeoms[[2]])
+#' plot(pregions$pgeometry[[2]])
 #' plot(frontier_pregion2)
 #'
 #' @import sf
 #' @export
 spa_contour <- function(pregion){
   if(pregion@type != "PLATEAUREGION"){
-    stop("pgeom must be a PLATEAUREGION type.", call. = FALSE)
+    stop("pregion must be a PLATEAUREGION type.", call. = FALSE)
   }
 
   pregion_tibble <- as_tibble(pregion)
@@ -1367,7 +1367,7 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
 #' 
 #' set.seed(456)
 #' 
-#' # some random points to create pgeom objects by using the function spa_creator
+#' # some random points to create pgeometry objects by using the function spa_creator
 #' tbl = tibble(x = runif(10, min= 0, max = 30), 
 #'              y = runif(10, min = 0, max = 30), 
 #'              z = runif(10, min = 0, max = 50))
@@ -1379,7 +1379,7 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
 #' pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 #' 
 #' # Showing the default list of classes
-#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #'
 #' # Changing the default classification
 #' 
@@ -1390,7 +1390,7 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
 #' 
 #' spa_set_classification(classes, c(small, medium, large))
 #' 
-#' spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+#' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #'
 #' @export
 spa_set_classification <- function(classes, mfs){
@@ -1495,7 +1495,7 @@ soft_alpha_eval <- function(degree, alpha){
 #'
 #' spa_boundary_pregion(pregion, bound_part = "region")
 #'
-#' @param pregion A `pgeom` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pregion A `pgeometry` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
 #' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
 #'
 #' @details
@@ -1505,13 +1505,13 @@ soft_alpha_eval <- function(degree, alpha){
 #' - a fuzzy line object that corresponds to the boundary of the core of `A`.
 #' - a fuzzy region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
 #' 
-#' This means that the function `spa_boundary_pregion` can yield one specific part of the fuzzy boundary of a plateau region object (the argument `pgeom`).
-#' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeom` (i.e., returns a `pgeom` object of the type `PLATEAULINE`).
-#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeom` (i.e., returns a `pgeom` object of the type `PLATEAUREGION`).
+#' This means that the function `spa_boundary_pregion` can yield one specific part of the fuzzy boundary of a plateau region object (the argument `pgeometry`).
+#' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeometry` (i.e., returns a `pgeometry` object of the type `PLATEAULINE`).
+#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeometry` (i.e., returns a `pgeometry` object of the type `PLATEAUREGION`).
 #' 
 #' @return
 #'
-#' A `pgeom` object that represents a specific part of the fuzzy boundary of `pgeom` object given as input.
+#' A `pgeometry` object that represents a specific part of the fuzzy boundary of `pgeometry` object given as input.
 #'
 #' @references
 #'
@@ -1525,7 +1525,7 @@ soft_alpha_eval <- function(degree, alpha){
 #' 
 #' set.seed(123)
 #' 
-#' # some random points to create pgeom objects by using the function spa_creator
+#' # some random points to create pgeometry objects by using the function spa_creator
 #' tbl = tibble(x = runif(10, min= 0, max = 30), 
 #'              y = runif(10, min = 0, max = 50), 
 #'              z = runif(10, min = 0, max = 100))
@@ -1535,24 +1535,24 @@ soft_alpha_eval <- function(degree, alpha){
 #' mf2 <- genmf("trimf", c(20, 80, 100))
 #' 
 #' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
-#' pregions$pgeoms[[1]]
-#' pregions$pgeoms[[2]]
+#' pregions$pgeometry[[1]]
+#' pregions$pgeometry[[2]]
 #' 
-#' # capturing and showing the boundary plateau line of each pgeom object previously created
-#' (spa_boundary_pregion(pregions$pgeoms[[1]], bound_part = "line")) 
-#' (spa_boundary_pregion(pregions$pgeoms[[2]], bound_part = "line"))
+#' # capturing and showing the boundary plateau line of each pgeometry object previously created
+#' (spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
+#' (spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
 #' # the last boundary is empty because there is no core! 
 #' 
 #' # capturing and showing the boundary plateau region (this is the default behavior)
-#' (spa_boundary_pregion(pregions$pgeoms[[1]]))
-#' (spa_boundary_pregion(pregions$pgeoms[[2]]))
+#' (spa_boundary_pregion(pregions$pgeometry[[1]]))
+#' (spa_boundary_pregion(pregions$pgeometry[[2]]))
 #'
 #' @import methods utils sf
 #' @export
 spa_boundary_pregion <- function(pregion, bound_part = "region"){
 
   if(pregion@type != "PLATEAUREGION"){
-    stop("pgeom is not a PLATEAUREGION object.", call. = FALSE)
+    stop("pregion is not a PLATEAUREGION object.", call. = FALSE)
   }
 
   if(bound_part == "line"){
@@ -1572,7 +1572,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region"){
       bpr <- create_empty_pgeometry("PLATEAUREGION")
       bpr <- spa_add_component(bpr, head(pregion@component, n=n_comps-1))
     } else {
-      ret <- new("pgeom", component = pregion@component, supp = pregion@supp, type = pregion@type)
+      ret <- new("pgeometry", component = pregion@component, supp = pregion@supp, type = pregion@type)
       return(ret)
     }
   }
@@ -1645,10 +1645,10 @@ f_abs_diff <- function(x, y){
 }
 
 #' @noRd
-check_spa_topological_condition <- function(pgeom1, pgeom2){
-  if(pgeom1@type != pgeom2@type){
+check_spa_topological_condition <- function(pgo1, pgo2){
+  if(pgo1@type != pgo2@type){
     stop("The spatial plateau objects have different types.", call. = FALSE)
-  } else if(pgeom1@type != "PLATEAUREGION" || pgeom2@type != "PLATEAUREGION") {
-    stop(paste0("This operator is not implemented to (", pgeom1@type, " x ", pgeom2@type, ") yet."), call. = FALSE)
+  } else if(pgo1@type != "PLATEAUREGION" || pgo2@type != "PLATEAUREGION") {
+    stop(paste0("This operator is not implemented to (", pgo1@type, " x ", pgo2@type, ") yet."), call. = FALSE)
   }
 }

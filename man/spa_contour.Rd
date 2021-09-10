@@ -7,10 +7,10 @@
 spa_contour(pregion)
 }
 \arguments{
-\item{pregion}{A \code{pgeom} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pregion}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
 }
 \value{
-A \code{pgeom} object of the type \code{PLATEAULINE} that represents the contour (i.e. frontier) of a plateau region object given as input.
+A \code{pgeometry} object of the type \code{PLATEAULINE} that represents the contour (i.e. frontier) of a plateau region object given as input.
 }
 \description{
 This function extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
@@ -29,7 +29,7 @@ library(FuzzyR)
 
 set.seed(123)
 
-# some random points to create pgeom objects by using the function spa_creator
+# some random points to create pgeometry objects by using the function spa_creator
 tbl = tibble(x = runif(10, min= 0, max = 30), 
              y = runif(10, min = 0, max = 50), 
              z = runif(10, min = 0, max = 100))
@@ -44,14 +44,14 @@ ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 
 pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2), base_poly = ch)
 
-# capturing and showing the frontier of each pgeom object previously created
-frontier_pregion1 <- spa_contour(pregions$pgeoms[[1]]) 
-frontier_pregion2 <- spa_contour(pregions$pgeoms[[2]])
+# capturing and showing the frontier of each pgeometry object previously created
+frontier_pregion1 <- spa_contour(pregions$pgeometry[[1]]) 
+frontier_pregion2 <- spa_contour(pregions$pgeometry[[2]])
 
-plot(pregions$pgeoms[[1]])
+plot(pregions$pgeometry[[1]])
 plot(frontier_pregion1)
 
-plot(pregions$pgeoms[[2]])
+plot(pregions$pgeometry[[2]])
 plot(frontier_pregion2)
 
 }

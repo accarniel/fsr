@@ -2,24 +2,24 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_support}
 \alias{spa_support}
-\title{Capturing the support of a \code{pgeom} object}
+\title{Capturing the support of a \code{pgeometry} object}
 \usage{
-spa_support(pgeom)
+spa_support(pgo)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object of any type.}
+\item{pgo}{A \code{pgeometry} object of any type.}
 }
 \value{
-An \code{sfg} object that represents the support of \code{pgeom}. It can be an empty object if \code{pgeom} is empty.
+An \code{sfg} object that represents the support of \code{pgeometry}. It can be an empty object if \code{pgeometry} is empty.
 }
 \description{
-This function yields a crisp spatial object (as an \code{sfg} object) that corresponds to the support of a \code{pgeom} object given as input.
+This function yields a crisp spatial object (as an \code{sfg} object) that corresponds to the support of a \code{pgeometry} object given as input.
 }
 \details{
 It employs the classical definition of \emph{support} from the fuzzy set theory in the context of spatial plateau algebra.
 The \emph{support} only comprises the points with membership degree greater than or equal to 1.
-Hence, this operation returns the \code{sfg} object that represents the total extent of the \code{pgeom} given as input.
-If the \code{pgeom} object has no components, then an empty \code{sfg} object is returned (i.e., a crisp spatial object without points).
+Hence, this operation returns the \code{sfg} object that represents the total extent of the \code{pgeometry} given as input.
+If the \code{pgeometry} object has no components, then an empty \code{sfg} object is returned (i.e., a crisp spatial object without points).
 }
 \examples{
 

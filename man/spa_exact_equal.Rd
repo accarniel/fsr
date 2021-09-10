@@ -4,21 +4,21 @@
 \alias{spa_exact_equal}
 \title{Check exact equality}
 \usage{
-spa_exact_equal(pgeom1, pgeom2)
+spa_exact_equal(pgo1, pgo2)
 }
 \arguments{
-\item{pgeom1}{A \code{pgeom} object of any type.}
+\item{pgo1}{A \code{pgeometry} object of any type.}
 
-\item{pgeom2}{A \code{pgeom} object of any type.}
+\item{pgo2}{A \code{pgeometry} object of any type.}
 }
 \value{
-A Boolean value that indicates if two \code{pgeom} objects are exactly equal.
+A Boolean value that indicates if two \code{pgeometry} objects are exactly equal.
 }
 \description{
 This function checks whether two spatial plateau objects are exactly equal.
 }
 \details{
-It is a Boolean function that checks \emph{fuzzy equality} in the spatial plateau context. Two \code{pgeom} objects are exactly equal if their components are equal.
+It is a Boolean function that checks \emph{fuzzy equality} in the spatial plateau context. Two \code{pgeometry} objects are exactly equal if their components are equal.
 Two components are equal if they have the same membership degree and they are (spatially) equal (i.e., their \code{sfg} objects have the same geometric format - this means that the order of the points can be different).
 }
 \examples{

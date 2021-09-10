@@ -10,22 +10,22 @@
 \alias{spa_contains}
 \title{Fuzzy topological relationships}
 \usage{
-spa_overlap(pgeom1, pgeom2, itype = "min", ret = "degree", ...)
+spa_overlap(pgo1, pgo2, itype = "min", ret = "degree", ...)
 
-spa_meet(pgeom1, pgeom2, itype = "min", ret = "degree", ...)
+spa_meet(pgo1, pgo2, itype = "min", ret = "degree", ...)
 
-spa_disjoint(pgeom1, pgeom2, itype = "min", ret = "degree", ...)
+spa_disjoint(pgo1, pgo2, itype = "min", ret = "degree", ...)
 
-spa_equal(pgeom1, pgeom2, utype = "max", ret = 'degree', ...)
+spa_equal(pgo1, pgo2, utype = "max", ret = 'degree', ...)
 
-spa_inside(pgeom1, pgeom2, utype = "max", ret = 'degree', ...)
+spa_inside(pgo1, pgo2, utype = "max", ret = 'degree', ...)
 
-spa_contains(pgeom1, pgeom2, utype = "max", ret = 'degree', ...)
+spa_contains(pgo1, pgo2, utype = "max", ret = 'degree', ...)
 }
 \arguments{
-\item{pgeom1}{A \code{pgeom} object of the type \code{PLATEAUREGION}.}
+\item{pgo1}{A \code{pgeometry} object of the type \code{PLATEAUREGION}.}
 
-\item{pgeom2}{A \code{pgeom} object of the type \code{PLATEAUREGION}.}
+\item{pgo2}{A \code{pgeometry} object of the type \code{PLATEAUREGION}.}
 
 \item{itype}{A character value that indicates the name of a function implementing a t-norm. The default value is \code{"min"}, which is the standard operator of the intersection.}
 
@@ -49,7 +49,7 @@ The resulting degree can be also interpreted as a linguistic value.
 }
 \details{
 These functions implement topological relationships of the spatial plateau algebra.
-They receive two \code{pgeom} objects of the type \code{PLATEAUREGION} together with some additional parameters (as detailed below).
+They receive two \code{pgeometry} objects of the type \code{PLATEAUREGION} together with some additional parameters (as detailed below).
 The family of fuzzy topological relationships consists of the following functions:
 \itemize{
 \item \code{spa_overlap} computes the overlapping degree of two plateau region objects.
@@ -60,9 +60,9 @@ Similarly to \code{spa_overlap}, a t-norm operator can be given by the parameter
 Similarly to \code{spa_overlap} and \code{spa_meet}, a t-norm operator can be given by the parameter \code{itype}.
 \item \code{spa_equal} - computes how equal are two plateau region objects.
 Since it uses the union operation, a t-conorm operator can be given by the parameter \code{utype}. Currently, it can assume \code{"max"} (default).
-\item \code{spa_inside} - computes the containment degree of \code{pgeom1} in \code{pgeom2}.
+\item \code{spa_inside} - computes the containment degree of \code{pgo1} in \code{pgo2}.
 Similarly to \code{spa_equal}, a t-conorm operator can be given by the parameter \code{utype}.
-\item \code{spa_contains} - it is the same of \code{spa_inside} but changing the order of the operands \code{pgeom1} and \code{pgeom2}.
+\item \code{spa_contains} - it is the same of \code{spa_inside} but changing the order of the operands \code{pgo1} and \code{pgo2}.
 }
 
 The parameter \code{ret} determines the returning value of a fuzzy topological relationship. The default value is the following:
@@ -92,7 +92,7 @@ library(FuzzyR)
 
 set.seed(456)
 
-# some random points to create pgeom objects by using the function spa_creator
+# some random points to create pgeometry objects by using the function spa_creator
 tbl = tibble(x = runif(10, min= 0, max = 30), 
              y = runif(10, min = 0, max = 30), 
              z = runif(10, min = 0, max = 50))
@@ -104,17 +104,17 @@ ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 
 # Showing the different types of returning values
-spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]])
-spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "bool", 
+spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]])
+spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "bool", 
            eval_mode = "soft_eval", lval = "mostly")
 
 # Evaluating the other fuzzy topological relationships
-spa_meet(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-spa_disjoint(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-spa_equal(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-spa_inside(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
-spa_contains(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 
 }
 \references{

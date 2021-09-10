@@ -2,33 +2,33 @@
 % Please edit documentation in R/utility_functions.R
 \name{create_empty_pgeometry}
 \alias{create_empty_pgeometry}
-\title{Creation of an empty \code{pgeom} object}
+\title{Creation of an empty \code{pgeometry} object}
 \usage{
 create_empty_pgeometry(type)
 }
 \arguments{
-\item{type}{A character value indicating the data type of the \code{pgeom} object.
+\item{type}{A character value indicating the data type of the \code{pgeometry} object.
 It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"} or \code{"PLATEAUREGION"}.}
 }
 \value{
-A \code{pgeom} object.
+A \code{pgeometry} object.
 }
 \description{
-This function builds an empty \code{pgeom} object of a specific type.
+This function builds an empty \code{pgeometry} object of a specific type.
 }
 \details{
-The \code{create_empty_pgeometry} creates a new pgeom object with no components. To add new components to this object, you
-should use \code{spa_add_component}. The components added to this object must be of same type of the empty pgeom object.
+The \code{create_empty_pgeometry} creates a new \code{pgeometry} object with no components. To add new components to this object, you
+should use \code{spa_add_component}. The components added to this object must be of same type of the empty pgeometry object.
 }
 \examples{
 
 # Creating an Empty Plateau Point object
-empty_plateau_point_pgeom <- create_empty_pgeometry("PLATEAUPOINT")
+empty_plateau_point <- create_empty_pgeometry("PLATEAUPOINT")
 
 # Creating an Empty Plateau Line object
-empty_plateau_line_pgeom <- create_empty_pgeometry("PLATEAULINE")
+empty_plateau_line <- create_empty_pgeometry("PLATEAULINE")
 
 # Creating an Empty Plateau Region object
-empty_plateau_region_pgeom <- create_empty_pgeometry("PLATEAUREGION")
+empty_plateau_region <- create_empty_pgeometry("PLATEAUREGION")
 
 }

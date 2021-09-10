@@ -2,32 +2,32 @@
 % Please edit documentation in R/utility_functions.R
 \name{fsr_is_empty}
 \alias{fsr_is_empty}
-\title{Checking whether a \code{pgeom} object is empty}
+\title{Checking whether a \code{pgeometry} object is empty}
 \usage{
-fsr_is_empty(pgeom)
+fsr_is_empty(pgo)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object.}
+\item{pgo}{A \code{pgeometry} object.}
 }
 \value{
-A Boolean value that indicates if a \code{pgeom} is empty.
+A Boolean value that indicates if a \code{pgeometry} is empty.
 }
 \description{
-This function checks whether a \code{pgeom} object is empty (i.e., if it does not contain components).
+This function checks whether a \code{pgeometry} object is empty (i.e., if it does not contain components).
 }
 \details{
-It checks if a pgeom object has any component or not. If the number of components of a \code{pgeom} object is equal to 0, then
+It checks if a pgeometry object has any component or not. If the number of components of a \code{pgeometry} object is equal to 0, then
 it returns  \code{TRUE}. Otherwise, it returns \code{FALSE}.
 }
 \examples{
 
-# Creating an empty pgeom object 
-pgeom_1 <- create_empty_pgeometry("PLATEAULINE")
+# Creating an empty pgeometry object 
+pgo1 <- create_empty_pgeometry("PLATEAULINE")
 
 # Checking if it is empty
-fsr_is_empty(pgeom_1)
+fsr_is_empty(pgo1)
 
-# Creating a component to populate the pgeom object
+# Creating a component to populate the pgeometry object
 
 library(sf)
 md <- 0.4
@@ -35,10 +35,10 @@ pts <- rbind(c(1, 1), c(2, 3), c(2, 1))
 
 comp <- component_from_sfg(st_multipoint(pts), md)
 
-# Adding the component to the pgeom object
-pgeom_1 <- spa_add_component(pgeom_1, comp)
+# Adding the component to the pgeometry object
+pgo1 <- spa_add_component(pgo1, comp)
 
 # Checking if it is still empty
-fsr_is_empty(pgeom_1) 
+fsr_is_empty(pgo1) 
 
 }

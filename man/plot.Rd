@@ -2,23 +2,23 @@
 % Please edit documentation in R/fsr_base.R, R/utility_functions.R
 \name{plot}
 \alias{plot}
-\alias{plot,pgeom,missing-method}
+\alias{plot,pgeometry,missing-method}
 \alias{fsr_plot}
-\title{Visualization of \code{pgeom} objects}
+\title{Visualization of \code{pgeometry} objects}
 \usage{
-\S4method{plot}{pgeom,missing}(x, y, ...)
+\S4method{plot}{pgeometry,missing}(x, y, ...)
 
-fsr_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, 
+fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, 
            low = "white", high = "black", ...)
 }
 \arguments{
-\item{x}{A \code{pgeom} object of any type.}
+\item{x}{A \code{pgeometry} object of any type.}
 
 \item{y}{Not applicable.}
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Optional parameters. They can be the same as the parameters of \code{geom_sf} function.}
 
-\item{pgeom}{A \code{pgeom} object of any type.}
+\item{pgo}{A \code{pgeometry} object of any type.}
 
 \item{base_poly}{A \code{sfg} object of the type \code{POLYGON} or \code{MULTIPOLYGON}.}
 
@@ -32,10 +32,10 @@ fsr_plot(pgeom, base_poly = NULL, add_base_poly = TRUE,
 A \code{ggplot} object.
 }
 \description{
-This function plots a \code{pgeom} object.
+This function plots a \code{pgeometry} object.
 }
 \details{
-The \code{fsr_plot} uses a \code{ggplot} method to construct the plot. It receives a \code{pgeom} object (if it is empty, an empty graphics
+The \code{fsr_plot} uses a \code{ggplot} method to construct the plot. It receives a \code{pgeometry} object (if it is empty, an empty graphics
 in obtained).
 
 The \code{low} and \code{high} parameters are the colors for the minimum and maximum limits of the membership degrees. The
@@ -66,12 +66,12 @@ comp1 <- component_from_sfg(st_multipoint(pts1), md1)
 comp2 <- component_from_sfg(st_multipoint(pts2), md2)
 comp3 <- component_from_sfg(st_multipoint(pts3), md3)
 
-# Creating the plateau point object as a pgeom object with 3 components
+# Creating the plateau point object as a pgeometry object with 3 components
 
-plateau_point_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 
-fsr_plot(plateau_point_pgeom) # with default colors
-fsr_plot(plateau_point_pgeom, low="blue",high = "red") # with custom limit colors
+fsr_plot(ppoint) # with default colors
+fsr_plot(ppoint, low="blue",high = "red") # with custom limit colors
 
 # Example 2 - PLATEAULINE PLOT
 
@@ -83,10 +83,10 @@ comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
 comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 
-plateau_line_pgeom<- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
-fsr_plot(plateau_line_pgeom) # Default values
-fsr_plot(plateau_line_pgeom, low="green", high="blue") # Custom colors ...
+fsr_plot(pline) # Default values
+fsr_plot(pline, low="green", high="blue") # Custom colors ...
 
 
 # Example 3 - PLATEAUREGION PLOT
@@ -103,8 +103,8 @@ comp1 <- component_from_sfg(pol1, 0.2)
 comp2 <- component_from_sfg(pol2, 0.4)
 comp3 <- component_from_sfg(pol3, 0.7)
 
-plateau_region_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
-fsr_plot(plateau_region_pgeom)
-fsr_plot(plateau_region_pgeom, low = "blue", high = "red")
+pregion <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
+fsr_plot(pregion)
+fsr_plot(pregion, low = "blue", high = "red")
 
 }

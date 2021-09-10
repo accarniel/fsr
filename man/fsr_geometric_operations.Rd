@@ -8,18 +8,18 @@
 \alias{spa_common_points}
 \title{Fuzzy geometric set operations}
 \usage{
-spa_intersection(pgeom1, pgeom2, itype = "min")
+spa_intersection(pgo1, pgo2, itype = "min")
 
-spa_union(pgeom1, pgeom2, utype = "max")
+spa_union(pgo1, pgo2, utype = "max")
 
-spa_difference(pgeom1, pgeom2, dtype = "f_diff")
+spa_difference(pgo1, pgo2, dtype = "f_diff")
 
 spa_common_points(pline1, pline2, itype = "min")
 }
 \arguments{
-\item{pgeom1}{A \code{pgeom} object of any type.}
+\item{pgo1}{A \code{pgeometry} object of any type.}
 
-\item{pgeom2}{A \code{pgeom} object of the same type of \code{pgeom1}.}
+\item{pgo2}{A \code{pgeometry} object of the same type of \code{pgo1}.}
 
 \item{itype}{A character value that indicates the name of a function implementing a t-norm. The default value is \code{"min"}, which is the standard operator of the intersection.}
 
@@ -27,12 +27,12 @@ spa_common_points(pline1, pline2, itype = "min")
 
 \item{dtype}{A character value that indicates the name of a difference operator. The default value is \code{"f_diff"}, which implements the standard fuzzy difference.}
 
-\item{pline1}{A \code{pgeom} object of the type \code{PLATEAULINE}.}
+\item{pline1}{A \code{pgeometry} object of the type \code{PLATEAULINE}.}
 
-\item{pline2}{A \code{pgeom} object of the type \code{PLATEAULINE}.}
+\item{pline2}{A \code{pgeometry} object of the type \code{PLATEAULINE}.}
 }
 \value{
-A \code{pgeom} object that is the result of the geometric manipulation between two spatial plateau objects.
+A \code{pgeometry} object that is the result of the geometric manipulation between two spatial plateau objects.
 }
 \description{
 Fuzzy geometric set operations are given as a family of functions that implements spatial plateau set operations.
@@ -41,7 +41,7 @@ such as the intersection of two plateau region objects.
 }
 \details{
 These functions implement geometric operations of the spatial plateau algebra.
-They receive two \code{pgeom} objects of the \emph{same type} together with an operation as inputs and yield another \code{pgeom} object as output. The output object has \emph{the same} type of the inputs.
+They receive two \code{pgeometry} objects of the \emph{same type} together with an operation as inputs and yield another \code{pgeometry} object as output. The output object has \emph{the same} type of the inputs.
 The family of fuzzy geometric set operations consists of the following functions:
 \itemize{
 \item \code{spa_intersection} computes the geometric intersection of two spatial plateau objects.

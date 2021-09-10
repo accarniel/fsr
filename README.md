@@ -2,6 +2,8 @@
 
 Current release: 1.0.0
 
+A research paper describing the first version of _fsr_ has been accepted to publication in [ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems 2021 (ACM SIGSPATIAL 2021)](https://sigspatial2021.sigspatial.org/accepted-papers/).
+
 ## About _fsr_
 
 Many spatial objects (i.e., geographical objects) in reality may have inexact locations, vague boundaries, and/or blurred interiors, and hence cannot be adequately represented by well-known (crisp) spatial objects (e.g., those objects available in spatial libraries like GEOS and GDAL). Fuzzy set theory and fuzzy logic are powerful approaches to deal with spatial fuzziness.

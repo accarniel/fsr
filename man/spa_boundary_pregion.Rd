@@ -7,12 +7,12 @@
 spa_boundary_pregion(pregion, bound_part = "region")
 }
 \arguments{
-\item{pregion}{A \code{pgeom} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pregion}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
 
 \item{bound_part}{A character value that indicates the part of the fuzzy boundary to be returned. It can be \code{"region"} or \code{"line"}. See below for more details.}
 }
 \value{
-A \code{pgeom} object that represents a specific part of the fuzzy boundary of \code{pgeom} object given as input.
+A \code{pgeometry} object that represents a specific part of the fuzzy boundary of \code{pgeometry} object given as input.
 }
 \description{
 This function yields a specific part of the fuzzy boundary of a plateau region object.
@@ -25,9 +25,9 @@ The \emph{fuzzy boundary} of a fuzzy region object \code{A} has a heterogeneous 
 \item a fuzzy region object that comprises all points of \code{A} with a membership degree greater than 0 and less than 1.
 }
 
-This means that the function \code{spa_boundary_pregion} can yield one specific part of the fuzzy boundary of a plateau region object (the argument \code{pgeom}).
-If \code{boundary = "line"}, then the function returns the boundary plateau line of \code{pgeom} (i.e., returns a \code{pgeom} object of the type \code{PLATEAULINE}).
-Else if \code{boundary = "region"} (the default value), then the function returns the boundary plateau region of \code{pgeom} (i.e., returns a \code{pgeom} object of the type \code{PLATEAUREGION}).
+This means that the function \code{spa_boundary_pregion} can yield one specific part of the fuzzy boundary of a plateau region object (the argument \code{pgeometry}).
+If \code{boundary = "line"}, then the function returns the boundary plateau line of \code{pgeometry} (i.e., returns a \code{pgeometry} object of the type \code{PLATEAULINE}).
+Else if \code{boundary = "region"} (the default value), then the function returns the boundary plateau region of \code{pgeometry} (i.e., returns a \code{pgeometry} object of the type \code{PLATEAUREGION}).
 }
 \examples{
 
@@ -36,7 +36,7 @@ library(FuzzyR)
 
 set.seed(123)
 
-# some random points to create pgeom objects by using the function spa_creator
+# some random points to create pgeometry objects by using the function spa_creator
 tbl = tibble(x = runif(10, min= 0, max = 30), 
              y = runif(10, min = 0, max = 50), 
              z = runif(10, min = 0, max = 100))
@@ -46,17 +46,17 @@ mf1 <- genmf("trapmf", c(0, 5, 20, 35))
 mf2 <- genmf("trimf", c(20, 80, 100))
 
 pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
-pregions$pgeoms[[1]]
-pregions$pgeoms[[2]]
+pregions$pgeometry[[1]]
+pregions$pgeometry[[2]]
 
-# capturing and showing the boundary plateau line of each pgeom object previously created
-(spa_boundary_pregion(pregions$pgeoms[[1]], bound_part = "line")) 
-(spa_boundary_pregion(pregions$pgeoms[[2]], bound_part = "line"))
+# capturing and showing the boundary plateau line of each pgeometry object previously created
+(spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
+(spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
 # the last boundary is empty because there is no core! 
 
 # capturing and showing the boundary plateau region (this is the default behavior)
-(spa_boundary_pregion(pregions$pgeoms[[1]]))
-(spa_boundary_pregion(pregions$pgeoms[[2]]))
+(spa_boundary_pregion(pregions$pgeometry[[1]]))
+(spa_boundary_pregion(pregions$pgeometry[[2]]))
 
 }
 \references{

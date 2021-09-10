@@ -1,0 +1,17 @@
+citHeader("To cite fsr in publications use:")
+
+citEntry(entry = "inProceedings",
+  key          = "fsr21SIGSPATIAL",
+  title        = "Handling Fuzzy Spatial Data in R using the {fsr} Package",
+  author       = personList(as.person("Anderson C. Carniel"),
+                   as.person("Felippe Galdino"),
+                   as.person("Juliana S. Philippsen"),
+                   as.person("Markus Schneider")),
+  booktitle    = "ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems",
+  year         = "2021",
+
+  textVersion  =
+  paste("Anderson Chaves Carniel, Felippe Galdino, Juliana Strieder Philippsen, and Markus Schneider. 2021.",
+        "Handling Fuzzy Spatial Data in R using the fsr Package.",
+        "To appear in 29th International Conference on Advances in Geographic Information Systems (SIGSPATIAL '21).")
+)

@@ -2,28 +2,28 @@
 % Please edit documentation in R/spa_functions.R
 \name{spa_add_component}
 \alias{spa_add_component}
-\title{Adding components to a \code{pgeom} object}
+\title{Adding components to a \code{pgeometry} object}
 \usage{
-spa_add_component(pgeom, components)
+spa_add_component(pgo, components)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object of any type.}
+\item{pgo}{A \code{pgeometry} object of any type.}
 
 \item{components}{A \code{component} object or a list of \code{component} objects.}
 }
 \value{
-A \code{pgeom} object containing the \code{component} objects.
+A \code{pgeometry} object containing the \code{component} objects.
 }
 \description{
-This function adds components to a spatial plateau object (i.e., \code{pgeom} object).
+This function adds components to a spatial plateau object (i.e., \code{pgeometry} object).
 The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
-For instance, a \code{pgeom} object of the type \code{PLATEAUREGION} accepts only components containing polygons (e.g., \code{POLYGON} or \code{MULTIPOLYGON}).
+For instance, a \code{pgeometry} object of the type \code{PLATEAUREGION} accepts only components containing polygons (e.g., \code{POLYGON} or \code{MULTIPOLYGON}).
 }
 \details{
 This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
-The goal of this function is to insert a component or a list of components into a \code{pgeom} object.
+The goal of this function is to insert a component or a list of components into a \code{pgeometry} object.
 This insertion is based on the membership degree of the component (e.g., created by \code{component_from_sfg}). Thus, it preserves the properties of a spatial plateau object.
-However, this function assumes that a component is compatible with the \code{pgeom} object and its geometric format is valid (i.e., it does not overlap with existing components).
+However, this function assumes that a component is compatible with the \code{pgeometry} object and its geometric format is valid (i.e., it does not overlap with existing components).
 }
 \examples{
 
@@ -33,7 +33,7 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 
-# appending these components into an empty pgeom object
+# appending these components into an empty pgeometry object
 
 pp <- create_empty_pgeometry("PLATEAUPOINT")
 pp <- spa_add_component(pp, list(comp1, comp2))

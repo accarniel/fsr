@@ -2,7 +2,7 @@
 % Please edit documentation in R/builder_functions.R
 \name{spa_creator}
 \alias{spa_creator}
-\title{Building \code{pgeom} objects from a point dataset}
+\title{Building \code{pgeometry} objects from a point dataset}
 \usage{
 spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 }
@@ -16,7 +16,7 @@ spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Parameters for the chosen policies. See details below.}
 }
 \value{
-A tibble in the format \verb{(classes, pgeoms)}, where \code{classes} is a character column and \code{pgeoms} is a list of \code{pgeom} objects.
+A tibble in the format \verb{(class, pgeometry)}, where \code{class} is a character column and \code{pgeometry} is a list of \code{pgeometry} objects.
 This means that a spatial plateau object is created for representing a specific class of the point dataset.
 }
 \description{

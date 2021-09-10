@@ -3,36 +3,36 @@
 \name{PWKT}
 \alias{PWKT}
 \alias{spa_pwkt}
-\alias{format.pgeom}
-\alias{show,pgeom-method}
-\alias{as.character,pgeom-method}
+\alias{format.pgeometry}
+\alias{show,pgeometry-method}
+\alias{as.character,pgeometry-method}
 \title{The PWKT of a spatial plateau object}
 \usage{
-spa_pwkt(pgeom)
+spa_pwkt(pgo)
 
-\method{format}{pgeom}(x, ...)
+\method{format}{pgeometry}(x, ...)
 
-\S4method{show}{pgeom}(object)
+\S4method{show}{pgeometry}(object)
 
-\S4method{as.character}{pgeom}(x, ...)
+\S4method{as.character}{pgeometry}(x, ...)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object of any type.}
+\item{pgo}{A \code{pgeometry} object of any type.}
 
-\item{x}{A \code{pgeom} object of any type.}
+\item{x}{A \code{pgeometry} object of any type.}
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Unused.}
 
-\item{object}{A \code{pgeom} object of any type.}
+\item{object}{A \code{pgeometry} object of any type.}
 }
 \value{
-A character value with the textual representation of a given \code{pgeom} object.
+A character value with the textual representation of a given \code{pgeometry} object.
 }
 \description{
-This function gives the Plateau Well-Known Text (PWKT) representation of a \code{pgeom} object.
+This function gives the Plateau Well-Known Text (PWKT) representation of a \code{pgeometry} object.
 }
 \details{
-It gives the textual representation for a \code{pgeom} object,
+It gives the textual representation for a \code{pgeometry} object,
 combining the Well-Known Text (WKT) representation for crisp vector geometry
 objects and the formal definitions of the tree spatial plateau data types.
 (i.e. \code{PLATEAUPOINT}, \code{PLATEAULINE}, \code{PLATEAUREGION}).
@@ -41,16 +41,16 @@ objects and the formal definitions of the tree spatial plateau data types.
 
 library(sf)
 
-# For a `PLATEAUPOINT` pgeom object.
+# For a `PLATEAUPOINT` object.
 pts1 <- rbind(c(1, 2), c(3, 2))
 comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 
-plateau_point_pgeom <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
+ppoint <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 
-spa_pwkt(plateau_point_pgeom)
+spa_pwkt(ppoint)
 
-# For a `PLATEAULINE` pgeom object.
+# For a `PLATEAULINE` object.
 
 lpts1 <- rbind(c(0, 0), c(1, 1))
 lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
@@ -60,11 +60,11 @@ comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
 comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 
-plateau_line_pgeom<- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
-spa_pwkt(plateau_line_pgeom)
+spa_pwkt(pline)
 
-# For a `PLATEAUREGION` pgeom object.
+# For a `PLATEAUREGION` object.
 
 p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
@@ -72,9 +72,9 @@ pol1 <-st_polygon(list(p1,p2))
 
 comp1 <- component_from_sfg(pol1, 0.2)
 
-plateau_region_pgeom <- create_pgeometry(list(comp1), "PLATEAUREGION")
+pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 
-spa_pwkt(plateau_region_pgeom)
+spa_pwkt(pregion)
 
 
 }

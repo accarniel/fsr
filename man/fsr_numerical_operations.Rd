@@ -9,9 +9,9 @@
 \alias{spa_length}
 \title{Fuzzy numerical operations}
 \usage{
-spa_avg_degree(pgeom)
+spa_avg_degree(pgo)
 
-spa_ncomp(pgeom)
+spa_ncomp(pgo)
 
 spa_area(pr)
 
@@ -20,11 +20,11 @@ spa_perimeter(pr)
 spa_length(pl)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object of any type.}
+\item{pgo}{A \code{pgeometry} object of any type.}
 
-\item{pr}{A \code{pgeom} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pr}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
 
-\item{pl}{A \code{pgeom} object of the type \code{PLATEAULINE}. It throws an error if a different type is given.}
+\item{pl}{A \code{pgeometry} object of the type \code{PLATEAULINE}. It throws an error if a different type is given.}
 }
 \value{
 A numerical value.
@@ -35,8 +35,8 @@ These functions extract metric properties from spatial plateau objects,
 such as the area of a plateau region object and the length of a plateau line object.
 }
 \details{
-These functions calculate numerical properties from spatial plateau objects (i.e., \code{pgeom} objects).
-Some of them are \emph{type-independent}. This means that the parameter can be a \code{pgeom} object of any type.
+These functions calculate numerical properties from spatial plateau objects (i.e., \code{pgeometry} objects).
+Some of them are \emph{type-independent}. This means that the parameter can be a \code{pgeometry} object of any type.
 The type-independent functions are:
 \itemize{
 \item \code{spa_avg_degree} calculates the average membership degree of a spatial plateau object.
@@ -82,11 +82,11 @@ ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 
 pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
 
-spa_area(pregions$pgeoms[[1]])
-spa_area(pregions$pgeoms[[2]])
+spa_area(pregions$pgeometry[[1]])
+spa_area(pregions$pgeometry[[2]])
 
-spa_perimeter(pregions$pgeoms[[1]])
-spa_perimeter(pregions$pgeoms[[2]])
+spa_perimeter(pregions$pgeometry[[1]])
+spa_perimeter(pregions$pgeometry[[2]])
 
 # calculating the length of a plateau line object
 

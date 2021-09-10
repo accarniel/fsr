@@ -4,26 +4,26 @@
 \alias{spa_exact_inside}
 \title{Check exact containment}
 \usage{
-spa_exact_inside(pgeom1, pgeom2)
+spa_exact_inside(pgo1, pgo2)
 }
 \arguments{
-\item{pgeom1}{A \code{pgeom} object of any type.}
+\item{pgo1}{A \code{pgeometry} object of any type.}
 
-\item{pgeom2}{A \code{pgeom} object of any type.}
+\item{pgo2}{A \code{pgeometry} object of any type.}
 }
 \value{
-A Boolean value that indicates if a \code{pgeom} is completely and certainly inside \code{pgeom2}.
+A Boolean value that indicates if a \code{pgeometry} is completely and certainly inside \code{pgo2}.
 }
 \description{
-This function checks whether a \code{pgeom} object is completely inside of another \code{pgeom} object.
+This function checks whether a \code{pgeometry} object is completely inside of another \code{pgeometry} object.
 }
 \details{
 It is a Boolean function that checks \emph{fuzzy containment} in the spatial plateau context.
 
-This Boolean function checks whether the components of \code{pgeom1} are contained in the components of \code{pgeom2}
+This Boolean function checks whether the components of \code{pgo1} are contained in the components of \code{pgo2}
 by considering their membership degrees and geographic positions. That is, it is follows the classical definition of fuzzy containment of the fuzzy set theory.
 
-In other words, this function checks if the (standard) intersection of \code{pgeom1} and \code{pgeom2} is exactly equal to \code{pgeom1}. The other of operands affects the result.
+In other words, this function checks if the (standard) intersection of \code{pgo1} and \code{pgo2} is exactly equal to \code{pgo1}. The other of operands affects the result.
 }
 \examples{
 

@@ -66,7 +66,7 @@ fsi_create <- function(name, and_method = "min",
 #' 
 #' @details 
 #' 
-#' The fuzzy spatial antecedent added by the `fsi_add_fsa` function is composed of a linguistic variable and its corresponding `pgeom` objects annotated by linguistic values. 
+#' The fuzzy spatial antecedent added by the `fsi_add_fsa` function is composed of a linguistic variable and its corresponding `pgeometry` objects annotated by linguistic values. 
 #' The format of the `tbl` parameter is the same as the output of the function `spa_creator`, allowing the user to directly provides plateau region objects as input when designing FSI models.
 #' 
 #' @returns 
@@ -107,11 +107,11 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
     stop("The tibble with spatial plateau objects should contain at least one line", call. = FALSE)
   }
 
-  # TODO Juliana - validate the format of tbl
-  pgeom_layer <- tbl[c(1, 2)]
-  colnames(pgeom_layer) <- c("lval", "pgeom")
+  # TODO validate the format of tbl
+  pgeometry_layer <- tbl[c(1, 2)]
+  colnames(pgeometry_layer) <- c("lval", "pgeometry")
 
-  fsi$fsa <- append(fsi$fsa, list(list(name = lvar, layer = pgeom_layer)))
+  fsi$fsa <- append(fsi$fsa, list(list(name = lvar, layer = pgeometry_layer)))
 
   fsi
 }
@@ -402,7 +402,7 @@ fsi_eval <- function(fsi, point, ...) {
     input_layer <- input$layer
     for(i in 1:nrow(input_layer)) {
       row <- input_layer[i, ]
-      tbl_eval <- add_row(tbl_eval, lvar = input$name, lval = row$lval, degree = spa_eval(row$pgeom[[1]], point))
+      tbl_eval <- add_row(tbl_eval, lvar = input$name, lval = row$lval, degree = spa_eval(row$pgeometry[[1]], point))
     }
   }
 

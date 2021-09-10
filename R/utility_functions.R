@@ -34,7 +34,7 @@
 #' 
 #' @return
 #'
-#' A `component` object that can be added to a spatial plateau object (i.e., a `pgeom` object).
+#' A `component` object that can be added to a spatial plateau object (i.e., a `pgeometry` object).
 #'
 #' @examples
 #'
@@ -153,82 +153,84 @@ component_from_sfg <- function(sfg, md){
   }
 }
 
-#' @title Creation of an empty `pgeom` object
+#' @title Creation of an empty `pgeometry` object
 #'
-#' @description This function builds an empty `pgeom` object of a specific type.
+#' @description This function builds an empty `pgeometry` object of a specific type.
 #'
 #' @usage
 #'
 #' create_empty_pgeometry(type)
 #'
-#' @param type A character value indicating the data type of the `pgeom` object.
+#' @param type A character value indicating the data type of the `pgeometry` object.
 #' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"` or `"PLATEAUREGION"`.
 #'
 #' @details
 #'
-#' The `create_empty_pgeometry` creates a new pgeom object with no components. To add new components to this object, you
-#' should use `spa_add_component`. The components added to this object must be of same type of the empty pgeom object.
+#' The `create_empty_pgeometry` creates a new `pgeometry` object with no components. To add new components to this object, you
+#' should use `spa_add_component`. The components added to this object must be of same type of the empty pgeometry object.
 #'
 #' @return
 #'
-#' A `pgeom` object.
+#' A `pgeometry` object.
 #'
 #' @examples
 #'
 #' # Creating an Empty Plateau Point object
-#' empty_plateau_point_pgeom <- create_empty_pgeometry("PLATEAUPOINT")
+#' empty_plateau_point <- create_empty_pgeometry("PLATEAUPOINT")
 #'
 #' # Creating an Empty Plateau Line object
-#' empty_plateau_line_pgeom <- create_empty_pgeometry("PLATEAULINE")
+#' empty_plateau_line <- create_empty_pgeometry("PLATEAULINE")
 #'
 #' # Creating an Empty Plateau Region object
-#' empty_plateau_region_pgeom <- create_empty_pgeometry("PLATEAUREGION")
+#' empty_plateau_region <- create_empty_pgeometry("PLATEAUREGION")
 #'
 #' @import sf methods
 #' @export
 create_empty_pgeometry <- function(type){
   type = toupper(type)
   if(is_pgeometry(type)){
+    supp <- NULL
     if(type == "PLATEAUPOINT"){
-      new("pgeom", component = list(), supp = st_multipoint(), type = type)
+      supp <- st_multipoint()
     } else if(type == "PLATEAULINE"){
-      new("pgeom", component = list(), supp = st_multilinestring(), type = type)
+      supp <- st_multilinestring()
     } else if(type == "PLATEAUREGION"){
-      new("pgeom", component = list(), supp = st_multipolygon(), type = type)
+      supp = st_multipolygon()
     }
+    new("pgeometry", component = list(), supp = supp, type = type)
   } else {
     stop("Invalid data type", call. = FALSE)
   }
   
 }
 
-#' @title Creation of a `pgeom` object with components
+#' @title Creation of a `pgeometry` object with components
 #'
-#' @description This function creates a `pgeom` object from a `data.frame` or a list of components.
+#' @description This function creates a `pgeometry` object from a `data.frame` or a list of components.
 #'
 #' @usage
 #' 
 #' create_pgeometry(components, type)
 #'
 #' @param components A list of `component` objects or a `data.frame`. The type of each component must be the same for all components.
-#' @param type A character value that indicates the type of the desired `pgeom` object. 
+#' @param type A character value that indicates the type of the desired `pgeometry` object. 
 #' It should be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, or `"PLATEAUREGION"`. It must be compatible with 
 #' the components given in `components` parameter.
 #'
 #' @details
 #' 
-#' The `create_pgeometry` function creates a `pgeom` object of a given type. This object is built by using either a 
+#' The `create_pgeometry` function creates a `pgeometry` object of a given type. This object is built by using either a 
 #' list of `component` objects or a dataframe (or tibble). If a dataframe is given, it must have two columns: the first one is 
 #' a `sfc` object and second one indicates the membership degree of each respective object of the `sfc` column.
 #' 
 #' @return
 #' 
-#' A `pgeom` object.
+#' A `pgeometry` object.
 #' 
 #' @examples
 #'
 #' library(sf)
-#' # Example 1 - Creating an `PLATEAUPOINT` pgeom object.
+#' # Example 1 - Creating an `PLATEAUPOINT` object.
 #' 
 #' # Creating components for the plateau point object
 #' v1 <- rbind(c(1,2), c(3,4))
@@ -245,11 +247,11 @@ create_empty_pgeometry <- function(type){
 #' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
 #' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
 #' 
-#' # Creating the plateau point object as a pgeom object with 3 components
+#' # Creating the plateau point object as a pgeometry object with 3 components
 #' 
 #' plateau_point_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 #' 
-#' # Example 2 - Creating an `PLATEAULINE` pgeom object.
+#' # Example 2 - Creating an `PLATEAULINE` object.
 #' 
 #' lpts1 <- rbind(c(0, 0), c(1, 1))
 #' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
@@ -259,7 +261,7 @@ create_empty_pgeometry <- function(type){
 #' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 #' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 #'
-#' plateau_line_pgeom <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+#' plateau_line <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
 #' 
 #' @import sf dplyr
@@ -306,7 +308,7 @@ create_pgeometry <- function(components, type){
       }
       supp = st_union(new_df[,1])
     }
-    new("pgeom", component = new_components, supp = supp[[1]], type = type)
+    new("pgeometry", component = new_components, supp = supp[[1]], type = type)
   }
 }
 
@@ -314,33 +316,34 @@ create_pgeometry <- function(components, type){
 #' @export
 tibble::as_tibble
 
-#' @title Converting a `pgeom` object into a `tibble`
+#' @title Converting a `pgeometry` object into tabular data
 #'
-#' @description This function converts a `pgeom` object into a `tibble` object so that its components are rows of the table.
+#' @description We can convert a `pgeometry` object into tabular data, such as a `tibble` or `data.frame` object, 
+#' where the components of the `pgeometry` object compose the rows of the table.
 #'
-#' @method as_tibble pgeom
+#' @method as_tibble pgeometry
 #'
-#' @param x A `pgeom` object.
-#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused, for extensibility.
+#' @param x A `pgeometry` object.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @details
 #' 
 #' This function is an interface for the S3 generic `as_tibble`. 
-#' Here, it turns a `pgeom` object into a tibble, which is a data frame with class `tbl_df`.
-#' This allows us to get the internal components of the `pgeom` object 
+#' Here, it turns a `pgeometry` object into a tibble, which is a data frame with class `tbl_df`.
+#' This allows us to get the internal components of the `pgeometry` object 
 #' (i.e., spatial features objects and membership degrees) as a data frame with
 #' two separate columns - called `md` (_membership degree_) and `geometry` (an `sfc` object). 
 #' 
-#' For each component of the `pgeom` object, `as_tibble` gets the `md` and `geometry` 
+#' For each component of the `pgeometry` object, `as_tibble` gets the `md` and `geometry` 
 #' values and allocates them into a row of the new created tibble, in separated columns.
-#' Therefore, each row of this tibble represents a component of the original `pgeom` object. 
+#' Therefore, each row of this tibble represents a component of the original `pgeometry` object. 
 #' 
-#' It is also possible to call the S3 method `as.data.frame` to convert a `pgeom` object into tabular data.
+#' It is also possible to call the S3 method `as.data.frame` to convert a `pgeometry` object into tabular data.
 #' 
 #' @return
 #' 
 #' A tibble object of size `n x 2` where `n` is the number of components of 
-#' the `pgeom` object and two columns in the format `(md, geometry)`.
+#' the `pgeometry` object and two columns in the format `(md, geometry)`.
 #' 
 #' @examples
 #' 
@@ -361,18 +364,18 @@ tibble::as_tibble
 #' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
 #' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
 #' 
-#' # Creating the plateau point object as a pgeom object with 3 components
+#' # Creating the plateau point object as a pgeometry object with 3 components
 #' 
-#' plateau_point_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' plateau_point <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 #' 
-#' # Converting the pgeom object into a tibble object
-#' plateau_point_tibble <- as_tibble(plateau_point_pgeom)
+#' # Converting the pgeometry object into a tibble object
+#' plateau_point_tibble <- as_tibble(plateau_point)
 #' 
 #' plateau_point_tibble
 #' 
 #' @import sf tibble
 #' @export
-as_tibble.pgeom <- function(x, ...) {
+as_tibble.pgeometry <- function(x, ...) {
   get_md <- function(comp){
     md <- comp@md
     return(md)
@@ -383,12 +386,12 @@ as_tibble.pgeom <- function(x, ...) {
     return(obj)
   }
   
-  pgeom_tibble <- tibble(
+  pgo_tibble <- tibble(
     md <- unlist(lapply(x@component, get_md)),
     points <- st_sfc(lapply(x@component, get_obj))
   )
-  colnames(pgeom_tibble) <- c("md", "geometry")
-  return(pgeom_tibble)
+  colnames(pgo_tibble) <- c("md", "geometry")
+  return(pgo_tibble)
 }
 
 #' search_by_md finds the index of the component of a plateau plateau object based on a given membership degree
@@ -419,16 +422,16 @@ search_by_md <- function(components, low, high, m){
   return(c(FALSE, low))
 }
 
-#' @title Visualization of `pgeom` objects
+#' @title Visualization of `pgeometry` objects
 #'
-#' @description This function plots a `pgeom` object.
+#' @description This function plots a `pgeometry` object.
 #'
 #' @usage
 #' 
-#' fsr_plot(pgeom, base_poly = NULL, add_base_poly = TRUE, 
+#' fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, 
 #'            low = "white", high = "black", ...)
 #'
-#' @param pgeom A `pgeom` object of any type.
+#' @param pgo A `pgeometry` object of any type.
 #' @param base_poly A `sfg` object of the type `POLYGON` or `MULTIPOLYGON`.
 #' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
 #' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
@@ -439,7 +442,7 @@ search_by_md <- function(components, low, high, m){
 #'
 #' @details
 #' 
-#' The `fsr_plot` uses a `ggplot` method to construct the plot. It receives a `pgeom` object (if it is empty, an empty graphics
+#' The `fsr_plot` uses a `ggplot` method to construct the plot. It receives a `pgeometry` object (if it is empty, an empty graphics
 #'  in obtained). 
 #' 
 #' The `low` and `high` parameters are the colors for the minimum and maximum limits of the membership degrees. The 
@@ -474,12 +477,12 @@ search_by_md <- function(components, low, high, m){
 #' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
 #' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
 #' 
-#' # Creating the plateau point object as a pgeom object with 3 components
+#' # Creating the plateau point object as a pgeometry object with 3 components
 #' 
-#' plateau_point_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 #' 
-#' fsr_plot(plateau_point_pgeom) # with default colors
-#' fsr_plot(plateau_point_pgeom, low="blue",high = "red") # with custom limit colors
+#' fsr_plot(ppoint) # with default colors
+#' fsr_plot(ppoint, low="blue",high = "red") # with custom limit colors
 #' 
 #'# Example 2 - PLATEAULINE PLOT
 #' 
@@ -491,10 +494,10 @@ search_by_md <- function(components, low, high, m){
 #' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 #' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 #'
-#' plateau_line_pgeom<- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+#' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #'
-#' fsr_plot(plateau_line_pgeom) # Default values
-#' fsr_plot(plateau_line_pgeom, low="green", high="blue") # Custom colors ...
+#' fsr_plot(pline) # Default values
+#' fsr_plot(pline, low="green", high="blue") # Custom colors ...
 #'
 #'
 #'# Example 3 - PLATEAUREGION PLOT
@@ -511,32 +514,34 @@ search_by_md <- function(components, low, high, m){
 #' comp2 <- component_from_sfg(pol2, 0.4)
 #' comp3 <- component_from_sfg(pol3, 0.7)
 #' 
-#' plateau_region_pgeom <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
-#' fsr_plot(plateau_region_pgeom)
-#' fsr_plot(plateau_region_pgeom, low = "blue", high = "red")
+#' pregion <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
+#' fsr_plot(pregion)
+#' fsr_plot(pregion, low = "blue", high = "red")
 #' 
 #' @import sf ggplot2
 #' @importFrom rlang .data
 #' @export
-fsr_plot <- function(pgeom,  base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
+fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
   
-  pgeom_tibble <- as_tibble(pgeom)
+  pgo_tibble <- as_tibble(pgo)
+  
+  #TODO validate if pgo is empty and base_poly is not empty (then we should only plot base_poly)
   
   if(!is.null(base_poly)) {
-    pgeom_tibble$geometry <- st_intersection(pgeom_tibble$geometry, base_poly)
+    pgo_tibble$geometry <- st_intersection(pgo_tibble$geometry, base_poly)
   }
   
-  if(inherits(pgeom_tibble$geometry, "sfc_MULTILINESTRING")||
-     inherits(pgeom_tibble$geometry, "sfc_MULTIPOINT")||
-     inherits(pgeom_tibble$geometry, "sfc_LINESTRING")||
-     inherits(pgeom_tibble$geometry, "sfc_POINT")){
-    plot <-  ggplot(data = pgeom_tibble) +
+  if(inherits(pgo_tibble$geometry, "sfc_MULTILINESTRING")||
+     inherits(pgo_tibble$geometry, "sfc_MULTIPOINT")||
+     inherits(pgo_tibble$geometry, "sfc_LINESTRING")||
+     inherits(pgo_tibble$geometry, "sfc_POINT")){
+    plot <-  ggplot(data = pgo_tibble) +
       geom_sf(aes(color = .data$md, geometry = .data$geometry), ...) +
       scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high)  +
       theme_classic()
   } else {
     # lwd = 0 ; color = NA in order to remove the border of the components in the plot
-    plot <-  ggplot(data = pgeom_tibble) +
+    plot <-  ggplot(data = pgo_tibble) +
       geom_sf(aes(fill = .data$md, geometry = .data$geometry), ...) +
       scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
       theme_classic()
@@ -590,34 +595,34 @@ is_pgeometry <- function(type){
   }
 }
 
-#' @title Checking whether a `pgeom` object is empty
+#' @title Checking whether a `pgeometry` object is empty
 #'
-#' @description This function checks whether a `pgeom` object is empty (i.e., if it does not contain components).
+#' @description This function checks whether a `pgeometry` object is empty (i.e., if it does not contain components).
 #'
 #' @usage
 #' 
-#' fsr_is_empty(pgeom)
+#' fsr_is_empty(pgo)
 #'
-#' @param pgeom A `pgeom` object.
+#' @param pgo A `pgeometry` object.
 #'
 #' @details
 #' 
-#' It checks if a pgeom object has any component or not. If the number of components of a `pgeom` object is equal to 0, then 
+#' It checks if a pgeometry object has any component or not. If the number of components of a `pgeometry` object is equal to 0, then 
 #' it returns  `TRUE`. Otherwise, it returns `FALSE`. 
 #' 
 #' @return
 #' 
-#' A Boolean value that indicates if a `pgeom` is empty.
+#' A Boolean value that indicates if a `pgeometry` is empty.
 #' 
 #' @examples
 #'
-#' # Creating an empty pgeom object 
-#' pgeom_1 <- create_empty_pgeometry("PLATEAULINE")
+#' # Creating an empty pgeometry object 
+#' pgo1 <- create_empty_pgeometry("PLATEAULINE")
 #' 
 #' # Checking if it is empty
-#' fsr_is_empty(pgeom_1)
+#' fsr_is_empty(pgo1)
 #' 
-#' # Creating a component to populate the pgeom object
+#' # Creating a component to populate the pgeometry object
 #' 
 #' library(sf)
 #' md <- 0.4
@@ -625,16 +630,16 @@ is_pgeometry <- function(type){
 #' 
 #' comp <- component_from_sfg(st_multipoint(pts), md)
 #' 
-#' # Adding the component to the pgeom object
-#' pgeom_1 <- spa_add_component(pgeom_1, comp)
+#' # Adding the component to the pgeometry object
+#' pgo1 <- spa_add_component(pgo1, comp)
 #' 
 #' # Checking if it is still empty
-#' fsr_is_empty(pgeom_1) 
+#' fsr_is_empty(pgo1) 
 #' 
 #' @import sf
 #' @export
-fsr_is_empty <- function(pgeom){
-  if(st_is_empty(pgeom@supp) && !length(pgeom@component)){
+fsr_is_empty <- function(pgo){
+  if(st_is_empty(pgo@supp) && !length(pgo@component)){
     TRUE
   } else {
     FALSE
@@ -642,8 +647,8 @@ fsr_is_empty <- function(pgeom){
 }
 
 #' @noRd
-get_counter_ctype <- function(pgeom){
-  ptype <- pgeom@type
+get_counter_ctype <- function(pgo){
+  ptype <- pgo@type
   
   type <- switch(ptype,
                  PLATEAUPOINT = "POINT",
@@ -655,12 +660,12 @@ get_counter_ctype <- function(pgeom){
 
 #' @import sf methods
 #' @noRd
-append_valid_comps <- function(sfg, pgeom, md, lcomps){
-  if(!st_is_empty(sfg) && is_compatible(sfg, pgeom@type)){
+append_valid_comps <- function(sfg, pgo, md, lcomps){
+  if(!st_is_empty(sfg) && is_compatible(sfg, pgo@type)){
     result_comp <- new("component", obj = sfg, md = md)
     lcomps <- append(lcomps, result_comp)
   } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
-    type_geom = get_counter_ctype(pgeom)
+    type_geom = get_counter_ctype(pgo)
     result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = type_geom))[[1]], md = md)
     lcomps <- append(lcomps, result_comp)
   }

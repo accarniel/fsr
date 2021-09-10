@@ -5,9 +5,9 @@
 #' In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.
 #' <https://doi.org/10.1109/FUZZ-IEEE.2019.8858878>
 #'
-#' @param tbl A data.frame or tibble with the following format: (x, y, z)
-#' @param classes A character vector containing the class names
-#' @param mfs A vector of membership functions generated from FuzzyR (function `genmf`). Each membership function `i` correpgeom_objnds to the class `i`
+#' @param tbl A data.frame or tibble with the following format: (x, y, z).
+#' @param classes A character vector containing the class names.
+#' @param mfs A vector of membership functions generated from FuzzyR (function `genmf`). Each membership function `i` corresponds to the class `i`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
@@ -61,7 +61,7 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
 #' @param iter A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
-#' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
+#' @return a tibble containing `n` new attributes, where `n` corresponds to the `k` groups.
 #'
 #' @examples
 #'
@@ -177,7 +177,7 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
-#' @return a tibble in the format (classes, pgeoms)
+#' @return a tibble in the format (class, pgeometry)
 #'
 #' @examples
 #'
@@ -202,7 +202,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
   pts <- st_as_sf(lp, coords = c(1, 2))
 
   cls <- colnames(lp)[-c(1:3)]
-  pgeom_objs <- vector("list")
+  pgo <- vector("list")
 
   cells <- voronoi_delaunay_prep(pts, base_poly = base_poly)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
@@ -212,10 +212,10 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
     # we create list of components for each class
     lcomps <- apply(pts[, c(class, "cells")], MARGIN = 1, FUN = function(x) new("component", obj = x[[2]], md = x[[1]]))
 
-    pgeom_objs <- append(pgeom_objs, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
+    pgo <- append(pgo, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
   }
 
-  tibble(classes = cls, pgeoms = pgeom_objs)
+  tibble(class = cls, pgeometry = pgo)
 }
 
 #' Delaunay triangulation policy for the construction stage, as described in the following paper
@@ -230,7 +230,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
-#' @return a tibble in the format (classes, pgeoms)
+#' @return a tibble in the format (class, pgeometry)
 #'
 #' @details Note that it is possible to use its own t-norms. A t-norm should has the following signature:
 #' FUN(x) where x is a numeric vector. Such a function should return a single numeric value.
@@ -261,7 +261,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
   pts <- st_as_sf(lp, coords = c(1, 2))
 
   cls <- colnames(lp)[-c(1:3)]
-  pgeom_objs <- vector("list")
+  pgo <- vector("list")
 
   triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = base_poly)
   # getting the indexes of the points of each triangle as a sparse geometry binary predicate list
@@ -272,13 +272,13 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
     # we create list of components for each class
     lcomps <- lapply(seq_along(triangs_p_int), function(index) new("component", obj = triangs[[index]], md = sigma( pts[triangs_p_int[[index]], class][[1]] )))
 
-    pgeom_objs <- append(pgeom_objs, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
+    pgo <- append(pgo, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
   }
 
-  tibble(classes = cls, pgeoms = pgeom_objs)
+  tibble(class = cls, pgeometry = pgo)
 }
 
-#' @title Building `pgeom` objects from a point dataset
+#' @title Building `pgeometry` objects from a point dataset
 #'
 #' @description This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
 #'
@@ -329,7 +329,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #'
 #' @return
 #'
-#' A tibble in the format `(classes, pgeoms)`, where `classes` is a character column and `pgeoms` is a list of `pgeom` objects.
+#' A tibble in the format `(class, pgeometry)`, where `class` is a character column and `pgeometry` is a list of `pgeometry` objects.
 #' This means that a spatial plateau object is created for representing a specific class of the point dataset.
 #'
 #' @references

@@ -4,22 +4,22 @@
 \alias{spa_eval}
 \title{Capturing the membership degree of a point}
 \usage{
-spa_eval(pgeom, point)
+spa_eval(pgo, point)
 }
 \arguments{
-\item{pgeom}{A \code{pgeom} object of any type.}
+\item{pgo}{A \code{pgeometry} object of any type.}
 
 \item{point}{An \code{sfg} object of the type \code{POINT}.}
 }
 \value{
-A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., \code{sfg} object) in a spatial plateau object (i.e., \code{pgeom} object).
+A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., \code{sfg} object) in a spatial plateau object (i.e., \code{pgeometry} object).
 }
 \description{
 This function evaluates the membership degree of a given point in a spatial plateau object of any type.
-It returns a value in [0, 1] that indicates to which extent the point belongs to the \code{pgeom} object.
+It returns a value in [0, 1] that indicates to which extent the point belongs to the \code{pgeometry} object.
 }
 \details{
-The goal of this function is to return the membership degree of a simple point object (i.e., \code{sfg} object) in a given spatial plateau object (i.e., \code{pgeom} object).
+The goal of this function is to return the membership degree of a simple point object (i.e., \code{sfg} object) in a given spatial plateau object (i.e., \code{pgeometry} object).
 This evaluation depends on the following basic cases:
 \itemize{
 \item if the simple point object belongs to the interior or boundary of \emph{one} component of the spatial plateau object, it returns the membership degree of that component.
@@ -64,8 +64,8 @@ ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
 
 # capturing the membership degree of a specific point in each object
-spa_eval(pregions$pgeoms[[1]], st_point(c(5, 15)))
-spa_eval(pregions$pgeoms[[2]], st_point(c(5, 15)))
+spa_eval(pregions$pgeometry[[1]], st_point(c(5, 15)))
+spa_eval(pregions$pgeometry[[2]], st_point(c(5, 15)))
 
 }
 \references{

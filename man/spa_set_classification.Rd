@@ -27,7 +27,7 @@ library(FuzzyR)
 
 set.seed(456)
 
-# some random points to create pgeom objects by using the function spa_creator
+# some random points to create pgeometry objects by using the function spa_creator
 tbl = tibble(x = runif(10, min= 0, max = 30), 
              y = runif(10, min = 0, max = 30), 
              z = runif(10, min = 0, max = 50))
@@ -39,7 +39,7 @@ ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 
 # Showing the default list of classes
-spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 
 # Changing the default classification
 
@@ -50,7 +50,7 @@ large <- genmf("trapmf", c(0.6, 0.8, 1, 1))
 
 spa_set_classification(classes, c(small, medium, large))
 
-spa_overlap(pregions$pgeoms[[1]], pregions$pgeoms[[2]], ret = "list")
+spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 
 }
 \references{
