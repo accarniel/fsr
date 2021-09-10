@@ -33,13 +33,13 @@ cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
 cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 
-pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 pp
 
 pp_supp <- spa_support(pp)
 pp_supp
 
-pp_empty <- create_empty_pgeom("PLATEAUPOINT")
+pp_empty <- create_empty_pgeometry("PLATEAUPOINT")
 pp_empty_supp <- spa_support(pp_empty)
 pp_empty_supp
 

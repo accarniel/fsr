@@ -43,7 +43,7 @@ cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
 cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 
-pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 
 spa_eval(pp, st_point(c(1, 2)))
 spa_eval(pp, st_point(c(1, 3)))

@@ -38,8 +38,8 @@ cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 
 # Creating two spatial plateau objects
-pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
-pp2 <- create_pgeom(list(cp2, cp1), "PLATEAUPOINT")
+pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
 
 # The other of operands after the result
 # pp1 is not inside pp2 since it has one point that is not included in pp2

@@ -2,13 +2,13 @@
 % Please edit documentation in R/fsr_base.R
 \name{PWKT}
 \alias{PWKT}
-\alias{pgeom_to_pwkt}
+\alias{spa_pwkt}
 \alias{format.pgeom}
 \alias{show,pgeom-method}
 \alias{as.character,pgeom-method}
 \title{The PWKT of a spatial plateau object}
 \usage{
-pgeom_to_pwkt(pgeom)
+spa_pwkt(pgeom)
 
 \method{format}{pgeom}(x, ...)
 
@@ -46,9 +46,9 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 
-plateau_point_pgeom <- create_pgeom(list(comp1, comp2), "PLATEAUPOINT")
+plateau_point_pgeom <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 
-pgeom_to_pwkt(plateau_point_pgeom)
+spa_pwkt(plateau_point_pgeom)
 
 # For a `PLATEAULINE` pgeom object.
 
@@ -60,9 +60,9 @@ comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
 comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 
-plateau_line_pgeom<- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
+plateau_line_pgeom<- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
-pgeom_to_pwkt(plateau_line_pgeom)
+spa_pwkt(plateau_line_pgeom)
 
 # For a `PLATEAUREGION` pgeom object.
 
@@ -72,9 +72,9 @@ pol1 <-st_polygon(list(p1,p2))
 
 comp1 <- component_from_sfg(pol1, 0.2)
 
-plateau_region_pgeom <- create_pgeom(list(comp1), "PLATEAUREGION")
+plateau_region_pgeom <- create_pgeometry(list(comp1), "PLATEAUREGION")
 
-pgeom_to_pwkt(plateau_region_pgeom)
+spa_pwkt(plateau_region_pgeom)
 
 
 }

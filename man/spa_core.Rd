@@ -33,14 +33,14 @@ cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
 cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 
-pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 pp
 
 pp_core <- spa_core(pp)
 pp_core
 
 #Creating a pgeom object without core
-pp2 <- create_pgeom(list(cp1, cp2), "PLATEAUPOINT")
+pp2 <- create_pgeometry(list(cp1, cp2), "PLATEAUPOINT")
 pp2
 
 spa_core(pp2)

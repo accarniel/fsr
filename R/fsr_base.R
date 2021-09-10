@@ -53,7 +53,7 @@ setClass("pgeom",
 #'
 #' @usage
 #'
-#' pgeom_to_pwkt(pgeom)
+#' spa_pwkt(pgeom)
 #'
 #' @param pgeom A `pgeom` object of any type.
 #' 
@@ -83,9 +83,9 @@ setClass("pgeom",
 #' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 #' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 #' 
-#' plateau_point_pgeom <- create_pgeom(list(comp1, comp2), "PLATEAUPOINT")
+#' plateau_point_pgeom <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 #' 
-#' pgeom_to_pwkt(plateau_point_pgeom)
+#' spa_pwkt(plateau_point_pgeom)
 #' 
 #' # For a `PLATEAULINE` pgeom object.
 #' 
@@ -97,9 +97,9 @@ setClass("pgeom",
 #' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
 #' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
 #'
-#' plateau_line_pgeom<- create_pgeom(list(comp4, comp5, comp6), "PLATEAULINE")
+#' plateau_line_pgeom<- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
-#' pgeom_to_pwkt(plateau_line_pgeom)
+#' spa_pwkt(plateau_line_pgeom)
 #'
 #' # For a `PLATEAUREGION` pgeom object.
 #' 
@@ -109,16 +109,16 @@ setClass("pgeom",
 #' 
 #' comp1 <- component_from_sfg(pol1, 0.2)
 #' 
-#' plateau_region_pgeom <- create_pgeom(list(comp1), "PLATEAUREGION")
+#' plateau_region_pgeom <- create_pgeometry(list(comp1), "PLATEAUREGION")
 #' 
-#' pgeom_to_pwkt(plateau_region_pgeom)
+#' spa_pwkt(plateau_region_pgeom)
 #' 
 #' 
 #' @import sf
 #' @export
-pgeom_to_pwkt <- function(pgeom) {
+spa_pwkt <- function(pgeom) {
 
-  if(pgeom_is_empty(pgeom)){
+  if(fsr_is_empty(pgeom)){
     return(paste0(pgeom@type, " EMPTY"))
   }
 
@@ -138,7 +138,7 @@ pgeom_to_pwkt <- function(pgeom) {
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #' @export
 format.pgeom <- function(x, ...) {
-  pgeom_to_pwkt(x)
+  spa_pwkt(x)
 }
 
 #' @name PWKT
@@ -149,7 +149,7 @@ format.pgeom <- function(x, ...) {
 #' @import methods
 #' @export
 setMethod("show", "pgeom", function(object) {
-  print(pgeom_to_pwkt(object))
+  print(spa_pwkt(object))
 })
 
 #' @name PWKT
@@ -162,11 +162,11 @@ setMethod("show", "pgeom", function(object) {
 #' @import methods
 #' @export
 setMethod("as.character", "pgeom", function(x, ...) {
-  pgeom_to_pwkt(x)
+  spa_pwkt(x)
 })
 
 
-#' @name pgeom_plot
+#' @name plot
 #' 
 #' @param x A `pgeom` object of any type.
 #' @param y Not applicable.
@@ -176,12 +176,12 @@ setMethod("as.character", "pgeom", function(x, ...) {
 #' @import methods
 #' @export
 setMethod("plot", signature(x = "pgeom", y = "missing"), function(x, y, ...) {
-  pgeom_plot(x, ...)
+  fsr_plot(x, ...)
 })
 
 #' @export
 as.data.frame.pgeom <-
   function(x, row.names=NULL, optional=FALSE, ...)
   {
-    as.data.frame(pgeom_as_tibble(x))
+    as.data.frame(as_tibble(x))
   }

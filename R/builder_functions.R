@@ -212,7 +212,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
     # we create list of components for each class
     lcomps <- apply(pts[, c(class, "cells")], MARGIN = 1, FUN = function(x) new("component", obj = x[[2]], md = x[[1]]))
 
-    pgeom_objs <- append(pgeom_objs, spa_add_component(create_empty_pgeom("PLATEAUREGION"), lcomps))
+    pgeom_objs <- append(pgeom_objs, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
   }
 
   tibble(classes = cls, pgeoms = pgeom_objs)
@@ -272,7 +272,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
     # we create list of components for each class
     lcomps <- lapply(seq_along(triangs_p_int), function(index) new("component", obj = triangs[[index]], md = sigma( pts[triangs_p_int[[index]], class][[1]] )))
 
-    pgeom_objs <- append(pgeom_objs, spa_add_component(create_empty_pgeom("PLATEAUREGION"), lcomps))
+    pgeom_objs <- append(pgeom_objs, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
   }
 
   tibble(classes = cls, pgeoms = pgeom_objs)

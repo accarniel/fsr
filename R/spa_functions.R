@@ -36,7 +36,7 @@
 #' 
 #' # appending these components into an empty pgeom object
 #' 
-#' pp <- create_empty_pgeom("PLATEAUPOINT")
+#' pp <- create_empty_pgeometry("PLATEAUPOINT")
 #' pp <- spa_add_component(pp, list(comp1, comp2))
 #' pp
 #'
@@ -44,7 +44,7 @@
 #' @export
 spa_add_component <- function(pgeom, components) {
   if(is.null(pgeom)){
-    stop("pgeom is null. Please use create_pgeom() to
+    stop("pgeom is null. Please use create_pgeometry() to
          create an empty spatial plateau object.", call. = FALSE)
   }
 
@@ -76,7 +76,7 @@ spa_add_component <- function(pgeom, components) {
     }
 
     # 2. if the pgeom is empty and the component is not empty and has a membership greater than 0
-    if(pgeom_is_empty(pgeom) && !(is.null(c) || st_is_empty(c)) && m > 0){
+    if(fsr_is_empty(pgeom) && !(is.null(c) || st_is_empty(c)) && m > 0){
       pgeom@component[[1]] <- component
       pgeom@supp <- c
 
@@ -143,7 +143,7 @@ spa_add_component <- function(pgeom, components) {
 #' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 #' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 #' 
-#' pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' 
 #' spa_eval(pp, st_point(c(1, 2)))
 #' spa_eval(pp, st_point(c(1, 3)))
@@ -247,7 +247,7 @@ spa_eval <- function(pgeom, point){
 #' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 #' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 #' 
-#' pp <- create_pgeom(list(comp1, comp2), "PLATEAUPOINT")
+#' pp <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 #' 
 #' # calculating the average degree and number of components of pp
 #' 
@@ -285,7 +285,7 @@ spa_eval <- function(pgeom, point){
 #' cp2 <- component_from_sfg(st_linestring(lpts2), 1)
 #' cp3 <- component_from_sfg(st_linestring(lpts3), 0.7)
 #' 
-#' pline <- create_pgeom(list(cp1, cp2, cp3), "PLATEAULINE")
+#' pline <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAULINE")
 #' 
 #' spa_length(pline)
 #'
@@ -453,7 +453,7 @@ spa_length <- function(pl){
 #' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 #' cp3 <- component_from_sfg(st_multipoint(pts3), 1)
 #' 
-#' pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' 
 #' pts4 <- rbind(c(0, 0), c(1, 1))
 #' pts5 <- rbind(c(2, 3), c(1.2, 1.9), c(2, 1))
@@ -463,7 +463,7 @@ spa_length <- function(pl){
 #' cp5 <- component_from_sfg(st_multipoint(pts5), 1)
 #' cp6 <- component_from_sfg(st_multipoint(pts6), 0.7)
 #' 
-#' pp2 <- create_pgeom(list(cp4, cp5, cp6), "PLATEAUPOINT")
+#' pp2 <- create_pgeometry(list(cp4, cp5, cp6), "PLATEAUPOINT")
 #' 
 #' pp1
 #' pp2
@@ -482,7 +482,7 @@ spa_intersection <- function(pgeom1, pgeom2, itype = "min"){
   }
 
   sigma <- match.fun(itype)
-  result <- create_empty_pgeom(pgeom1@type)
+  result <- create_empty_pgeometry(pgeom1@type)
   lcomps <- vector("list")
 
   for(comp1 in pgeom1@component){
@@ -498,7 +498,7 @@ spa_intersection <- function(pgeom1, pgeom2, itype = "min"){
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
       # check geom and pgeom
-      lcomps <- check_geom_sfg_pgeom(sf_result, result , result_md, lcomps)
+      lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
       }
   }
 
@@ -526,7 +526,7 @@ spa_union <- function(pgeom1, pgeom2, utype = "max"){
   }
 
   tau <- match.fun(utype)
-  result <- create_empty_pgeom(pgeom1@type)
+  result <- create_empty_pgeometry(pgeom1@type)
   lcomps <- vector("list")
 
   supp_intersected <- st_intersection(pgeom1@supp, pgeom2@supp)
@@ -543,12 +543,12 @@ spa_union <- function(pgeom1, pgeom2, utype = "max"){
 
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
-      lcomps <- check_geom_sfg_pgeom(sf_result, result , result_md, lcomps)
+      lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
     }
 
     sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
     # check result type and appends to list if compatible
-    lcomps <- check_geom_sfg_pgeom(sf_diff_1, result, md_comp_p1, lcomps)
+    lcomps <- append_valid_comps(sf_diff_1, result, md_comp_p1, lcomps)
   }
 
   for(comp2 in pgeom2@component){
@@ -557,7 +557,7 @@ spa_union <- function(pgeom1, pgeom2, utype = "max"){
 
     sf_diff_3 <- st_difference(obj_comp_p2, supp_intersected)
     # check result type and appends to list if compatible
-    lcomps <- check_geom_sfg_pgeom(sf_diff_3, result, md_comp_p2, lcomps)
+    lcomps <- append_valid_comps(sf_diff_3, result, md_comp_p2, lcomps)
   }
 
   if(length(lcomps) > 0){
@@ -584,7 +584,7 @@ spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
   }
 
   nu <- match.fun(dtype)
-  result <- create_empty_pgeom(pgeom1@type)
+  result <- create_empty_pgeometry(pgeom1@type)
   lcomps <- vector("list")
 
   supp_intersected <- st_intersection(pgeom1@supp, pgeom2@supp)
@@ -601,13 +601,13 @@ spa_difference <- function(pgeom1, pgeom2, dtype = "f_diff"){
 
       sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
 
-      lcomps <- check_geom_sfg_pgeom(sf_result, result , result_md, lcomps)
+      lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
     }
 
     sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
 
     # check result type and appends to list if compatible
-    lcomps <- check_geom_sfg_pgeom(sf_diff_1, result, md_comp_p1, lcomps)
+    lcomps <- append_valid_comps(sf_diff_1, result, md_comp_p1, lcomps)
   }
 
   if(length(lcomps) > 0){
@@ -635,7 +635,7 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
   }
   
   sigma <- match.fun(itype)
-  result <- create_empty_pgeom(pline1@type)
+  result <- create_empty_pgeometry(pline1@type)
   lcomps <- vector("list")
   
   for(comp1 in pline1@component){
@@ -705,13 +705,13 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
 #' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 #' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 #' 
-#' pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp
 #' 
 #' pp_supp <- spa_support(pp)
 #' pp_supp
 #' 
-#' pp_empty <- create_empty_pgeom("PLATEAUPOINT")
+#' pp_empty <- create_empty_pgeometry("PLATEAUPOINT")
 #' pp_empty_supp <- spa_support(pp_empty)
 #' pp_empty_supp
 #'
@@ -757,14 +757,14 @@ spa_support <- function(pgeom){
 #' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 #' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 #' 
-#' pp <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp
 #' 
 #' pp_core <- spa_core(pp)
 #' pp_core
 #'
 #' #Creating a pgeom object without core
-#' pp2 <- create_pgeom(list(cp1, cp2), "PLATEAUPOINT")
+#' pp2 <- create_pgeometry(list(cp1, cp2), "PLATEAUPOINT")
 #' pp2
 #' 
 #' spa_core(pp2)
@@ -823,8 +823,8 @@ spa_core <- function(pgeom){
 #' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 #' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 #' 
-#' pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' pp2 <- create_pgeom(list(cp2, cp1), "PLATEAUPOINT")
+#' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
 #' 
 #' spa_exact_equal(pp1, pp2)
 #' 
@@ -896,8 +896,8 @@ spa_exact_equal <- function(pgeom1, pgeom2){
 #' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
 #' 
 #' # Creating two spatial plateau objects
-#' pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' pp2 <- create_pgeom(list(cp2, cp1), "PLATEAUPOINT")
+#' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
 #' 
 #' # The other of operands after the result
 #' # pp1 is not inside pp2 since it has one point that is not included in pp2
@@ -1317,12 +1317,12 @@ spa_contour <- function(pregion){
     stop("pgeom must be a PLATEAUREGION type.", call. = FALSE)
   }
 
-  pregion_tibble <- pgeom_as_tibble(pregion)
+  pregion_tibble <- as_tibble(pregion)
   pregion_tibble$boundary <- st_boundary(pregion_tibble$geometry)
   pregion_df <- as.data.frame(pregion_tibble)
-  pline <- create_pgeom(pregion_df[,c(3,1)], "PLATEAULINE")
+  pline <- create_pgeometry(pregion_df[,c(3,1)], "PLATEAULINE")
   
-  crisp_contour <- create_empty_pgeom("PLATEAULINE")
+  crisp_contour <- create_empty_pgeometry("PLATEAULINE")
   crisp_contour <- spa_add_component(crisp_contour, component_from_sfg(st_boundary(pregion@supp), 1))
   
   spa_intersection(pline, crisp_contour)
@@ -1556,7 +1556,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region"){
   }
 
   if(bound_part == "line"){
-    bpl <- create_empty_pgeom("PLATEAULINE")
+    bpl <- create_empty_pgeometry("PLATEAULINE")
     last_comp <- tail(pregion@component, 1)
     if(last_comp[[1]]@md == 1){
       boundary_component <- st_boundary(last_comp[[1]]@obj)
@@ -1569,7 +1569,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region"){
     last_comp <- tail(pregion@component, 1)
     n_comps <- spa_ncomp(pregion)
     if(last_comp[[1]]@md == 1 && n_comps > 1){
-      bpr <- create_empty_pgeom("PLATEAUREGION")
+      bpr <- create_empty_pgeometry("PLATEAUREGION")
       bpr <- spa_add_component(bpr, head(pregion@component, n=n_comps-1))
     } else {
       ret <- new("pgeom", component = pregion@component, supp = pregion@supp, type = pregion@type)

@@ -81,7 +81,7 @@ cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
 cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
 cp3 <- component_from_sfg(st_multipoint(pts3), 1)
 
-pp1 <- create_pgeom(list(cp1, cp2, cp3), "PLATEAUPOINT")
+pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 
 pts4 <- rbind(c(0, 0), c(1, 1))
 pts5 <- rbind(c(2, 3), c(1.2, 1.9), c(2, 1))
@@ -91,7 +91,7 @@ cp4 <- component_from_sfg(st_multipoint(pts4), 0.4)
 cp5 <- component_from_sfg(st_multipoint(pts5), 1)
 cp6 <- component_from_sfg(st_multipoint(pts6), 0.7)
 
-pp2 <- create_pgeom(list(cp4, cp5, cp6), "PLATEAUPOINT")
+pp2 <- create_pgeometry(list(cp4, cp5, cp6), "PLATEAUPOINT")
 
 pp1
 pp2

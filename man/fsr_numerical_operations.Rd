@@ -60,7 +60,7 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
 
-pp <- create_pgeom(list(comp1, comp2), "PLATEAUPOINT")
+pp <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 
 # calculating the average degree and number of components of pp
 
@@ -98,7 +98,7 @@ cp1 <- component_from_sfg(st_linestring(lpts1), 0.4)
 cp2 <- component_from_sfg(st_linestring(lpts2), 1)
 cp3 <- component_from_sfg(st_linestring(lpts3), 0.7)
 
-pline <- create_pgeom(list(cp1, cp2, cp3), "PLATEAULINE")
+pline <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAULINE")
 
 spa_length(pline)
 

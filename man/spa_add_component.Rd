@@ -35,7 +35,7 @@ comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)
 
 # appending these components into an empty pgeom object
 
-pp <- create_empty_pgeom("PLATEAUPOINT")
+pp <- create_empty_pgeometry("PLATEAUPOINT")
 pp <- spa_add_component(pp, list(comp1, comp2))
 pp
 
