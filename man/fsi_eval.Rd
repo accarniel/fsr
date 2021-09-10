@@ -7,7 +7,7 @@
 fsi_eval(fsi, point, ...)
 }
 \arguments{
-\item{fsi}{An FSI model builded with the function \code{fsi_create} and populated by the functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
+\item{fsi}{An FSI model built with the function \code{fsi_create} and populated by the functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
 
 \item{point}{An \code{sfg} object of geometry type \code{point}, which is created through the function \code{st_point} of the sf package.}
 
@@ -67,5 +67,5 @@ res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_length=200)
 
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8015707}{A. C. Carniel and M. Schneider, "Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems", IEEE Int. Conf. on Fuzzy Systems, pp. 1-6, 2017.}
+\href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
 }

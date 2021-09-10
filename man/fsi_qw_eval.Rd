@@ -7,7 +7,7 @@
 fsi_qw_eval(fsi, qw, approach = "discretization", ...)
 }
 \arguments{
-\item{fsi}{An FSI model builded with the \code{fsi_create} function that is populated by the following functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
+\item{fsi}{An FSI model built with the \code{fsi_create} function that is populated by the following functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
 
 \item{qw}{An \code{sfg} object storing the query window that is supposed to be used as input for the inference. It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).}
 
@@ -33,7 +33,7 @@ For the \emph{discretization} approach, two additional parameters are needed and
 For the \emph{pso} approach, it is necessary to set the following parameters:
 \itemize{
 \item \code{what}: A character value that defines the user's goal, which can be either \strong{maximize} or \strong{minimize} inferred values. Thus, this parameter can be \verb{“max”} and \verb{“min”}, respectively. The default value is \verb{“max”}.
-\item \code{max_depth}: A numeric value that refers to the number of times the user wants to split the query window. The default value is equal to 2. For instance, a \code{max_depth} = 2 results in the query window splitted into four sub quadrants, where the PSO algorithm will be applied to each one as its search space.
+\item \code{max_depth}: A numeric value that refers to the number of times the user wants to split the query window. The default value is equal to 2. For instance, a \code{max_depth} = 2 results in the query window split into four sub quadrants, where the particle swarm optimization (PSO) algorithm will be applied to each one as its search space.
 In addition, the PSO algorithm has its own set of parameters:
 \item \code{maxit}: A numeric value that defines the maximum number of iterations. Default value is 50.
 \item \code{population}: A numeric value that defines the number of particles. Default value is 10.

@@ -23,7 +23,7 @@ This means that a spatial plateau object is created for representing a specific 
 This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
 }
 \details{
-It follows the two-stage construction systematic approach described \href{https://doi.org/10.1109/FUZZ-IEEE.2019.8858878}{here}.
+It follows the two-stage construction systematic approach described in the research paper of reference.
 
 The input \code{tbl} is a point dataset where each point represents the location of a phenomenon treated by the application.
 Further, each point is annotated with numerical data that describe its meaning in the application.
@@ -88,5 +88,5 @@ spa_creator(tbl, fuzz_policy = "fcp", const_policy = "delaunay", k = 3, tnorm = 
 
 }
 \references{
-\href{https://doi.org/10.1109/FUZZ-IEEE.2019.8858878}{Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.}
+\href{https://ieeexplore.ieee.org/document/8858878/}{Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.}
 }

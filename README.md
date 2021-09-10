@@ -18,7 +18,7 @@ Unfortunately, spatial fuzziness has so far not found its way into *spatial data
 
 ## Installing
 
-Install the development version from github with
+Install the development version from GitHub with
 
 ```r
 library(devtools)

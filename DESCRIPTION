@@ -21,8 +21,7 @@ Imports: rlang (>= 0.4.11),
          e1071 (>= 1.7.3),
          utils (>= 3.6.3),
          lwgeom (>= 0.2.6)
-Description: An R package that implements fuzzy spatial objects, their operations, and fuzzy spatial inference models 
-    based on Spatial Plateau Algebra. For this, we employ fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
+Description: An R package that implements fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. For this, we employ fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
 License: GPL-3
 LazyData: true
 RoxygenNote: 7.1.1

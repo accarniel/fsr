@@ -316,7 +316,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' 
 #' fsi_eval(fsi, point, ...)
 #' 
-#' @param fsi An FSI model builded with the function `fsi_create` and populated by the functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
+#' @param fsi An FSI model built with the function `fsi_create` and populated by the functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
 #' @param point An `sfg` object of geometry type `point`, which is created through the function `st_point` of the sf package.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Informs the `fsi_eval` how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: `discret_by` is 0.5 and `discret_length` is NULL.
 #'
@@ -337,7 +337,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' 
 #' @references
 #'
-#' [A. C. Carniel and M. Schneider, "Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems", IEEE Int. Conf. on Fuzzy Systems, pp. 1-6, 2017.](https://ieeexplore.ieee.org/document/8015707)
+#' [Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.](https://ieeexplore.ieee.org/document/8015707)
 #'
 #' @examples 
 #'
@@ -589,7 +589,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #'
 #' fsi_qw_eval(fsi, qw, approach = "discretization", ...) 
 #'
-#' @param fsi An FSI model builded with the `fsi_create` function that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
+#' @param fsi An FSI model built with the `fsi_create` function that is populated by the following functions `fsi_add_fsa`, `fsi_add_cs`, and `fsi_add_rules`.
 #' @param qw An `sfg` object storing the query window that is supposed to be used as input for the inference. It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).
 #' @param approach Defines which approach is employed to perform the query window inference: `“discretization”` or `“pso”`. Default value is `"discretization"``
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Different set of parameters required depending on the chosen approach (see more in details below).
@@ -602,7 +602,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' 
 #' For the _pso_ approach, it is necessary to set the following parameters:
 #' - `what`: A character value that defines the user's goal, which can be either **maximize** or **minimize** inferred values. Thus, this parameter can be `“max”` and `“min”`, respectively. The default value is `“max”`.
-#' - `max_depth`: A numeric value that refers to the number of times the user wants to split the query window. The default value is equal to 2. For instance, a `max_depth` = 2 results in the query window splitted into four sub quadrants, where the PSO algorithm will be applied to each one as its search space. 
+#' - `max_depth`: A numeric value that refers to the number of times the user wants to split the query window. The default value is equal to 2. For instance, a `max_depth` = 2 results in the query window split into four sub quadrants, where the particle swarm optimization (PSO) algorithm will be applied to each one as its search space. 
 #' In addition, the PSO algorithm has its own set of parameters:
 #' - `maxit`: A numeric value that defines the maximum number of iterations. Default value is 50.
 #' - `population`: A numeric value that defines the number of particles. Default value is 10.

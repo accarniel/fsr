@@ -293,7 +293,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #'
 #' @details
 #'
-#' It follows the two-stage construction systematic approach described [here](https://doi.org/10.1109/FUZZ-IEEE.2019.8858878).
+#' It follows the two-stage construction systematic approach described in the research paper of reference.
 #'
 #' The input `tbl` is a point dataset where each point represents the location of a phenomenon treated by the application.
 #' Further, each point is annotated with numerical data that describe its meaning in the application.
@@ -334,7 +334,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #'
 #' @references
 #'
-#' [Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.](https://doi.org/10.1109/FUZZ-IEEE.2019.8858878)
+#' [Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.](https://ieeexplore.ieee.org/document/8858878/)
 #'
 #' @examples
 #'
