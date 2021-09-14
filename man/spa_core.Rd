@@ -10,7 +10,7 @@ spa_core(pgo)
 \item{pgo}{A \code{pgeometry} object of any type.}
 }
 \value{
-An \code{sfg} object that represents the core of \code{pgeometry}. It can be an empty object if \code{pgeometry} has no a component with membership degree 1.
+An \code{sfg} object that represents the core of \code{pgo}. It can be an empty object if \code{pgo} does not have a component with membership degree 1.
 }
 \description{
 This function yields a crisp spatial object (as an \code{sfg} object) that corresponds to the core of a \code{pgeometry} object given as input.
@@ -19,7 +19,7 @@ This function yields a crisp spatial object (as an \code{sfg} object) that corre
 It employs the classical definition of \emph{core} from the fuzzy set theory in the context of spatial plateau algebra.
 The \emph{core} only comprises the points with membership degree equal to 1.
 Hence, this operation returns the \code{sfg} object that represents the component labeled with
-membership degree equal to 1 of the \code{pgeometry} given as input. If the \code{pgeometry} object has no core, then an empty \code{sfg} object is returned (i.e., a crisp spatial object without points).
+membership degree equal to 1 of the \code{pgeometry} object given as input. If the \code{pgeometry} object has no core, then an empty \code{sfg} object is returned (i.e., a crisp spatial object without points).
 }
 \examples{
 

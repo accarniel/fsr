@@ -643,8 +643,8 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' # Example using the discretization approach:
 #' dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 25)
 #'
-#' # Example using the pso approach in one level only:
-#' pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 1)
+#' ## Example using the pso approach in two levels:
+#' # pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
 #' 
 #' @import utils dplyr
 #' @importFrom rlang .data

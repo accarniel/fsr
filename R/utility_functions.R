@@ -429,13 +429,14 @@ search_by_md <- function(components, low, high, m){
 #' @usage
 #' 
 #' fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, 
-#'            low = "white", high = "black", ...)
+#'            low = "white", high = "black", crs = 4326, ...)
 #'
 #' @param pgo A `pgeometry` object of any type.
 #' @param base_poly A `sfg` object of the type `POLYGON` or `MULTIPOLYGON`.
 #' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
 #' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
 #' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
+#' @param crs A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is 4326.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Optional parameters. They can be the same as the parameters of `geom_sf` function.
 #'
 #' @name plot
@@ -521,7 +522,12 @@ search_by_md <- function(components, low, high, m){
 #' @import sf ggplot2
 #' @importFrom rlang .data
 #' @export
-fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", ...){
+fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", 
+                     crs = 4326, ...) {
+  
+  if(!is.null(base_poly) && inherits(base_poly, "sfg")) {
+    stop("base_poly has to be an sfg object.", call. = FALSE)
+  }
   
   pgo_tibble <- as_tibble(pgo)
   
@@ -530,6 +536,8 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
   if(!is.null(base_poly)) {
     pgo_tibble$geometry <- st_intersection(pgo_tibble$geometry, base_poly)
   }
+  
+  st_crs(pgo_tibble$geometry) <- crs
   
   if(inherits(pgo_tibble$geometry, "sfc_MULTILINESTRING")||
      inherits(pgo_tibble$geometry, "sfc_MULTIPOINT")||
@@ -543,12 +551,12 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
     # lwd = 0 ; color = NA in order to remove the border of the components in the plot
     plot <-  ggplot(data = pgo_tibble) +
       geom_sf(aes(fill = .data$md, geometry = .data$geometry), ...) +
-      scale_fill_gradient(name="", limits = c(0, 1),  low = low, high = high) +
+      scale_fill_gradient(name = "", limits = c(0, 1),  low = low, high = high) +
       theme_classic()
   }
   
   if(!is.null(base_poly) && add_base_poly) {
-    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly)), 
+    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly, crs = crs)), 
                            color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent")
   }
   

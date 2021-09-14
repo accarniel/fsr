@@ -109,12 +109,12 @@ spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "bool", 
            eval_mode = "soft_eval", lval = "mostly")
 
-# Evaluating the other fuzzy topological relationships
-spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+## Examples for evaluating the other fuzzy topological relationships
+# spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+# spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+# spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+# spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+# spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 
 }
 \references{

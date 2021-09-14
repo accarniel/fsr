@@ -71,7 +71,7 @@ qw1 <- st_polygon(list(pts_qw1))
 # Example using the discretization approach:
 dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 25)
 
-# Example using the pso approach in one level only:
-pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 1)
+## Example using the pso approach in two levels:
+# pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
 
 }

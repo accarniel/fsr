@@ -3,9 +3,10 @@ Type: Package
 Title: An R Package for Handling Fuzzy Spatial Data
 Version: 1.0.0
 Authors@R: c(
-    person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("aut","cre")),
-    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("aut")),
-    person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("aut")))
+    person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("rth", "aut", "cre")),
+    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("rtm", "aut")),
+    person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("rtm", "aut")),
+    person("Markus", "Schneider", email = "mschneid@cise.ufl.edu", role = c("rth")))
 URL: https://github.com/accarniel/fsr
 BugReports: https://github.com/accarniel/fsr/issues
 Depends: R (>= 3.6.0)

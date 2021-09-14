@@ -735,11 +735,11 @@ spa_support <- function(pgo){
 #' It employs the classical definition of _core_ from the fuzzy set theory in the context of spatial plateau algebra. 
 #' The _core_ only comprises the points with membership degree equal to 1.
 #' Hence, this operation returns the `sfg` object that represents the component labeled with 
-#' membership degree equal to 1 of the `pgeometry` given as input. If the `pgeometry` object has no core, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#' membership degree equal to 1 of the `pgeometry` object given as input. If the `pgeometry` object has no core, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
 #'
 #' @return
 #'
-#' An `sfg` object that represents the core of `pgeometry`. It can be an empty object if `pgeometry` has no a component with membership degree 1.
+#' An `sfg` object that represents the core of `pgo`. It can be an empty object if `pgo` does not have a component with membership degree 1.
 #'
 #' @references
 #'
@@ -1030,12 +1030,12 @@ spa_eval_relation <- function(ret, result, ...){
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "bool", 
 #'            eval_mode = "soft_eval", lval = "mostly")
 #'
-#' # Evaluating the other fuzzy topological relationships
-#' spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' ## Examples for evaluating the other fuzzy topological relationships
+#' # spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' # spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' # spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' # spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' # spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #'
 #' @import sf
 #' @export
