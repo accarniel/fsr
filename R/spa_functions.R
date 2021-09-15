@@ -80,7 +80,7 @@ spa_add_component <- function(pgo, components) {
       pgo@component[[1]] <- component
       pgo@supp <- c
 
-    } else if(!is.null(c) & length(c) >= 1){
+    } else if(!is.null(c) && length(c) >= 1){
       index = search_by_md(pgo@component, 1, length(pgo@component), m)
 
       # 3. if the membership degree exists in the pgo, we should merge it
@@ -930,7 +930,7 @@ spa_eval_relation <- function(ret, result, ...){
          list = return(aux_function(result)),
          bool = {
            list_res <- aux_function(result)
-           if(!("eval_mode" %in% names(args) & "lval" %in% names(args))){
+           if(!("eval_mode" %in% names(args) && "lval" %in% names(args))){
              stop("args not supplied. 'eval_mode' and 'lval' needed for bool result type", call. = FALSE)
            }
            e_mode <- match.fun(args$eval_mode)
@@ -1031,12 +1031,14 @@ spa_eval_relation <- function(ret, result, ...){
 #'            eval_mode = "soft_eval", lval = "mostly")
 #'
 #' ## Examples for evaluating the other fuzzy topological relationships
-#' # spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' # spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' # spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' # spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#' # spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#'
+#' \dontrun{ 
+#' spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
+#' }
+#' 
 #' @import sf
 #' @export
 spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
@@ -1088,8 +1090,8 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   p_core <- spa_core(p)
   c_core <- spa_core(c)
 
-  if((p_ncomp == 1) & !(st_is_empty(p_core)) ||
-     (c_ncomp == 1) & !(st_is_empty(c_core))){
+  if((p_ncomp == 1) && !(st_is_empty(p_core)) ||
+     (c_ncomp == 1) && !(st_is_empty(c_core))){
     result <- 1
   }
 
@@ -1329,14 +1331,14 @@ spa_contour <- function(pregion){
 }
 
 pkg_env <- new.env()
-pkg_env$ftopological_classes <- c("a little bit", "somewhat", "slightly", "averagely", "mostly","quite")
+pkg_env$ftopological_classes <- c("a little bit", "somewhat", "slightly", "averagely", "mostly", "quite")
 
-pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
-                              FuzzyR::genmf("trapmf", c(0.3, 0.8, 1.3, 1.5)),
-                              FuzzyR::genmf("trapmf", c(1.1, 1.5, 1.6, 2.0)),
-                              FuzzyR::genmf("trapmf", c(1.8, 2.1, 2.5, 2.9)),
-                              FuzzyR::genmf("trapmf", c(2.7, 3.1, 3.6, 3.9)),
-                              FuzzyR::genmf("trapmf", c(3.8, 4.1, 4.5, 4.5)))
+pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.03, 0.08)),
+                              FuzzyR::genmf("trapmf", c(0.03, 0.08, 0.2, 0.26)),
+                              FuzzyR::genmf("trapmf", c(0.2, 0.26, 0.39, 0.45)),
+                              FuzzyR::genmf("trapmf", c(0.39, 0.45, 0.62, 0.69)),
+                              FuzzyR::genmf("trapmf", c(0.62, 0.69, 0.93, 0.95)),
+                              FuzzyR::genmf("trapmf", c(0.93, 0.95, 1, 1)))
 
 #' @title Setting a new classification for fuzzy topological relationships
 #'
@@ -1354,6 +1356,10 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.3, 0.8)),
 #' This function replaces the default linguistic values employed by fuzzy topological relationships.
 #' Each membership function _i_ of the parameter `mfs` represents the class _i_ of the parameter `classes`.
 #' The length of these parameters have to be same.
+#' 
+#' @return 
+#' 
+#' No return values, called for side effects.
 #' 
 #' @references
 #'

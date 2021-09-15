@@ -432,7 +432,7 @@ search_by_md <- function(components, low, high, m){
 #'            low = "white", high = "black", crs = 4326, ...)
 #'
 #' @param pgo A `pgeometry` object of any type.
-#' @param base_poly A `sfg` object of the type `POLYGON` or `MULTIPOLYGON`.
+#' @param base_poly An `sfg` object of the type `POLYGON` or `MULTIPOLYGON`. It can also be an `sfc` object with only one element of the type `POLYGON` or `MULTIPOLYGON`.
 #' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
 #' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
 #' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
@@ -525,25 +525,30 @@ search_by_md <- function(components, low, high, m){
 fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", 
                      crs = 4326, ...) {
   
-  if(!is.null(base_poly) && inherits(base_poly, "sfg")) {
+  if(!is.null(base_poly) && !inherits(base_poly, c("sfg", "sfc"))) {
     stop("base_poly has to be an sfg object.", call. = FALSE)
   }
   
   pgo_tibble <- as_tibble(pgo)
   
-  #TODO validate if pgo is empty and base_poly is not empty (then we should only plot base_poly)
+  # TODO validate if pgo is empty and base_poly is not empty (then we should only plot base_poly)
+  
+  # TODO improve the management of CRS in pgeometry objects
+  # here, we simply add the CRS into the geometry column
+  # thus, the visualization and intersection will be valid
+  st_crs(pgo_tibble$geometry) <- crs
   
   if(!is.null(base_poly)) {
+    # TODO validate if base_poly has the same crs as the geometry column
+    # note that base_poly has a crs value only if it is an sfg object
     pgo_tibble$geometry <- st_intersection(pgo_tibble$geometry, base_poly)
   }
   
-  st_crs(pgo_tibble$geometry) <- crs
-  
-  if(inherits(pgo_tibble$geometry, "sfc_MULTILINESTRING")||
-     inherits(pgo_tibble$geometry, "sfc_MULTIPOINT")||
-     inherits(pgo_tibble$geometry, "sfc_LINESTRING")||
+  if(inherits(pgo_tibble$geometry, "sfc_MULTILINESTRING") ||
+     inherits(pgo_tibble$geometry, "sfc_MULTIPOINT") ||
+     inherits(pgo_tibble$geometry, "sfc_LINESTRING") ||
      inherits(pgo_tibble$geometry, "sfc_POINT")){
-    plot <-  ggplot(data = pgo_tibble) +
+    plot <- ggplot(data = pgo_tibble) +
       geom_sf(aes(color = .data$md, geometry = .data$geometry), ...) +
       scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high)  +
       theme_classic()
@@ -565,33 +570,25 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
 
 #' @import sf
 #' @noRd
-is_compatible <- function(sfg, ptype){
+is_compatible <- function(sfg, ptype) {
   ptype = toupper(ptype)
-  if(class(sfg)[1] == "XY"){
+  ret <- FALSE
+  if(class(sfg)[1] == "XY") {
     sfg_type = class(sfg)[2]
-    if(sfg_type == "POINT" || sfg_type == "MULTIPOINT"){
-      if(ptype=="PLATEAUPOINT"){
-        TRUE
-      } else{
-        FALSE
-      }
+    if((sfg_type == "POINT" || sfg_type == "MULTIPOINT") && 
+       ptype == "PLATEAUPOINT") {
+        ret <- TRUE
+    } else if((sfg_type == "LINESTRING" || sfg_type == "MULTILINESTRING") &&
+               ptype=="PLATEAULINE") {
+        ret <- TRUE
+    } else if((sfg_type == "POLYGON" || sfg_type == "MULTIPOLYGON") &&
+              ptype=="PLATEAUREGION") {
+        ret <- TRUE
     }
-    else if(sfg_type == "LINESTRING" || sfg_type == "MULTILINESTRING"){
-      if(ptype=="PLATEAULINE"){
-        TRUE
-      } else{
-        FALSE
-      }
-    }
-    else if(sfg_type == "POLYGON" || sfg_type == "MULTIPOLYGON"){
-      if(ptype=="PLATEAUREGION"){
-        TRUE
-      } else{
-        FALSE
-      }
-    }} else{
-      stop("Component is not a sfg data type", call. = FALSE)
-    }
+  } else{
+    stop("Component is not a sfg data type", call. = FALSE)
+  }
+  ret
 }
 
 #' @noRd

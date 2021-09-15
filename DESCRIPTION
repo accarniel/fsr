@@ -1,10 +1,10 @@
 Package: fsr
 Type: Package
-Title: An R Package for Handling Fuzzy Spatial Data
+Title: Handling Fuzzy Spatial Data
 Version: 1.0.0
 Authors@R: c(
-    person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("rth", "aut", "cre")),
-    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("rtm", "aut")),
+    person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("rth", "aut", "cre"), comment = c(ORCID = "0000-0002-8297-9894")),
+    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("rtm", "aut"), , comment = c(ORCID = "0000-0003-2594-9733")),
     person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("rtm", "aut")),
     person("Markus", "Schneider", email = "mschneid@cise.ufl.edu", role = c("rth")))
 URL: https://github.com/accarniel/fsr
@@ -22,7 +22,12 @@ Imports: rlang (>= 0.4.11),
          e1071 (>= 1.7.3),
          utils (>= 3.6.3),
          lwgeom (>= 0.2.6)
-Description: An R package that implements fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. For this, we employ fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
+Description: Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
+    It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
+    It implements underlying concepts defined in the following research papers: 
+    (i) "Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types" <doi:10.1109/FUZZ-IEEE.2018.8491565>; 
+    (ii) "A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets" <doi:10.1109/FUZZ-IEEE.2019.8858878>; 
+    (iii) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" <doi:10.1109/FUZZ-IEEE.2017.8015707>.
 License: GPL-3
 LazyData: true
 RoxygenNote: 7.1.1

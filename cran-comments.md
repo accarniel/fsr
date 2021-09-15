@@ -1,3 +1,14 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Removed redundant parts from title and description text.
+
+* Added references to research papers in the description field of the DESCRIPTION file.
+
+* Added \value to spa_set_classification.Rd to clearly indicate that this function does not return a value.
+
+* Wrapped code lines in examples in fsi_qw_eval.Rd and fsr_topological_relationships.Rd by using \dontrun (they contain lengthy examples - >5 sec)
+
 ## Test environments
 * Ubuntu 18.04.5 LTS (bionic), R 4.1.0
 * POP OS 21.04 (hirsute), R 4.0.4

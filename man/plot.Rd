@@ -20,7 +20,7 @@ fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE,
 
 \item{pgo}{A \code{pgeometry} object of any type.}
 
-\item{base_poly}{A \code{sfg} object of the type \code{POLYGON} or \code{MULTIPOLYGON}.}
+\item{base_poly}{An \code{sfg} object of the type \code{POLYGON} or \code{MULTIPOLYGON}. It can also be an \code{sfc} object with only one element of the type \code{POLYGON} or \code{MULTIPOLYGON}.}
 
 \item{add_base_poly}{A Boolean value that indicates whether \code{base_poly} will added to the visualization.}
 
