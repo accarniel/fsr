@@ -221,7 +221,7 @@ spa_eval <- function(pgo, point){
 #' The type-independent functions are:
 #' 
 #' - `spa_avg_degree` calculates the average membership degree of a spatial plateau object.
-#' - `spa_nofcomp` returns the number of components of a spatial plateau object.
+#' - `spa_ncomp` returns the number of components of a spatial plateau object.
 #' 
 #' The remaining functions are _type-dependent_. This means that the parameter have to be of a specific type.
 #' The type-dependent functions are:
