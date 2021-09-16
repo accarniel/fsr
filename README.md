@@ -18,6 +18,12 @@ Unfortunately, spatial fuzziness has so far not found its way into *spatial data
 
 ## Installing
 
+Install the stable version from CRAN with:
+
+```r
+install.packages("fsr")
+```
+
 Install the development version from GitHub with
 
 ```r
@@ -27,4 +33,4 @@ install_github("accarniel/fsr")
 
 ## Contributing and Contact
 
-The project welcomes contributions from three different perspectives. You can contribute to _fsr_ by making Pull Requests on this GitHub Repository. Alternatively, contact Anderson Carniel by sending an email to accarniel@ufscar.br. When a Pull Request or email is sent, Anderson Carniel will check it as soon as possible.
+The project welcomes contributions from three different perspectives. You can contribute to _fsr_ by making Issues or Pull Requests on this GitHub Repository. Alternatively, contact Anderson Carniel by sending an email to accarniel@ufscar.br. When a Pull Request or email is sent, Anderson Carniel will check it as soon as possible.
