@@ -1,3 +1,7 @@
+# fsr 1.0.0.9000
+
+Changes in the development version of the _fsr_ package
+
 # fsr 1.0.0
 
 - This is the first release of _fsr_ that consists of the following modules:
