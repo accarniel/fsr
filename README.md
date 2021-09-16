@@ -1,8 +1,8 @@
 # _fsr_ Package: Handling fuzzy spatial data in R
 
-Current release: 1.0.0
+Current CRAN version: 1.0.0
 
-A research paper describing the first version of _fsr_ has been accepted to publication in [ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems 2021 (ACM SIGSPATIAL 2021)](https://sigspatial2021.sigspatial.org/accepted-papers/).
+A research paper describing the first version of _fsr_ has been accepted for publication in [ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems 2021 (ACM SIGSPATIAL 2021)](https://sigspatial2021.sigspatial.org/accepted-papers/).
 
 ## About _fsr_
 
