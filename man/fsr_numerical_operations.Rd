@@ -40,7 +40,7 @@ Some of them are \emph{type-independent}. This means that the parameter can be a
 The type-independent functions are:
 \itemize{
 \item \code{spa_avg_degree} calculates the average membership degree of a spatial plateau object.
-\item \code{spa_nofcomp} returns the number of components of a spatial plateau object.
+\item \code{spa_ncomp} returns the number of components of a spatial plateau object.
 }
 
 The remaining functions are \emph{type-dependent}. This means that the parameter have to be of a specific type.

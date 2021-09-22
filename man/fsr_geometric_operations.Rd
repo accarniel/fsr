@@ -36,7 +36,7 @@ A \code{pgeometry} object that is the result of the geometric manipulation betwe
 }
 \description{
 Fuzzy geometric set operations are given as a family of functions that implements spatial plateau set operations.
-These functions produces a spatial plateau object from a specific combination of other two spatial plateau objects,
+These functions yield a spatial plateau object from a specific combination of other two spatial plateau objects,
 such as the intersection of two plateau region objects.
 }
 \details{
