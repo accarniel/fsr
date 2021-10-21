@@ -23,15 +23,12 @@ setClass("component",
 
 #' An S4 Class for representing a spatial plateau object
 #'
-#' @slot component A list of components.
 #' @slot supp An `sfg` object that stores the union of the spatial objects of the components of the spatial plateau object.
-#' @slot type The data type of the spatial plateau object.
 #' 
 #' @details 
 #' 
-#' A `pgeometry` object is composed of a list of `component` objects, an `sfg` object that represents 
-#' the union of all crisp spatial objects of its components (i.e., the support), and its data
-#' type, which can be either `PLATEAUPOINT`, `PLATEAULINE`, or `PLATEAUREGION`.
+#' A `pgeometry` object is composed of an `sfg` object that represents the union 
+#' of all crisp spatial objects of its components (i.e., the support).
 #' 
 #' @references
 #'
@@ -41,11 +38,134 @@ setClass("component",
 #' @export
 setClass("pgeometry",
          slots = list(
-           component = "list",
-           supp = "XY",
-           type = "character"
+           supp = "XY"
          )
 )
+
+#' An S4 Class for representing a plateau point object (subclass of `pgeometry`)
+#'
+#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot component A list of components.
+#' 
+#' @details 
+#' 
+#' A `ppoint` object is composed of a list of `component` objects and inherits 
+#' all attributes of the class `pgeometry` (i.e., the support).
+#' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' 
+#' @import methods
+#' @export
+setClass("ppoint",
+         contains = "pgeometry",
+         slots = list(
+           component = "list"
+         )
+)
+
+#' An S4 Class for representing a plateau line object (subclass of `pgeometry`)
+#'
+#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot component A list of components.
+#' 
+#' @details 
+#' 
+#' A `pline` object is composed of a list of `component` objects and inherits 
+#' all attributes of the class `pgeometry` (i.e., the support).
+#' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' 
+#' @import methods
+#' @export
+setClass("pline",
+         contains = "pgeometry",
+         slots = list(
+           component = "list"
+         )
+)
+
+#' An S4 Class for representing a plateau region object (subclass of `pgeometry`)
+#'
+#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot component A list of components.
+#' 
+#' @details 
+#' 
+#' A `pregion` object is composed of a list of `component` objects and inherits 
+#' all attributes of the class `pgeometry` (i.e., the support).
+#' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' 
+#' @import methods
+#' @export
+setClass("pregion",
+         contains = "pgeometry",
+         slots = list(
+           component = "list"
+         )
+)
+
+#' An S4 Class for representing a plateau composition object (subclass of `pgeometry`)
+#'
+#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot ppoint An S4 Class for representing a plateau point object.
+#' @slot ppline An S4 Class for representing a plateau line object.
+#' @slot ppregion An S4 Class for representing a plateau region object.
+#' 
+#' @details 
+#' 
+#' A `pcomposition` object is composed of a `ppoint` object, `pline` object, `pregion` object and inherits 
+#' all attributes of the class `pgeometry` (i.e., the support).
+#' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#' 
+#' @import methods
+#' @export
+setClass("pcomposition",
+         contains = "pgeometry",
+         slots = list(
+           ppoint = "ppoint",
+           pline = "pline",
+           pregion = "pregion"
+         )
+)
+
+#' An S4 Class for representing a plateau collection object (subclass of `pgeometry`)
+#'
+#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot pgos A list of spatial plateau objects.
+#' 
+#' @details 
+#' 
+#' A `pcollection` object is composed of a list of spatial plateau objects and inherits 
+#' all attributes of the class `pgeometry` (i.e., the support).
+#' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#' 
+#' @import methods
+#' @export
+setClass("pcollection",
+         contains = "pgeometry",
+         slots = list(
+           pgos = "list"
+         )
+)
+
+#' @import sf
+#' @noRd
+component_to_text <- function(comp) {
+  paste0("(", st_as_text(comp@obj), ", ", comp@md, ")")
+}
 
 #' @title The PWKT of a spatial plateau object
 #'
@@ -114,21 +234,25 @@ setClass("pgeometry",
 #' spa_pwkt(pregion)
 #' 
 #' 
-#' @import sf
 #' @export
 spa_pwkt <- function(pgo) {
+  
+  type <- toupper(is(pgo)[1])
+  type <- paste0("PLATEAU", substr(type, 2, nchar(type)))
 
   if(fsr_is_empty(pgo)){
-    return(paste0(pgo@type, " EMPTY"))
+    return(paste0(type, " EMPTY"))
   }
 
-  component_to_text <- function(comp) {
-    paste0("(", st_as_text(comp@obj), ", ", comp@md, ")")
+  if(type == "PLATEAUCOMPOSITION"){
+    l <- c(spa_pwkt(pgo@ppoint), spa_pwkt(pgo@pline), spa_pwkt(pgo@pregion))
+  }else if(type == "PLATEAUCOLLECTION"){
+    l <- unlist(lapply(pgo@pgos, spa_pwkt))
+  }else{
+    l <- unlist(lapply(pgo@component, component_to_text))
   }
-
-  l <- unlist(lapply(pgo@component, component_to_text))
-
-  l <- paste(pgo@type," (", paste(l, collapse = ", "), ")", sep="")
+  
+  l <- paste(type," (", paste(l, collapse = ", "), ")", sep="")
   l
 }
 
