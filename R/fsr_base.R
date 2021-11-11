@@ -21,6 +21,16 @@ setClass("component",
          )
 )
 
+setValidity("component", function(object){
+  if(inherits(object@obj, "sfg") && 
+     inherits(object@obj, c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING", "POLYGON", "MULTIPOLYGON")) &&
+     object@md > 0 && object@md <= 1){
+    TRUE
+  } else{
+    "The component must be a pair of an sfg object and the membership degree in ]0,1]"
+  }
+})
+
 #' An S4 Class for representing a spatial plateau object
 #'
 #' @slot supp An `sfg` object that stores the union of the spatial objects of the components of the spatial plateau object.
@@ -41,6 +51,55 @@ setClass("pgeometry",
            supp = "XY"
          )
 )
+
+#' @noRd
+spa_is_valid <- function(object){
+  
+  if(!fsr_is_empty(object)){
+    
+    if(is.unsorted(sapply(object@component, attr, "md"))){
+      "The list of components is not in ascending order of membership degree."
+    } else{
+          
+      type <- spa_get_type(object)
+      pgo <- compute_support(object@component, type)
+      supp <- pgo[[2]]
+      
+      if(!st_equals(object@supp, supp, sparse = FALSE)[1]){
+        "The support of the spatial plateau object is not correct."
+      } else{
+        
+        # If all components in the list of components are valid
+        if(all(sapply(object@component, validObject))){
+          
+          crisp_objs <- lapply(object@component, attr, "obj")
+  
+          disjunction <- st_disjoint(st_sfc(crisp_objs), sparse = FALSE)
+          adjacency <- st_touches(st_sfc(crisp_objs), sparse = FALSE)
+          
+          if(type == "PLATEAULINE"){
+            intersection <- st_crosses(st_sfc(crisp_objs), sparse = FALSE)
+            topology_matrix <- disjunction[upper.tri(disjunction, diag = FALSE)] |
+                               adjacency[upper.tri(adjacency, diag = FALSE)] |
+                               intersection[upper.tri(intersection, diag = FALSE)]
+          } else{
+            topology_matrix <- disjunction[upper.tri(disjunction, diag = FALSE)] |
+                               adjacency[upper.tri(adjacency, diag = FALSE)]
+          }
+          
+          # Checking disjunction, intersection (only for spatial plateau line) and adjacency between all crisp objects in the list of components
+          if(all(topology_matrix)){
+              TRUE
+          } else{
+            "All crisp spatial objects in the list of components must be disjoint or adjacent from each other."
+          }
+        }
+      }
+    }
+  } else{
+    TRUE
+  }
+}
 
 #' An S4 Class for representing a plateau point object (subclass of `pgeometry`)
 #'
@@ -65,6 +124,10 @@ setClass("ppoint",
          )
 )
 
+setValidity("ppoint", function(object){
+  spa_is_valid(object)
+})
+
 #' An S4 Class for representing a plateau line object (subclass of `pgeometry`)
 #'
 #' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
@@ -88,6 +151,10 @@ setClass("pline",
          )
 )
 
+setValidity("pline", function(object){
+  spa_is_valid(object)
+})
+
 #' An S4 Class for representing a plateau region object (subclass of `pgeometry`)
 #'
 #' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
@@ -110,6 +177,10 @@ setClass("pregion",
            component = "list"
          )
 )
+
+setValidity("pregion", function(object){
+  spa_is_valid(object)
+})
 
 #' An S4 Class for representing a plateau composition object (subclass of `pgeometry`)
 #'
@@ -138,6 +209,42 @@ setClass("pcomposition",
          )
 )
 
+setValidity("pcomposition", function(object){
+  
+  if(!fsr_is_empty(object)){
+    
+    if(validObject(object@ppoint) && validObject(object@pline) && validObject(object@pregion)){
+      
+      disjunction <- st_disjoint(st_sfc(object@ppoint@supp, object@pline@supp, object@pregion@supp), sparse = FALSE)
+      adjacency <- st_touches(st_sfc(object@ppoint@supp, object@pline@supp, object@pregion@supp), sparse = FALSE)
+      
+      topology_matrix <- disjunction[upper.tri(disjunction, diag = FALSE)] |
+                         adjacency[upper.tri(adjacency, diag = FALSE)]
+      
+      if(all(topology_matrix)){
+        
+        supp <- st_union(st_sfc(object@ppoint@supp, object@pline@supp, object@pregion@supp))
+        
+        if(st_equals(object@supp, supp, sparse = FALSE)[1]){
+          # TODO validate the condition (iii) of a spatial plateau composition defined in the paper
+          # [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+          TRUE
+        } else{
+          "The support of the spatial plateau composition is not correct."
+        }
+        
+      } else{
+        "Any pair of supports of the spatial plateau objects contained in the triple have to be adjacent or disjoint."
+      }
+      
+    }
+    
+  } else{
+    TRUE
+  }
+  
+})
+
 #' An S4 Class for representing a plateau collection object (subclass of `pgeometry`)
 #'
 #' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
@@ -161,6 +268,32 @@ setClass("pcollection",
          )
 )
 
+setValidity("pcollection", function(object){
+  
+  if(!fsr_is_empty(object)){
+  
+    if(all(sapply(object@pgos, validObject))){
+      
+      obj_sf <- list()
+      for(pgo in 1:length(object@pgos)){
+        object_sf <- object@pgos[[pgo]]@supp
+        obj_sf[[pgo]] <- object_sf
+      }
+      supp <- st_union(st_sfc(obj_sf))
+      
+      if(st_equals(object@supp, supp, sparse = FALSE)[1]){
+        TRUE
+      } else{
+        "The support of the spatial plateau collection is not correct."
+      }
+      
+    }
+  } else{
+    TRUE
+  }
+  
+})
+
 #' @import sf
 #' @noRd
 component_to_text <- function(comp) {
@@ -183,8 +316,8 @@ component_to_text <- function(comp) {
 #'
 #' It gives the textual representation for a `pgeometry` object, 
 #' combining the Well-Known Text (WKT) representation for crisp vector geometry
-#' objects and the formal definitions of the tree spatial plateau data types.
-#' (i.e. `PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`).
+#' objects and the formal definitions of the five spatial plateau data types.
+#' (i.e. `PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`, `PLATEAUCOMPOSITION`, `PLATEAUCOLLECTION`).
 #'
 #' @return
 #'
@@ -193,6 +326,7 @@ component_to_text <- function(comp) {
 #' @references
 #'
 #' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
 #'
 #' @examples
 #'
@@ -223,9 +357,9 @@ component_to_text <- function(comp) {
 #'
 #' # For a `PLATEAUREGION` object.
 #' 
-#' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-#' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-#' pol1 <-st_polygon(list(p1,p2))
+#' p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+#' p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+#' pol1 <-st_polygon(list(p1, p2))
 #' 
 #' comp1 <- component_from_sfg(pol1, 0.2)
 #' 
@@ -233,12 +367,45 @@ component_to_text <- function(comp) {
 #' 
 #' spa_pwkt(pregion)
 #' 
+#' # For a `PLATEAUCOMPOSITION` object.
 #' 
+#' ppts <- rbind(c(1, 2), c(3, 2))
+#' pcomp <- component_from_sfg(st_multipoint(ppts), 0.2) 
+#' 
+#' lpts <- rbind(c(0, 0), c(1, 1))
+#' lcomp <- component_from_sfg(st_linestring(lpts), 0.4)
+#' 
+#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+#' pol <- st_polygon(list(rpts1, rpts2))
+#' rcomp <- component_from_sfg(pol, 0.2)
+#' 
+#' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
+#' 
+#' spa_pwkt(pcomposition)
+#' 
+#' # For a `PLATEAUCOLLECTION` object.
+#' 
+#' lpts <- rbind(c(0, 0), c(1, 1))
+#' lcomp <- component_from_sfg(st_linestring(lpts), 0.4)
+#' pline <- create_pgeometry(list(lcomp), "PLATEAULINE")
+#' 
+#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+#' pol <- st_polygon(list(rpts1, rpts2))
+#' rcomp <- component_from_sfg(pol, 0.2)
+#' pregion <- create_pgeometry(list(rcomp), "PLATEAUREGION")
+#' 
+#' pcomposition <- create_pgeometry(list(pline, pregion), "PLATEAUCOMPOSITION")
+#' 
+#' pcollection <- create_pgeometry(list(pline, pregion, pcomposition), "PLATEAUCOLLECTION")
+#'  
+#' spa_pwkt(pcollection)
+#'  
 #' @export
 spa_pwkt <- function(pgo) {
   
-  type <- toupper(is(pgo)[1])
-  type <- paste0("PLATEAU", substr(type, 2, nchar(type)))
+  type <- spa_get_type(pgo)
 
   if(fsr_is_empty(pgo)){
     return(paste0(type, " EMPTY"))
