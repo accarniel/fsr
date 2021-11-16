@@ -371,6 +371,14 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
                                    The values are 'fsp' and 'fsc'."), call. = FALSE)
                        )
 
+  if("digits" %in% names(params)) {
+    if(is_integer(params$digits)){
+      fuzz_stage[ , 4:ncol(fuzz_stage)] <- round(fuzz_stage[ , 4:ncol(fuzz_stage)], params$digits)
+    } else {
+      stop("The digits argument have to be a integer.", call. = FALSE)
+    }
+  }
+  
   # second step is to apply the construction step
   result <- switch (const_policy,
     voronoi = do.call(voronoi_diagram_policy, c(list(lp = fuzz_stage), params)),
