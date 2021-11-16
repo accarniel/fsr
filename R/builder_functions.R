@@ -13,6 +13,7 @@
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
 #' @examples
+#' 
 #' library(rlang)
 #' library(tibble)
 #' library(FuzzyR)
@@ -293,11 +294,11 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #'
 #' @details
 #'
-#' It follows the two-stage construction systematic approach described in the research paper of reference.
+#' It follows the two-stage construction method described in the research paper of reference.
 #'
 #' The input `tbl` is a point dataset where each point represents the location of a phenomenon treated by the application.
 #' Further, each point is annotated with numerical data that describe its meaning in the application.
-#' Therefore, `tbl` must have three columns: _x_, _y_ for the locations, and _z_ for the domain-specific numeric values.
+#' Therefore, `tbl` must have three columns: (_x_, _y_, _z_). The columns _x_, _y_ are the pair of coordinates, and _z_ is the column containing domain-specific numeric values.
 #'
 #' `fuzz_policy` refers to the method used by the **fuzzification stage**.
 #' This stage aims to assign membership degrees to each point of the dataset.
@@ -312,6 +313,11 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #' - `method`: A fuzzy clustering method of the package `e1071`, which can be either `"cmeans"` (default) or `"cshell"`
 #' - `use_coords`: A Boolean value to indicate whether the columns (x, y) should be used in the clustering algorithm (default is `FALSE`)
 #' - `iter`: A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
+#' 
+#' An optional and common parameter for both fuzzification stages is the `"digits"`. 
+#' This is an integer value that indicates the number of decimal digits of the membership degrees calculated by the fuzzification stage.
+#' That is, it is used to round such membership degrees to a specified number of decimal digits.
+#' Be careful with this optional parameter! If you specify a low value for `"digits"` some membership degrees could be rounded to 0 and thus, some components would not be created.
 #'
 #' `const_policy` refers to the method used by the **construction stage**.
 #' This stage aims to create polygons from the labeled point dataset and use them to build spatial plateau objects.
@@ -323,7 +329,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #' `"delaunay"` stands for _Delaunay triangulation policy_, which accepts the following parameters in `...`:
 #' - `base_poly`: An `sfg` object that will be used to clip the generated triangles (optional argument).
 #' - `tnorm`: A t-norm used to calculate the membership degree of the triangle. It should be the name of a vector function.
-#' Possible values are `"min"` (default), and `"prod"`.
+#' Possible values are `"min"` (default), and `"prod"`. 
 #' Note that it is possible to use your own t-norms. A t-norm should has the following signature: `FUN(x)` where
 #' - _x_ is a numeric vector. Such a function should return a single numeric value.
 #'
@@ -352,11 +358,14 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #' spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf))
 #'
 #' spa_creator(tbl, fuzz_policy = "fcp", k = 4)
+#' 
+#' spa_creator(tbl, fuzz_policy = "fcp", k = 4, digits = 2)
 #'
 #' spa_creator(tbl, fuzz_policy = "fcp", k = 3, const_policy = "delaunay")
 #'
 #' spa_creator(tbl, fuzz_policy = "fcp", const_policy = "delaunay", k = 3, tnorm = "prod")
 #'
+#' @import methods
 #' @export
 spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...) {
   # should we validate the params here instead of validating them in the policies?
@@ -371,11 +380,14 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
                                    The values are 'fsp' and 'fsc'."), call. = FALSE)
                        )
 
-  if("digits" %in% names(params)) {
-    if(is_integer(params$digits)){
+  # from https://stat.ethz.ch/R-manual/R-devel/library/base/html/integer.html
+  is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
+  
+  if(hasArg("digits")) {
+    if(is.wholenumber(params$digits)) {
       fuzz_stage[ , 4:ncol(fuzz_stage)] <- round(fuzz_stage[ , 4:ncol(fuzz_stage)], params$digits)
     } else {
-      stop("The digits argument have to be a integer.", call. = FALSE)
+      stop("The argument 'digits' have to be an integer value.", call. = FALSE)
     }
   }
   
