@@ -1,4 +1,4 @@
-# _fsr_ Package: Handling fuzzy spatial data in R
+# The Package _fsr_: Handling fuzzy spatial data in R
 
 [![CRAN](https://www.r-pkg.org/badges/version/fsr)](https://cran.r-project.org/package=fsr)
 [![CRAN checks](https://cranchecks.info/badges/worst/fsr)](https://cran.r-project.org/web/checks/check_results_fsr.html)
