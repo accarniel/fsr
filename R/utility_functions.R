@@ -671,7 +671,11 @@ append_valid_comps <- function(sfg, pgo, md, lcomps){
     lcomps <- append(lcomps, result_comp)
   } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
     type_geom = get_counter_ctype(pgo)
-    result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = type_geom))[[1]], md = md)
+    union_obj <- st_union(st_collection_extract(sfg, type = type_geom))
+    if(inherits(union_obj, "sfc")) {
+      union_obj <- union_obj[[1]]
+    }
+    result_comp <- new("component", obj = union_obj, md = md)
     lcomps <- append(lcomps, result_comp)
   }
   lcomps

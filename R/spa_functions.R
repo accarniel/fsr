@@ -655,7 +655,11 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
         lcomps <- append(lcomps, result_comp)
       } else if(!st_is_empty(sf_result) && st_geometry_type(sf_result) == "GEOMETRYCOLLECTION") {
         type_geom = get_counter_ctype(pline1)
-        result_comp <- new("component", obj = st_union(st_collection_extract(sf_result, type = "POINT"))[[1]], md = result_md)
+        union_obj <- st_union(st_collection_extract(sf_result, type = type_geom))
+        if(inherits(union_obj, "sfc")) {
+          union_obj <- union_obj[[1]]
+        }
+        result_comp <- new("component", obj = union_obj, md = result_md)
         lcomps <- append(lcomps, result_comp)
       }
     }
