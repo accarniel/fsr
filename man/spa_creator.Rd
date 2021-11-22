@@ -23,11 +23,11 @@ This means that a spatial plateau object is created for representing a specific 
 This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
 }
 \details{
-It follows the two-stage construction systematic approach described in the research paper of reference.
+It follows the two-stage construction method described in the research paper of reference.
 
 The input \code{tbl} is a point dataset where each point represents the location of a phenomenon treated by the application.
 Further, each point is annotated with numerical data that describe its meaning in the application.
-Therefore, \code{tbl} must have three columns: \emph{x}, \emph{y} for the locations, and \emph{z} for the domain-specific numeric values.
+Therefore, \code{tbl} must have three columns: (\emph{x}, \emph{y}, \emph{z}). The columns \emph{x}, \emph{y} are the pair of coordinates, and \emph{z} is the column containing domain-specific numeric values.
 
 \code{fuzz_policy} refers to the method used by the \strong{fuzzification stage}.
 This stage aims to assign membership degrees to each point of the dataset.
@@ -46,6 +46,11 @@ It accepts two possible values only: either \code{"fsp"} (default) or "\verb{fcp
 \item \code{use_coords}: A Boolean value to indicate whether the columns (x, y) should be used in the clustering algorithm (default is \code{FALSE})
 \item \code{iter}: A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
 }
+
+An optional and common parameter for both fuzzification stages is the \code{"digits"}.
+This is an integer value that indicates the number of decimal digits of the membership degrees calculated by the fuzzification stage.
+That is, it is used to round such membership degrees to a specified number of decimal digits.
+Be careful with this optional parameter! If you specify a low value for \code{"digits"} some membership degrees could be rounded to 0 and thus, some components would not be created.
 
 \code{const_policy} refers to the method used by the \strong{construction stage}.
 This stage aims to create polygons from the labeled point dataset and use them to build spatial plateau objects.
@@ -81,6 +86,8 @@ hot_mf <- genmf("trimf", c(35, 50, 100))
 spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf))
 
 spa_creator(tbl, fuzz_policy = "fcp", k = 4)
+
+spa_creator(tbl, fuzz_policy = "fcp", k = 4, digits = 2)
 
 spa_creator(tbl, fuzz_policy = "fcp", k = 3, const_policy = "delaunay")
 

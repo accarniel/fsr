@@ -9,7 +9,7 @@
 \S4method{plot}{pgeometry,missing}(x, y, ...)
 
 fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, 
-           low = "white", high = "black", crs = 4326, ...)
+           low = "white", high = "black", crs = NA, ...)
 }
 \arguments{
 \item{x}{A \code{pgeometry} object of any type.}
@@ -28,7 +28,7 @@ fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE,
 
 \item{high}{A character value that indicates the color for the higher \code{md}s limit value (1). Default is \code{"black"}.}
 
-\item{crs}{A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is 4326.}
+\item{crs}{A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is \code{NA}.}
 }
 \value{
 A \code{ggplot} object.

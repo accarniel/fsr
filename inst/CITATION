@@ -9,9 +9,9 @@ citEntry(entry = "inProceedings",
                    as.person("Markus Schneider")),
   booktitle    = "ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems",
   year         = "2021",
+  pages        = "526-535",
+  doi          = "10.1145/3474717.3484255",
 
   textVersion  =
-  paste("Anderson Chaves Carniel, Felippe Galdino, Juliana Strieder Philippsen, and Markus Schneider. 2021.",
-        "Handling Fuzzy Spatial Data in R using the fsr Package.",
-        "To appear in 29th International Conference on Advances in Geographic Information Systems (SIGSPATIAL '21).")
+  paste("Anderson Chaves Carniel, Felippe Galdino, Juliana Strieder Philippsen, and Markus Schneider. 2021. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (SIGSPATIAL '21), 526–535. DOI:https://doi.org/10.1145/3474717.3484255")
 )
