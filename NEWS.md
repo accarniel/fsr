@@ -2,13 +2,15 @@
 
 Changes in the development version of the _fsr_ package
 
-# Minor changes
+## Minor changes
 
-- Added an optional parameter in the function `spa_creator` named `digits` (an improved update based on the pull request [#28 - leticiabohnert](https://github.com/accarniel/fsr/pull/28))
+- Add the publication that describes the [fsr package](https://dl.acm.org/doi/abs/10.1145/3474717.3484255) into CITATION
+- Add an optional parameter in the function `spa_creator` named `digits` (an improved update based on the pull request [#28 - leticiabohnert](https://github.com/accarniel/fsr/pull/28))
 
-# Bug fixes
+## Bug fixes
 
-- Corrected the management of geometry collections resulting from some geometric computations of the spatial plateau geometric set operations
+- Fix the management of CRS when plotting spatial plateau objects
+- Fix the management of geometry collections resulting from some geometric computations of the spatial plateau geometric set operations
   
 # fsr 1.0.0
 
