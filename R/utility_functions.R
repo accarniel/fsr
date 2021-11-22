@@ -429,14 +429,14 @@ search_by_md <- function(components, low, high, m){
 #' @usage
 #' 
 #' fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, 
-#'            low = "white", high = "black", crs = 4326, ...)
+#'            low = "white", high = "black", crs = NA, ...)
 #'
 #' @param pgo A `pgeometry` object of any type.
 #' @param base_poly An `sfg` object of the type `POLYGON` or `MULTIPOLYGON`. It can also be an `sfc` object with only one element of the type `POLYGON` or `MULTIPOLYGON`.
 #' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
 #' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
 #' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
-#' @param crs A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is 4326.
+#' @param crs A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is `NA`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Optional parameters. They can be the same as the parameters of `geom_sf` function.
 #'
 #' @name plot
@@ -523,21 +523,32 @@ search_by_md <- function(components, low, high, m){
 #' @importFrom rlang .data
 #' @export
 fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", 
-                     crs = 4326, ...) {
+                     crs = NA, ...) {
   
   if(!is.null(base_poly) && !inherits(base_poly, c("sfg", "sfc"))) {
     stop("base_poly has to be an sfg object.", call. = FALSE)
   }
   
+  if(!is.na(crs) && !is.null(base_poly) && st_crs(crs) != st_crs(base_poly)) {
+    stop("The coordinate reference system (CRS) of base_poly is different than the informed CRS.", call. = FALSE)
+  }
+  
   pgo_tibble <- as_tibble(pgo)
+  
+  if(!is.null(base_poly) && is.na(crs)) {
+    crs <- st_crs(base_poly)
+  }
+  
+  if(!is.na(crs)) {
+    st_crs(pgo_tibble$geometry) <- crs
+  }
   
   # TODO validate if pgo is empty and base_poly is not empty (then we should only plot base_poly)
   
   # TODO improve the management of CRS in pgeometry objects
   # here, we simply add the CRS into the geometry column
   # thus, the visualization and intersection will be valid
-  st_crs(pgo_tibble$geometry) <- crs
-  
+
   if(!is.null(base_poly)) {
     # TODO validate if base_poly has the same crs as the geometry column
     # note that base_poly has a crs value only if it is an sfg object
@@ -550,19 +561,30 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
      inherits(pgo_tibble$geometry, "sfc_POINT")){
     plot <- ggplot(data = pgo_tibble) +
       geom_sf(aes(color = .data$md, geometry = .data$geometry), ...) +
-      scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high)  +
+      scale_colour_gradient(limits = c(0, 1), low = low, high = high)  +
       theme_classic()
   } else {
     # lwd = 0 ; color = NA in order to remove the border of the components in the plot
     plot <-  ggplot(data = pgo_tibble) +
       geom_sf(aes(fill = .data$md, geometry = .data$geometry), ...) +
-      scale_fill_gradient(name = "", limits = c(0, 1),  low = low, high = high) +
+      scale_fill_gradient(limits = c(0, 1),  low = low, high = high) +
       theme_classic()
   }
   
-  if(!is.null(base_poly) && add_base_poly) {
-    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly, crs = crs)), 
-                           color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent")
+  if (!is.null(base_poly) && add_base_poly) {
+    bl <- NULL
+    if(inherits(base_poly, c("sfg"))) {
+      if(is.na(crs)) {
+        bl <- st_sfc(base_poly)
+      } else {
+        bl <- st_sfc(base_poly, 
+                     crs = crs)
+      }
+    } else {
+      bl <- base_poly
+    }
+    plot <- plot + geom_sf(data = st_as_sf(bl), color = high, size = 0.5, aes(geometry = .data$x), 
+                           fill = "transparent")
   }
   
   plot
