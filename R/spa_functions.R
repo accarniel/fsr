@@ -80,7 +80,7 @@ spa_add_component <- function(pgo, components) {
       pgo@component[[1]] <- component
       pgo@supp <- c
 
-    } else if(!is.null(c) && length(c) >= 1){
+    } else if(!is.null(c) && length(pgo@component) >= 1){
       index = search_by_md(pgo@component, 1, length(pgo@component), m)
 
       # 3. if the membership degree exists in the pgo, we should merge it

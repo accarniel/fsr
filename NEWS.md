@@ -9,8 +9,9 @@ Changes in the development version of the _fsr_ package
 
 ## Bug fixes
 
-- Fix the management of CRS when plotting spatial plateau objects
-- Fix the management of geometry collections resulting from some geometric computations of the spatial plateau geometric set operations
+- Fix `spa_add_component` for checking a specific condition
+- Fix the management of CRS when plotting spatial plateau objects (function `fsr_plot`)
+- Fix the management of geometry collections resulting from some geometric computations of the spatial plateau geometric set operations (internal function `append_valid_comps`)
   
 # fsr 1.0.0
 
