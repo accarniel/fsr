@@ -69,6 +69,12 @@ Possible values are \code{"min"} (default), and \code{"prod"}.
 Note that it is possible to use your own t-norms. A t-norm should has the following signature: \code{FUN(x)} where
 \item \emph{x} is a numeric vector. Such a function should return a single numeric value.
 }
+
+\code{"convex_hull"} stands for \emph{Convex hull policy}, which accepts the following parameters in \code{...}:
+\itemize{
+\item \code{M}: A numeric vector containing the membership degrees that will be used to create the components. The default is defined by \code{seq(0.05, 1, by = 0.05)}.
+\item \code{d}: A numeric value representing the tolerance distance to compute the membership degree between the elements of \code{M} and the membership degrees of the points. The default is \code{0.05}.
+}
 }
 \examples{
 
@@ -92,6 +98,12 @@ spa_creator(tbl, fuzz_policy = "fcp", k = 4, digits = 2)
 spa_creator(tbl, fuzz_policy = "fcp", k = 3, const_policy = "delaunay")
 
 spa_creator(tbl, fuzz_policy = "fcp", const_policy = "delaunay", k = 3, tnorm = "prod")
+
+spa_creator(tbl, fuzz_policy = "fcp", k = 2, digits = 2, 
+            M = seq(0.1, 1, by = 0.1), d = 0.05, const_policy = "convex_hull")
+            
+spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), 
+            digits = 2, const_policy = "convex_hull")
 
 }
 \references{

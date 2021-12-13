@@ -279,6 +279,82 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
   tibble(class = cls, pgeometry = pgo)
 }
 
+#' Convex hull policy for the construction stage, as described in the following paper
+#'
+#'  Carniel, A. C.; Schneider, M.
+#' A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets.
+#' In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.
+#' <https://doi.org/10.1109/FUZZ-IEEE.2019.8858878>
+#'
+#' @param lp A data.frame or tibble with the labeled points in the format: (x, y, z, ...) where ... are attributes added by the fuzzification step
+#' @param M A numeric vector containing the membership degrees that will be used to create the components.
+#' @param d A numeric value representing the tolerance distance to compute the membership degree between the elements of M and the membership degrees of the points.
+#' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument). In fact, this kind of argument for this policy is useless since the plateau regions will be based on the "sub" convex hulls of the dataset.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
+#'
+#' @return a tibble in the format (class, pgeometry)
+#'
+#' @examples
+#'
+#' library(tibble)
+#' library(FuzzyR)
+#' library(sf)
+#' library(dplyr)
+#' 
+#' set.seed(7)
+#' tbl = tibble(x = runif(20, min= 0, max = 30), 
+#'   y = runif(20, min = 0, max = 50), 
+#'   z = runif(20, min = 0, max = 100))
+#' classes <- c("cold", "hot")
+#' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
+#' hot_mf <- genmf("trimf", c(35, 50, 100))
+#' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
+#'
+#' chp <- convex_hull_policy(fsp, seq(0.1, 1, by = 0.1), 0.05)
+#' chp
+#'
+#' #getting the CH as base_poly
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#'
+#' chp2 <- convex_hull_policy(fsp, seq(0.1, 1, by = 0.1), 0.05, base_poly = ch)
+#'
+#' @import sf tibble dplyr
+#' @noRd
+convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_poly = NULL, ...) {
+  # we create a plateau region based on the convex hull for each class
+  result_classes <- list(ncol(lp) - 3)
+  cls <- colnames(lp)[-c(1:3)]
+  
+  for(k in 4:ncol(lp)) {
+    result_classes[[k-3]] <- create_empty_pgeometry("PLATEAUREGION")
+
+    for (level in M){
+      res <- lp %>% filter((!!as.symbol(cls[k-3])) > 0 & (abs((!!as.symbol(cls[k-3])) - level) <= d))
+      
+      #if we have at least three points, we are able to produce a polygon
+      if(nrow(res) > 2) {
+        pts <- st_as_sf(res, coords = c(1, 2))
+        ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+        
+        if(inherits(ch, c("POLYGON", "MULTIPOLYGON"))){
+          
+          # lets make a clipping to our base_poly, if it is provided
+          if(!is.null(base_poly) && inherits(base_poly, c("POLYGON", "MULTIPOLYGON"))) {
+            ch <- st_intersection(ch, base_poly)
+          }
+          
+          comp <- component_from_sfg(ch, level)
+          pregion <- create_pgeometry(list(comp), "PLATEAUREGION")
+          result_classes[[k-3]] <- spa_union(result_classes[[k-3]], pregion)
+        }
+      }
+    }
+  }
+  
+  tibble(class = cls, pgeometry = result_classes)
+}
+
 #' @title Building `pgeometry` objects from a point dataset
 #'
 #' @description This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
@@ -332,6 +408,10 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #' Possible values are `"min"` (default), and `"prod"`. 
 #' Note that it is possible to use your own t-norms. A t-norm should has the following signature: `FUN(x)` where
 #' - _x_ is a numeric vector. Such a function should return a single numeric value.
+#' 
+#' `"convex_hull"` stands for _Convex hull policy_, which accepts the following parameters in `...`:
+#' - `M`: A numeric vector containing the membership degrees that will be used to create the components. The default is defined by `seq(0.05, 1, by = 0.05)`.
+#' - `d`: A numeric value representing the tolerance distance to compute the membership degree between the elements of `M` and the membership degrees of the points. The default is `0.05`.
 #'
 #' @return
 #'
@@ -364,6 +444,12 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 #' spa_creator(tbl, fuzz_policy = "fcp", k = 3, const_policy = "delaunay")
 #'
 #' spa_creator(tbl, fuzz_policy = "fcp", const_policy = "delaunay", k = 3, tnorm = "prod")
+#' 
+#' spa_creator(tbl, fuzz_policy = "fcp", k = 2, digits = 2, 
+#'             M = seq(0.1, 1, by = 0.1), d = 0.05, const_policy = "convex_hull")
+#'             
+#' spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), 
+#'             digits = 2, const_policy = "convex_hull")
 #'
 #' @import methods
 #' @export
@@ -387,7 +473,7 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
     if(is.wholenumber(params$digits)) {
       fuzz_stage[ , 4:ncol(fuzz_stage)] <- round(fuzz_stage[ , 4:ncol(fuzz_stage)], params$digits)
     } else {
-      stop("The argument 'digits' have to be an integer value.", call. = FALSE)
+      stop("The argument 'digits' has to be an integer value.", call. = FALSE)
     }
   }
   
@@ -395,6 +481,7 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
   result <- switch (const_policy,
     voronoi = do.call(voronoi_diagram_policy, c(list(lp = fuzz_stage), params)),
     delaunay = do.call(delaunay_triangulation_policy, c(list(lp = fuzz_stage), params)),
+    convex_hull = do.call(convex_hull_policy, c(list(lp = fuzz_stage), params)),
     stop(paste0("The construction policy '", const_policy, "' is not a supported policy.
                                    The possible values are 'voronoi' and 'delaunay'."), call. = FALSE)
     )
