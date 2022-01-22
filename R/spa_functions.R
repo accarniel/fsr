@@ -170,6 +170,7 @@ spa_add_component <- function(pgo, components) {
 #' @import  sf
 #' @export
 spa_eval <- function(pgo, point){
+  
   if(any(is.na(point))){
     stop("The parameter 'point' is NA.", call. = FALSE)
   }
@@ -179,23 +180,43 @@ spa_eval <- function(pgo, point){
   }
   
   ret <- 0
-
+  
   if(st_intersects(point, pgo@supp, sparse = FALSE)[1]){
-    # check in the boundary
-    md_comps <- c()
-    for(component in pgo@component){
-      if(st_intersects(point, st_boundary(component@obj), sparse = FALSE)[1]){
-        md_comps <- append(md_comps, component@md)
-      } #  check in its interior...
-      else if(st_intersects(point, component@obj, sparse = FALSE)[1]){
-        if(pgo@type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
-          return(component@md)
-        } else{
+    
+    type = spa_get_type(pgo)
+    
+    if(type == "PLATEAUCOMPOSITION"){
+      
+      ppoint_ret <- spa_eval(pgo@ppoint, point)
+      pline_ret <- spa_eval(pgo@pline, point)
+      pregion_ret <- spa_eval(pgo@pregion, point)
+      
+      ret <- max(c(ppoint_ret, pline_ret, pregion_ret))
+      
+    } else if(type == "PLATEAUCOLLECTION"){
+      
+      ret <- max(sapply(pgo@pgos, spa_eval, point)) 
+      
+    } else{
+      
+      # check in the boundary
+      md_comps <- c()
+      for(component in pgo@component){
+        if(st_intersects(point, st_boundary(component@obj), sparse = FALSE)[1]){
           md_comps <- append(md_comps, component@md)
+        } #  check in its interior...
+        else if(st_intersects(point, component@obj, sparse = FALSE)[1]){
+          if(type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
+            return(component@md)
+          } else{
+            md_comps <- append(md_comps, component@md)
+          }
         }
       }
+      
+      ret <- max(md_comps)
+      
     }
-    ret <- max(md_comps)
   }
   ret
 }

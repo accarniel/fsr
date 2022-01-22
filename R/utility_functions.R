@@ -517,7 +517,7 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
               }
               
               if(is_valid){
-                new("pcomposition", supp = supp, ppoint = ppoint, pline = pline, pregion = pregion)  
+                new("pcomposition", supp = supp, ppoint = ppoint, pline = pline, pregion = pregion)
               } else{
                 spa_obj <- create_empty_pgeometry(type)
                 spa_obj@supp <- supp
@@ -583,21 +583,32 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
                 if(is.null(pregion)){
                   pregion <- create_empty_pgeometry("PLATEAUREGION")
                 }
-  
-                # Calculate support and order components according to the membership degree
-                pgo <- compute_support(unlist(components), type)
-                supp <- pgo[[2]]
+
                 
-                if(is_valid){
-                  new("pcomposition", supp = supp, ppoint = ppoint, pline = pline, pregion = pregion) 
-                } else{
-                  spa_obj <- create_empty_pgeometry(type)
-                  spa_obj@supp <- supp
-                  spa_obj@ppoint <- ppoint
-                  spa_obj@pline <- pline
-                  spa_obj@pregion <-pregion
-                  spa_obj
+                if(!length(unlist(components))){
+                  create_empty_pgeometry(type)
+                }else{
+                  pgo <- compute_support(unlist(components), type)
+                  supp <- pgo[[2]]
+                  if(is_valid){
+                    new("pcomposition", supp = supp, ppoint = ppoint, pline = pline, pregion = pregion) 
+                  } else{
+                    spa_obj <- create_empty_pgeometry(type)
+                    spa_obj@supp <- supp
+                    spa_obj@ppoint <- ppoint
+                    spa_obj@pline <- pline
+                    spa_obj@pregion <-pregion
+                    spa_obj
+                  }
                 }
+                
+                # # Calculate support and order components according to the membership degree
+                # if(!length(unlist(components))){
+                #   supp <- st_geometrycollection()
+                # }else{
+                #   pgo <- compute_support(unlist(components), type)
+                #   supp <- pgo[[2]]
+                # }
                 
               }
             } else if (type == "PLATEAUCOLLECTION"){
@@ -712,22 +723,14 @@ tibble::as_tibble
 #' @import sf tibble
 #' @export
 as_tibble.pgeometry <- function(x, ...) {
-  get_md <- function(comp){
-    md <- comp@md
-    return(md)
-  }
   
-  get_obj <- function(comp){
-    obj <- comp@obj
-    return(obj)
-  }
+  components <- unlist(get_components(list(x)))
   
-  pgo_tibble <- tibble(
-    md <- unlist(lapply(x@component, get_md)),
-    points <- st_sfc(lapply(x@component, get_obj))
-  )
-  colnames(pgo_tibble) <- c("md", "geometry")
-  return(pgo_tibble)
+  md <- sapply(components, attr, "md")
+  geometry <- st_sfc(lapply(components, attr, "obj"))
+  
+  tibble(geometry, md)
+  
 }
 
 #' search_by_md finds the index of the component of a plateau plateau object based on a given membership degree
@@ -865,9 +868,18 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
     stop("base_poly has to be an sfg object.", call. = FALSE)
   }
   
-  pgo_tibble <- as_tibble(pgo)
+  plot <- NULL
   
-  # TODO validate if pgo is empty and base_poly is not empty (then we should only plot base_poly)
+  if(!is.null(base_poly) && add_base_poly){
+    plot <- ggplot() + geom_sf(data = st_as_sf(st_sfc(base_poly, crs = crs)), 
+            color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent") + 
+            theme_classic()
+    if(fsr_is_empty(pgo)){
+      return(plot)
+    }
+  }
+  
+  pgo_tibble <- as_tibble(pgo)
   
   # TODO improve the management of CRS in pgeometry objects
   # here, we simply add the CRS into the geometry column
@@ -876,32 +888,50 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
   
   if(!is.null(base_poly)) {
     # TODO validate if base_poly has the same crs as the geometry column
-    # note that base_poly has a crs value only if it is an sfg object
+    # note that base_poly has a crs value only if it is an sfc object
     pgo_tibble$geometry <- st_intersection(pgo_tibble$geometry, base_poly)
   }
   
-  if(inherits(pgo_tibble$geometry, "sfc_MULTILINESTRING") ||
-     inherits(pgo_tibble$geometry, "sfc_MULTIPOINT") ||
-     inherits(pgo_tibble$geometry, "sfc_LINESTRING") ||
-     inherits(pgo_tibble$geometry, "sfc_POINT")){
-    plot <- ggplot(data = pgo_tibble) +
-      geom_sf(aes(color = .data$md, geometry = .data$geometry), ...) +
-      scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high)  +
-      theme_classic()
-  } else {
-    # lwd = 0 ; color = NA in order to remove the border of the components in the plot
-    plot <-  ggplot(data = pgo_tibble) +
-      geom_sf(aes(fill = .data$md, geometry = .data$geometry), ...) +
-      scale_fill_gradient(name = "", limits = c(0, 1),  low = low, high = high) +
-      theme_classic()
+  points <- subset(pgo_tibble, sapply(pgo_tibble$geometry, st_is, c("MULTIPOINT", "POINT")))
+  lines <- subset(pgo_tibble, sapply(pgo_tibble$geometry, st_is, c("MULTILINESTRING", "LINESTRING")))
+  regions <- subset(pgo_tibble, sapply(pgo_tibble$geometry, st_is, c("MULTIPOLYGON", "POLYGON")))
+
+  if(nrow(regions) != 0){
+    if(!is.null(plot)){
+      # lwd = 0 ; color = NA in order to remove the border of the components in the plot
+      plot <- plot + geom_sf(data = regions, aes(fill = .data$md, geometry = .data$geometry), ...) + 
+        scale_fill_gradient(name = "", limits = c(0, 1), low = low, high = high)
+    } else{
+      plot <- ggplot() + geom_sf(data = regions, aes(fill = .data$md, geometry = .data$geometry), ...) +
+        scale_fill_gradient(name = "", limits = c(0, 1), low = low, high = high) +
+        theme_classic()
+    }
   }
   
-  if(!is.null(base_poly) && add_base_poly) {
-    plot <- plot + geom_sf(data = st_as_sf(st_sfc(base_poly, crs = crs)), 
-                           color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent")
+  if(nrow(lines) != 0){
+    if(!is.null(plot)){
+      plot <- plot + geom_sf(data = lines, aes(color = .data$md, geometry = .data$geometry), ...) 
+    } else{
+      plot <- ggplot() + geom_sf(data = lines, aes(color = .data$md, geometry = .data$geometry), ...) +
+              scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
+              theme_classic()
+    }
   }
   
+  if(nrow(points) != 0){
+    if(!is.null(plot)){
+      plot <- plot + geom_sf(data = points, aes(color = .data$md, geometry = .data$geometry), ...) +
+        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
+        theme_classic()
+    } else{
+      plot <- ggplot() + geom_sf(data = points, aes(color = .data$md, geometry = .data$geometry), ...) +
+        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
+        theme_classic()
+    }
+  }
+
   plot
+  
 }
 
 #' @import sf
@@ -1008,25 +1038,25 @@ fsr_is_empty <- function(pgo){
 
 #' @noRd
 get_counter_ctype <- function(pgo){
-  ptype <- pgo@type
-  
+  ptype = spa_get_type(pgo)
   type <- switch(ptype,
                  PLATEAUPOINT = "POINT",
                  PLATEAULINE = "LINESTRING",
                  PLATEAUREGION = "POLYGON")
-  
   type
 }
 
 #' @import sf methods
 #' @noRd
 append_valid_comps <- function(sfg, pgo, md, lcomps){
-  if(!st_is_empty(sfg) && is_compatible(sfg, pgo@type)){
+  ptype = spa_get_type(pgo)
+  if(!st_is_empty(sfg) && is_compatible(sfg, ptype) && md > 0 && md <= 1){
     result_comp <- new("component", obj = sfg, md = md)
     lcomps <- append(lcomps, result_comp)
   } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
     type_geom <- get_counter_ctype(pgo)
-    result_comp <- new("component", obj = st_union(st_collection_extract(sfg, type = type_geom))[[1]], md = md)
+    obj <- obj_union(sfg, type_geom)
+    result_comp <- new("component", obj = obj, md = md)
     lcomps <- append(lcomps, result_comp)
   }
   lcomps
