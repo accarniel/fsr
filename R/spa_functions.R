@@ -226,9 +226,9 @@ spa_eval <- function(pgo, point){
 #' The remaining functions are _type-dependent_. This means that the parameter have to be of a specific type.
 #' The type-dependent functions are:
 #' 
-#' - `spa_area` computes the area of a plateau region object. Thus, its parameter has to be a `PLATEAUREGION` object.
-#' - `spa_perimeter` computes the perimeter of a plateau region object. Thus, its parameter has to be a `PLATEAUREGION` object.
-#' - `spa_length` computes the length of a plateau line object. Thus, its parameter has to be a `PLATEAULINE` object.
+#' - `spa_area` computes the area of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a `PLATEAUREGION`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION` object.
+#' - `spa_perimeter` computes the perimeter of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a `PLATEAUREGION`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION` object.
+#' - `spa_length` computes the length of a plateau line, plateau composition, or plateau collection. Thus, its parameter has to be a `PLATEAULINE`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION` object.
 #' 
 #' @return
 #'
@@ -291,11 +291,18 @@ spa_eval <- function(pgo, point){
 #'
 #' @export
 spa_avg_degree <- function(pgo){
-  get_md <- function(comp){
-    comp@md
+  type <- spa_get_type(pgo)
+  if(!fsr_is_empty(pgo)){
+    if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")){
+      mean(sapply(pgo@component, attr, "md"))
+    }else if(type == "PLATEAUCOMPOSITION"){
+      mean(sapply(c(pgo@ppoint@component, pgo@pline@component, pgo@pregion@component), attr, "md"))
+    }else if(type == "PLATEAUCOLLECTION"){
+      mean(sapply(pgo@pgos, spa_avg_degree))
+    }
+  }else{
+    0
   }
-  mds_vec <- unlist(lapply(pgo@component, get_md))
-  mean(mds_vec)
 }
 
 #' @name fsr_numerical_operations
@@ -306,87 +313,130 @@ spa_avg_degree <- function(pgo){
 #'  
 #' @export
 spa_ncomp <- function(pgo){
-  length(pgo@component)
+  type <- spa_get_type(pgo)
+  if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")){
+    length(pgo@component)
+  }else if(type == "PLATEAUCOMPOSITION"){
+    spa_ncomp(pgo@ppoint) + spa_ncomp(pgo@pline) + spa_ncomp(pgo@pregion)
+  }else if(type == "PLATEAUCOLLECTION"){
+    if(!fsr_is_empty(pgo)){
+      sum(sapply(pgo@pgos, spa_ncomp))
+    }else{
+      0
+    }
+  }
 }
 
 #' @name fsr_numerical_operations
 #' 
 #' @usage
 #' 
-#' spa_area(pr) 
-#' 
-#' @param pr A `pgeometry` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
+#' spa_area(pgo) 
 #'  
 #' @import sf
 #' @export
-spa_area <- function(pr){
-
-  if(pr@type != "PLATEAUREGION"){
-    stop("The input is not a PLATEAUREGION object.", call. = FALSE)
+spa_area <- function(pgo){
+  
+  type <- spa_get_type(pgo)
+  if(type %in% c("PLATEAUPOINT", "PLATEAULINE")){
+    warning(paste("A", type, "object does not have an area."), call. = FALSE)
+    0
+  }else if(!fsr_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")){
+    
+    if(type == "PLATEAUREGION"){
+      
+      area_comp <- function(comp){
+        md_comp <- comp@md
+        area_obj <- st_area(comp@obj)
+        area_obj * md_comp
+      }
+      comps_areas <- sapply(pgo@component, area_comp)
+      sum(comps_areas)
+    }else if(type == "PLATEAUCOMPOSITION"){
+      spa_area(pgo@pregion)
+    }else if(type == "PLATEAUCOLLECTION"){
+      pgos <- get_pgos(pgo)
+      pgos <- pgos[sapply(pgos, spa_get_type) %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")]
+      sum(sapply(pgos, spa_area))
+    }
+  }else{
+    0
   }
-
-  area_comp <- function(comp){
-    md_comp = comp@md
-    area_obj = st_area(comp@obj)
-    area_obj * md_comp
-  }
-
-  comps_areas <- unlist(lapply(pr@component, area_comp))
-  sum(comps_areas)
 }
 
 #' @name fsr_numerical_operations
 #' 
 #' @usage
 #' 
-#' spa_perimeter(pr) 
-#'  
+#' spa_perimeter(pgo) 
+#' 
 #' @import sf lwgeom
 #' @export
-spa_perimeter <- function(pr){
+spa_perimeter <- function(pgo){
   
-  if(pr@type != "PLATEAUREGION"){
-    stop("The input is not a PLATEAUREGION object.", call. = FALSE)
+  type <- spa_get_type(pgo)
+  if(type %in% c("PLATEAUPOINT", "PLATEAULINE")){
+    warning(paste("A", type, "object does not have a perimeter."), call. = FALSE)
+    0
+  }else if(!fsr_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")){
+    
+    if(type == "PLATEAUREGION"){
+      perimeter_comp <- function(comp){
+        md_comp <- comp@md
+        temp <- st_sfc(comp@obj)
+        st_set_crs(temp, 4326)
+        perimeter_obj <- st_perimeter(temp)
+        perimeter_obj * md_comp
+      }
+      comps_perimeter <- sapply(pgo@component, perimeter_comp)
+      sum(comps_perimeter)
+    }else if(type == "PLATEAUCOMPOSITION"){
+      spa_perimeter(pgo@pregion)
+    }else if(type == "PLATEAUCOLLECTION"){
+      pgos <- get_pgos(pgo)
+      pgos <- pgos[sapply(pgos, spa_get_type) %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")]
+      sum(sapply(pgos, spa_perimeter))
+    }
+  }else{
+    0
   }
-  
-  perimeter_comp <- function(comp){
-    md_comp = comp@md
-    temp <- st_sfc(comp@obj)
-    st_set_crs(temp, 4326)
-    perimeter_obj = st_perimeter(temp)
-    perimeter_obj * md_comp
-  }
-  
-  comps_perimeter <- unlist(lapply(pr@component, perimeter_comp))
-  sum(comps_perimeter)
 }
 
 #' @name fsr_numerical_operations
 #' 
 #' @usage
 #' 
-#' spa_length(pl) 
+#' spa_length(pgo) 
 #' 
-#' @param pl A `pgeometry` object of the type `PLATEAULINE`. It throws an error if a different type is given.
-#'  
 #' @import sf
 #' @export
-spa_length <- function(pl){
-
-  if(pl@type != "PLATEAULINE"){
-    stop("The input is not a PLATEAULINE object.", call. = FALSE)
+spa_length <- function(pgo){
+  
+  type <- spa_get_type(pgo)
+  if(type %in% c("PLATEAUPOINT", "PLATEAUREGION")){
+    warning(paste("A", type, "object does not have a length."), call. = FALSE)
+    0
+  }else if(!fsr_is_empty(pgo) && type %in% c("PLATEAULINE", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")){
+    
+    if(type == "PLATEAULINE"){
+      length_comp <- function(comp){
+        md_comp = comp@md
+        length_obj = st_length(comp@obj)
+        length_obj * md_comp
+      }
+      components_lenghts <- sapply(pgo@component, length_comp)
+      sum(components_lenghts)
+    }else if(type == "PLATEAUCOMPOSITION"){
+      spa_length(pgo@pline)
+    }else if(type == "PLATEAUCOLLECTION"){
+      pgos <- get_pgos(pgo)
+      pgos <- pgos[sapply(pgos, spa_get_type) %in% c("PLATEAULINE", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")]
+      sum(sapply(pgos, spa_length))
+    }
+  }else{
+    0
   }
-
-  length_comp <- function(comp){
-    md_comp = comp@md
-    length_obj = st_length(comp@obj)
-    length_obj * md_comp
-  }
-
-  components_lenghts <- unlist(lapply(pl@component, length_comp))
-  sum(components_lenghts)
 }
-
 
 #' @title Fuzzy geometric set operations
 #'
