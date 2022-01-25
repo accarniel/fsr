@@ -1,7 +1,7 @@
 Package: fsr
 Type: Package
 Title: Handling Fuzzy Spatial Data
-Version: 1.0.0.9000
+Version: 1.0.1
 Authors@R: c(
     person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("rth", "aut", "cre"), comment = c(ORCID = "0000-0002-8297-9894")),
     person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("rtm", "aut"), , comment = c(ORCID = "0000-0003-2594-9733")),

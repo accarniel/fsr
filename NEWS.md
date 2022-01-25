@@ -1,15 +1,15 @@
-# fsr 1.0.0.9000
+# fsr 1.0.1
 
 Changes in the development version of the _fsr_ package
 
 ## Major changes
 
-- Add a new construction policy in the `spa_creator` function based on the convex hull (an improved implementation from the issue [#29 - FelipeBrusse](https://github.com/accarniel/fsr/issues/29))
+- Add a new construction policy in the `spa_creator` function based on the convex hull (an improved implementation from the issue [#29](https://github.com/accarniel/fsr/issues/29))
 
 ## Minor changes
 
 - Add the publication that describes the [fsr package](https://dl.acm.org/doi/abs/10.1145/3474717.3484255) into CITATION
-- Add an optional parameter in the function `spa_creator` named `digits` (an improved update based on the pull request [#28 - leticiabohnert](https://github.com/accarniel/fsr/pull/28))
+- Add an optional parameter in the function `spa_creator` named `digits` (an improved update based on the pull request [#2, @leticiabohnert](https://github.com/accarniel/fsr/pull/28))
 
 ## Bug fixes
 
