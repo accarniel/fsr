@@ -910,7 +910,9 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
   
   if(nrow(lines) != 0){
     if(!is.null(plot)){
-      plot <- plot + geom_sf(data = lines, aes(color = .data$md, geometry = .data$geometry), ...) 
+      plot <- plot + geom_sf(data = lines, aes(color = .data$md, geometry = .data$geometry), ...) + 
+        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
+        theme_classic()
     } else{
       plot <- ggplot() + geom_sf(data = lines, aes(color = .data$md, geometry = .data$geometry), ...) +
               scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
