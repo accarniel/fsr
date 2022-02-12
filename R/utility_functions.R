@@ -602,14 +602,6 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
                   }
                 }
                 
-                # # Calculate support and order components according to the membership degree
-                # if(!length(unlist(components))){
-                #   supp <- st_geometrycollection()
-                # }else{
-                #   pgo <- compute_support(unlist(components), type)
-                #   supp <- pgo[[2]]
-                # }
-                
               }
             } else if (type == "PLATEAUCOLLECTION"){
               
@@ -1046,22 +1038,8 @@ get_counter_ctype <- function(pgo){
   type <- switch(ptype,
                  PLATEAUPOINT = "POINT",
                  PLATEAULINE = "LINESTRING",
-                 PLATEAUREGION = "POLYGON")
+                 PLATEAUREGION = "POLYGON",
+                 PLATEAUCOMPOSITION = "GEOMETRYCOLLECTION",
+                 PLATEAUCOLLECTION = "GEOMETRYCOLLECTION")
   type
-}
-
-#' @import sf methods
-#' @noRd
-append_valid_comps <- function(sfg, pgo, md, lcomps){
-  ptype = spa_get_type(pgo)
-  if(!st_is_empty(sfg) && is_compatible(sfg, ptype) && md > 0 && md <= 1){
-    result_comp <- new("component", obj = sfg, md = md)
-    lcomps <- append(lcomps, result_comp)
-  } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
-    type_geom <- get_counter_ctype(pgo)
-    obj <- obj_union(sfg, type_geom)
-    result_comp <- new("component", obj = obj, md = md)
-    lcomps <- append(lcomps, result_comp)
-  }
-  lcomps
 }
