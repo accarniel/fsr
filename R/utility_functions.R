@@ -922,9 +922,11 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
   
   if(nrow(points) != 0){
     if(!is.null(plot)){
-      plot <- plot + geom_sf(data = points, aes(color = .data$md, geometry = .data$geometry), ...) +
-        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
+      plot <- plot + geom_sf(data = points, aes(color = .data$md, geometry = .data$geometry), ...)
+      if(nrow(lines) == 0){
+        plot <- plot + scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
         theme_classic()
+      }
     } else{
       plot <- ggplot() + geom_sf(data = points, aes(color = .data$md, geometry = .data$geometry), ...) +
         scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
