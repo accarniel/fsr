@@ -682,7 +682,7 @@ tibble::as_tibble
 #' @return
 #' 
 #' A tibble object of size `n x 2` where `n` is the number of components of 
-#' the `pgeometry` object and two columns in the format `(md, geometry)`.
+#' the `pgeometry` object and two columns in the format `(geometry, md)`.
 #' 
 #' @examples
 #' 
