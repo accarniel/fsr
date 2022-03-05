@@ -3,13 +3,17 @@
 #' @description This function adds components to a spatial plateau object (i.e., `pgeometry` object). 
 #' The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
 #' For instance, a `pgeometry` object of the type `PLATEAUREGION` accepts only components containing polygons (e.g., `POLYGON` or `MULTIPOLYGON`). 
+#' In the case of `PLATEAUCOMPOSITION` object, formed by a triple (`PLATEAUPOINT`, `PLATEAULINE` and `PLATEAUREGION`), any type of component is compatible to be added. 
+#' Thus, a component of type `POINT`, for example, will be added to the `PLATEAUPOINT` in which it is composed. 
+#' On the other hand, as a `PLATEAUCOLLECTION` object can have multiple spatial objects of the same type, this function is not applicable to it.
 #'
 #' @usage
 #'
-#' spa_add_component(pgo, components)
+#' spa_add_component(pgo, components, is_valid = FALSE)
 #'
 #' @param pgo A `pgeometry` object of any type.
 #' @param components A `component` object or a list of `component` objects.
+#' @param is_valid A Boolean value to check if the user wants to validate the updated spatial plateau object at the end. If `is_valid = TRUE`, it calls `validObject` method.
 #'
 #' @details
 #'
@@ -29,6 +33,8 @@
 #' @examples
 #'
 #' library(sf)
+#' 
+#' # For a `PLATEAUPOINT` object.
 #'
 #' pts1 <- rbind(c(1, 2), c(3, 2))
 #' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
@@ -39,62 +45,124 @@
 #' pp <- create_empty_pgeometry("PLATEAUPOINT")
 #' pp <- spa_add_component(pp, list(comp1, comp2))
 #' pp
+#' 
+#' # For a `PLATEAUCOMPOSITION` object.
+#' 
+#' pts <- rbind(c(1, 2), c(3, 2))
+#' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+#' pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
+#' pc
+#' 
+#' # appending these components into a pgeometry object
+#' 
+#' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lcp <- component_from_sfg(st_linestring(lpts1), 0.4)
+#' pc <- spa_add_component(pc, list(lcp))
+#' pc
 #'
 #' @import  sf
 #' @export
-spa_add_component <- function(pgo, components) {
+spa_add_component <- function(pgo, components, is_valid = FALSE) {
+  
   if(is.null(pgo)){
-    stop("pgo is null. Please use create_pgeometry() to
+    stop("pgo is null. Please use create_empty_pgeometry() to
          create an empty spatial plateau object.", call. = FALSE)
   }
 
   if(is.null(components)){
     stop("components is null. It should be a single component or a list of components.", call. = FALSE)
   }
-
-  if(class(pgo) != "pgeometry"){
-    stop(paste(pgo, "is not a pgeometry object.", sep = ' '), call. = FALSE)
+  
+  type <- spa_get_type(pgo)
+  
+  if(type == "PLATEAUCOLLECTION"){
+    stop("It is not possible to add components to a spatial plateau collection object.", call. = FALSE)
   }
 
   if(!inherits(components, "list")) {
     components <- list(components)
   }
+  
+  types <- sapply(lapply(components, is), function(x) x[[1]])
+  components <- components[(types == "component")]
 
-  #should we check all components or just the first one?
-  if(class(components[[1]]) != "component"){
-    stop(paste(components, " is not a component object.", sep = ' '), call. = FALSE)
+  pgo <- spa_add_internal(pgo, components)
+  
+  if(is_valid){
+    validObject(pgo)
   }
+  pgo
+}
 
-
+#' @import  sf
+#' @noRd
+spa_add_internal <- function(pgo, components) {
+  
+  type <- spa_get_type(pgo)
+  
   for(component in components) {
+    
     c <- component@obj
     m <- component@md
-
+    
     # does nothing, lets check the next component
     if(is.null(c) || st_is_empty(c) || m == 0){
       next
     }
-
+    
+    if(type == "PLATEAUCOMPOSITION"){
+      if(is_compatible(c, "PLATEAUPOINT")){
+        spobj  <- pgo@ppoint
+      } else if(is_compatible(c, "PLATEAULINE")){
+        spobj  <- pgo@pline
+      } else if(is_compatible(c, "PLATEAUREGION")){
+        spobj <- pgo@pregion
+      } else{
+        warning(paste(c, " is not compatible with the spatial plateau object; we will skip this component.", sep = ' '), call. = FALSE)
+        next
+      }
+    } else{
+      if(!is_compatible(c, type)){
+        warning(paste(c, " is not compatible with the spatial plateau object; we will skip this component.", sep = ' '), call. = FALSE)
+        next
+      } else{
+        spobj <- pgo
+      }
+    }
+    
     # 2. if the pgo is empty and the component is not empty and has a membership greater than 0
-    if(fsr_is_empty(pgo) && !(is.null(c) || st_is_empty(c)) && m > 0){
-      pgo@component[[1]] <- component
-      pgo@supp <- c
-
-    } else if(!is.null(c) && length(c) >= 1){
-      index = search_by_md(pgo@component, 1, length(pgo@component), m)
-
+    if(fsr_is_empty(spobj) && !(is.null(c) || st_is_empty(c)) && m > 0){
+      
+      spobj@component[[1]] <- component
+      spobj@supp <- c 
+      
+    } else if(!is.null(c) && length(spobj@component) >= 1){
+      index = search_by_md(spobj@component, 1, length(spobj@component), m)
+      
       # 3. if the membership degree exists in the pgo, we should merge it
       if(index[1] == TRUE){
-        pgo@component[[index[2]]]@obj <- st_union(pgo@component[[index[2]]]@obj, c)
+        spobj@component[[index[2]]]@obj <- st_union(spobj@component[[index[2]]]@obj, c)
       } else {
         #otherwise, we simply append into the correct location
-        pgo@component <- append(pgo@component, component, after=index[2]-1)
+        spobj@component <- append(spobj@component, component, after=index[2]-1)
       }
       #in both cases we update its support
+      spobj@supp <- st_union(spobj@supp, c)
+    }
+    
+    if(type == "PLATEAUCOMPOSITION"){
+      if(inherits(spobj, c("ppoint"))){
+        pgo@ppoint <- spobj
+      } else if(inherits(spobj, c("pline"))){
+        pgo@pline <- spobj
+      } else{
+        pgo@pregion <- spobj
+      }
       pgo@supp <- st_union(pgo@supp, c)
+    } else{
+      pgo <- spobj
     }
   }
-
   pgo
 }
 
@@ -180,7 +248,7 @@ spa_eval <- function(pgo, point){
   }
   
   ret <- 0
-  
+
   if(st_intersects(point, pgo@supp, sparse = FALSE)[1]){
     
     type = spa_get_type(pgo)
@@ -196,7 +264,7 @@ spa_eval <- function(pgo, point){
     } else if(type == "PLATEAUCOLLECTION"){
       
       ret <- max(sapply(pgo@pgos, spa_eval, point)) 
-      
+
     } else{
       
       # check in the boundary
@@ -353,6 +421,8 @@ spa_ncomp <- function(pgo){
 #' @usage
 #' 
 #' spa_area(pgo) 
+#' 
+#' @param pgo A `pgeometry` object of the type `PLATEAUREGION`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION`. It throws a warning if a different type is given.
 #'  
 #' @import sf
 #' @export
@@ -365,7 +435,7 @@ spa_area <- function(pgo){
   }else if(!fsr_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")){
     
     if(type == "PLATEAUREGION"){
-      
+    
       area_comp <- function(comp){
         md_comp <- comp@md
         area_obj <- st_area(comp@obj)
@@ -391,6 +461,8 @@ spa_area <- function(pgo){
 #' 
 #' spa_perimeter(pgo) 
 #' 
+#' @param pgo A `pgeometry` object of the type `PLATEAUREGION`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION`. It throws a warning if a different type is given.
+#'  
 #' @import sf lwgeom
 #' @export
 spa_perimeter <- function(pgo){
@@ -429,6 +501,8 @@ spa_perimeter <- function(pgo){
 #' 
 #' spa_length(pgo) 
 #' 
+#' @param pgo A `pgeometry` object of the type `PLATEAULINE`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION`. It throws a warning if a different type is given.
+#'  
 #' @import sf
 #' @export
 spa_length <- function(pgo){
@@ -459,6 +533,479 @@ spa_length <- function(pgo){
   }
 }
 
+#' @import sf
+#' @noRd
+obj_union <- function(obj, geom_type){
+  objs <- suppressWarnings(st_collection_extract(obj, geom_type))
+  if(inherits(objs, "sfg")){
+    objs
+  }else if(inherits(objs, "sfc")){
+    st_union(objs)[[1]]
+  }
+}
+
+#' @noRd
+append_comps <- function(obj, md, comps){
+  comp <- new("component", obj = obj, md = md)
+  append(comps, comp)
+}
+
+#' @noRd
+simplify <- function(pgo){
+  
+  if(fsr_is_empty(pgo)){
+    return(pgo)
+  }
+  
+  type <- spa_get_type(pgo)
+  
+  if(type == "PLATEAUCOMPOSITION"){
+    
+    triple <- c(pgo@ppoint, pgo@pline, pgo@pregion)
+    mask_empty_objs <- sapply(triple, fsr_is_empty)
+    n_empty_objs <- sum(mask_empty_objs)
+    if(n_empty_objs == 2){
+      if(!mask_empty_objs[1]){
+        pgo@ppoint
+      }else if(!mask_empty_objs[2]){
+        pgo@pline
+      }else if(!mask_empty_objs[3]){
+        pgo@pregion
+      }
+    }else{
+      pgo
+    }
+    
+  }else if(type == "PLATEAUCOLLECTION"){
+    
+    mask_empty_objs <- sapply(pgo@pgos, fsr_is_empty)
+    n_non_empty_objs <- length(pgo@pgos) - sum(mask_empty_objs)
+    
+    if(n_non_empty_objs == 1){
+      pgo@pgos[!mask_empty_objs][[1]]
+    }else{
+      pgo
+    }
+  
+  # Spatial plateau point, spatial plateau line, or spatial plateau region   
+  }else{
+    pgo
+  }
+  
+}
+
+#' @noRd
+heterogeneous_geom_comp <- function(pgo1, pgo2, sigma, beta, as_pcomposition){
+  
+  if(inherits(pgo1, "pcomposition") && inherits(pgo2, "pcomposition")){
+    spgo1 <- simplify(pgo1)
+    spgo2 <- simplify(pgo2)
+    
+    if(inherits(spgo1, c("ppoint", "pline", "pregion")) && inherits(spgo2, c("ppoint", "pline", "pregion"))){
+      return(sigma(spgo1, spgo2, beta, as_pcomposition = as_pcomposition))
+    }
+    cm <- combination_matrix(pgo1, pgo2, sigma, beta, as_pcomposition = TRUE)
+    agg_combination_matrix(cm, as_pcomposition)
+    
+  }else if(inherits(pgo1, c("ppoint", "pline", "pregion")) && inherits(pgo2, "pcomposition")){
+    # Due to the recursive nature of this function, we cannot simplify one pgeometry object ONLY. 
+    # Otherwise, we would simplify this case that we explicity want to use a pcomposition with only one non-empty component.
+    pgo1 <- create_pgeometry(list(pgo1), "PLATEAUCOMPOSITION")
+    sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
+    
+  }else if(inherits(pgo1, "pcomposition") && inherits(pgo2, c("ppoint", "pline", "pregion"))){
+    pgo2 <- create_pgeometry(list(pgo2), "PLATEAUCOMPOSITION")
+    sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
+    
+  }else if(inherits(pgo1, "pcollection") && inherits(pgo2, "pcollection")){
+    spgo1 <- simplify(pgo1)
+    spgo2 <- simplify(pgo2)
+    
+    if(inherits(spgo1, c("ppoint", "pline", "pregion")) && inherits(spgo2, c("ppoint", "pline", "pregion"))){
+      return(sigma(spgo1, spgo2, beta, as_pcomposition = as_pcomposition))
+    }
+    pgo1 <- pcollection_to_pcomposition(pgo1)
+    pgo2 <- pcollection_to_pcomposition(pgo2)
+    sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
+    
+  }else if(inherits(pgo1, "pcollection") && inherits(pgo2, c("ppoint", "pline", "pregion", "pcomposition"))){
+    pgo1 <- pcollection_to_pcomposition(pgo1)
+    sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
+    
+  }else if(inherits(pgo1, c("ppoint", "pline", "pregion", "pcomposition")) && inherits(pgo2, "pcollection")){
+    pgo2 <- pcollection_to_pcomposition(pgo2)
+    sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
+  }
+  
+}
+
+#' @noRd
+spa_union_list <- function(pgos, type){
+  
+  if(length(pgos) == 1){
+    pgos[[1]]
+  }else if(length(pgos) == 0){
+    create_empty_pgeometry(type)
+  }else{
+    result <- pgos[[1]]
+    for(pgo in pgos[2:length(pgos)]){
+      result <- spa_union(result, pgo, utype = "max", as_pcomposition = FALSE)
+      if(fsr_is_empty(result)){
+        result <- create_empty_pgeometry(type)
+      }
+    }
+    result
+  }
+}
+
+#' @noRd
+get_pgos <- function(pcollection){
+  
+  pgos <- list()
+  for(pgo in pcollection@pgos){
+    
+    type <- spa_get_type(pgo)
+    if(type == "PLATEAUCOLLECTION"){
+      pgos <- append(pgos, get_pgos(pgo))
+    } else{
+      pgos <- append(pgos, pgo)
+    }
+  }
+  pgos
+}
+
+#' @title Converting a spatial plateau collection to a spatial plateau composition
+#'
+#' @description This function gathers all the fuzzy spatial objects of a `PLATEAUCOLLECTION` and 
+#' reorganizes them into an equivalent fuzzy spatial composition object.
+#'
+#' @usage
+#'
+#' pcollection_to_pcomposition(pcollection)
+#'
+#' @param pcollection A `pcollection` object.
+#'
+#' @details
+#'
+#' It gives a fuzzy spatial composition object equivalent to the spatial collection object given as input
+#' aggregating all spatial plateau objects by type.
+#'
+#' @return
+#'
+#' A spatial plateau composition object.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#'
+#' @examples
+#'
+#' library(sf)
+#' 
+#' pts <- rbind(c(1, 2), c(3, 2))
+#' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+#' 
+#' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lcp <- component_from_sfg(st_linestring(lpts), 1)
+#' pline <- create_pgeometry(list(lcp), "PLATEAULINE", is_valid = TRUE)
+#' 
+#' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+#' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+#' rcp <- component_from_sfg(st_polygon(list(rpts1, rpts2)), 0.7)
+#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION", is_valid = TRUE)
+#' 
+#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
+#' pcollection <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' 
+#' pcollection_to_pcomposition(pcollection)
+#' 
+#' @import sf
+#' @export
+pcollection_to_pcomposition <- function(pcollection){
+  
+  project <- function(pcollection){
+    types <- sapply(pcollection@pgos, spa_get_type)
+    ppoint <- pcollection@pgos[types == "PLATEAUPOINT"]
+    if(!length(ppoint)){
+      ppoint <- create_empty_pgeometry("PLATEAUPOINT")
+    }else{
+      ppoint <- ppoint[[1]]
+    }
+    pline <- pcollection@pgos[types == "PLATEAULINE"]
+    if(!length(pline)){
+      pline <- create_empty_pgeometry("PLATEAULINE")
+    }else{
+      pline <- pline[[1]]
+    }
+    pregion <- pcollection@pgos[types == "PLATEAUREGION"]
+    if(!length(pregion)){
+      pregion <- create_empty_pgeometry("PLATEAUREGION")
+    }else{
+      pregion <- pregion[[1]]
+    }
+    pcomposition <- pcollection@pgos[types == "PLATEAUCOMPOSITION"]
+    if(!length(pcomposition)){
+      pcomposition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+    }else{
+      pcomposition <- pcomposition[[1]]
+    }
+    list(ppoint = ppoint, pline = pline, pregion = pregion, pcomposition = pcomposition)
+  }
+  
+  # Step (i): removes the hierarchy of the operand object and flattens it.
+  pcollection <- spa_flatten(pcollection)
+  
+  # Step (ii): we form the fuzzy geometric union of all fuzzy point objects, 
+  # fuzzy line objects, and fuzzy region objects respectively that can be found 
+  # in the flattened fuzzy spatial collection object.
+  quad <- project(pcollection)
+  ppoint <- spa_union(quad$ppoint, quad$pcomposition@ppoint)
+  pline <- spa_union(quad$pline, quad$pcomposition@pline)
+  pregion <- spa_union(quad$pregion, quad$pcomposition@pregion)
+  
+  # Step (iii): takes these two objects and transforms each of them into another fuzzy 
+  # spatial collection object. Their single fuzzy point, single fuzzy line, and single 
+  # fuzzy region sub-objects fulfill the topological constraints of disjointedness or 
+  # adjacency required in the definition of the data type fcomposition. Note that the 
+  # fuzzy union operation has the effect of only preserving those lower-dimensional 
+  # objects that are not located in higher-dimensional objects.
+  
+  # Spatial plateau point
+  pcomposition <- spa_union(ppoint, pline, as_pcomposition = TRUE)
+  pcomposition <- spa_union(pcomposition@ppoint, pregion, as_pcomposition = TRUE)
+  ppoint <- pcomposition@ppoint
+  # Spatial plateau line
+  pcomposition <- spa_union(pline, pregion, as_pcomposition = TRUE)
+  pline <- pcomposition@pline
+  
+  # Spatial plateau region
+  pregion <- pcomposition@pregion
+  
+  supp <- st_union(st_sfc(ppoint@supp, pline@supp, pregion@supp))
+
+  result <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+  result@supp <- supp[[1]]
+  result@ppoint <- ppoint
+  result@pline <- pline
+  result@pregion <- pregion
+  result
+  
+}
+
+#' @noRd
+combination_matrix <- function(pgo1, pgo2, sigma, beta, as_pcomposition = TRUE){
+  
+  triple1 <- c(pgo1@ppoint, pgo1@pline, pgo1@pregion)
+  triple2 <- c(pgo2@ppoint, pgo2@pline, pgo2@pregion)
+  rep1 <- rep(triple1, each = 3)
+  mapply(sigma, rep1, triple2, beta, as_pcomposition)
+}
+
+#' @noRd
+agg_combination_matrix <- function(cm, as_pcomposition = FALSE){
+  
+  ppoints <- lapply(cm, attr, "ppoint")
+  presult <- spa_union_list(ppoints[!sapply(ppoints, fsr_is_empty)], "PLATEAUPOINT")
+  
+  plines <- lapply(cm, attr, "pline")
+  lresult <- spa_union_list(plines[!sapply(plines, fsr_is_empty)], "PLATEAULINE")
+  
+  pregions <- lapply(cm, attr, "pregion")
+  rresult <- spa_union_list(pregions[!sapply(pregions, fsr_is_empty)], "PLATEAUREGION")
+  
+  mask_empty_objs <- sapply(c(presult, lresult, rresult), fsr_is_empty)
+  n_empty_objs <- sum(mask_empty_objs)
+  if(n_empty_objs == 2 && !as_pcomposition){
+    non_empty_objs <- c(presult, lresult, rresult)[!mask_empty_objs][[1]]
+    non_empty_objs
+  }else{
+    supp <- st_union(st_sfc(presult@supp, lresult@supp, rresult@supp))[[1]]
+    agg_cm <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+    agg_cm@supp <- supp
+    agg_cm@ppoint <- presult
+    agg_cm@pline <- lresult
+    agg_cm@pregion <- rresult
+    agg_cm
+  }
+  
+}
+
+#' @noRd
+final_data_type <- function(type1, type2){
+
+  if(type1 == type2){
+    type1
+  }else{
+    if(any(c(type1, type2) == "PLATEAUPOINT")){
+      "PLATEAUPOINT"
+    }else{
+      # plateau line and plateau region
+      "PLATEAULINE" 
+    }
+  }
+}
+
+#' @noRd
+pcomposition_builder <- function(comps, as_pcomposition, type){
+  # Spatial plateau composition (two or more non-empty lists)
+  non_empty <- sum(sapply(list(comps$point, comps$line, comps$region), length) > 0)
+  if(non_empty >= 2){
+    result <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+    spa_add_internal(result, c(comps$point, comps$line, comps$region))
+  }else if(non_empty == 1 && !as_pcomposition){
+    if(length(comps$point)){
+      result <- create_empty_pgeometry("PLATEAUPOINT")
+      spa_add_internal(result, comps$point)
+    }else if(length(comps$line)){
+      result <- create_empty_pgeometry("PLATEAULINE")
+      spa_add_internal(result, comps$line)
+    }else if(length(comps$region)){
+      result <- create_empty_pgeometry("PLATEAUREGION")
+      spa_add_internal(result, comps$region)
+    }
+  }else if(non_empty == 1 && as_pcomposition){
+    result <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+    if(length(comps$point)){
+      spa_add_internal(result, comps$point)
+    }else if(length(comps$line)){
+      spa_add_internal(result, comps$line)
+    }else if(length(comps$region)){
+      spa_add_internal(result, comps$region)
+    }
+  }else if(non_empty == 0 && as_pcomposition){
+    create_empty_pgeometry("PLATEAUCOMPOSITION")
+  }else if(non_empty == 0 && !as_pcomposition){
+    create_empty_pgeometry(type)
+  }
+}
+
+#' @noRd
+result_handler <- function(type1, type2, obj, md, comps, check_compatibility = FALSE){
+  
+  #TODO Explain how the compatibility works
+  if(!st_is_empty(obj) && md > 0 && md <= 1){
+    
+    geom_type = st_geometry_type(obj)
+    
+    if(check_compatibility){
+      if(type1 == type2 && type1 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION") && is_compatible(obj, type1)){
+        if(type1 == "PLATEAUPOINT"){
+          comps$point <- append_comps(obj, md, comps$point)
+        }else if(type1 == "PLATEAULINE"){
+          comps$line <- append_comps(obj, md, comps$line)
+        }else if(type1 == "PLATEAUREGION"){
+          comps$region <- append_comps(obj, md, comps$region)
+        }
+      }
+    }else{
+      if(geom_type == "GEOMETRYCOLLECTION"){
+        comps$point <- append_comps(obj_union(obj, "POINT"), md, comps$point)
+        comps$line <- append_comps(obj_union(obj, "LINESTRING"), md, comps$line)
+        comps$region <- append_comps(obj_union(obj, "POLYGON"), md, comps$region)
+      }else if(geom_type %in% c("POINT", "MULTIPOINT")){
+        comps$point <- append_comps(obj, md, comps$point)
+      }else if(geom_type %in% c("LINESTRING", "MULTILINESTRING")){
+        comps$line <- append_comps(obj, md, comps$line)
+      }else if(geom_type %in% c("POLYGON", "MULTIPOLYGON")){
+        comps$region <- append_comps(obj, md, comps$region)
+      }
+    }
+  }
+  comps
+}
+
+#' @title The operation flatten
+#'
+#' @description This function gathers all the fuzzy spatial objects of a `PLATEAUCOLLECTION` and 
+#' reorganizes them into a single flattened fuzzy spatial object containing a quadruple
+#' (`PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`, `PLATEAUCOMPOSITION`) that preserves the identity of sub-objects.
+#'
+#' @usage
+#'
+#' spa_flatten(pcollection)
+#'
+#' @param pcollection A `pcollection` object.
+#'
+#' @details
+#'
+#' It gives a single flattened fuzzy spatial object, aggregating all spatial plateau objects by their types.
+#' In the case of a two-level hierarchy, i.e., there is a `PLATEAUCOLLECTION` inside the other, 
+#' the function is applied recursively in the lower levels until the quadruple is built. 
+#' The t-conorm considered in the aggregation is the `max` operator.
+#'
+#' @return
+#'
+#' A spatial plateau collection object.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#'
+#' @examples
+#'
+#' library(sf)
+#' 
+#' pts <- rbind(c(1, 2), c(3, 2))
+#' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+#' 
+#' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lcp <- component_from_sfg(st_linestring(lpts), 1)
+#' pline <- create_pgeometry(list(lcp), "PLATEAULINE", is_valid = TRUE)
+#' 
+#' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+#' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+#' rcp <- component_from_sfg(st_polygon(list(rpts1, rpts2)), 0.7)
+#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION", is_valid = TRUE)
+#' 
+#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
+#' pcollection1 <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' pcollection2 <- create_pgeometry(list(pline, pregion, pcollection1), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' pcollection2@pgos
+#' 
+#' spa_flatten(pcollection2)@pgos
+#' 
+#' @import methods
+#' @export
+spa_flatten <- function(pcollection){
+  
+  if(fsr_is_empty(pcollection)){
+    pcollection@pgos <- append(pcollection@pgos, create_empty_pgeometry("PLATEAUPOINT"))
+    pcollection@pgos <- append(pcollection@pgos, create_empty_pgeometry("PLATEAULINE"))
+    pcollection@pgos <- append(pcollection@pgos, create_empty_pgeometry("PLATEAUREGION"))
+    pcollection@pgos <- append(pcollection@pgos, create_empty_pgeometry("PLATEAUCOMPOSITION"))
+    return(pcollection)
+  }
+  
+  pgo_list <- get_pgos(pcollection)
+  types <- lapply(pgo_list, spa_get_type)
+  
+  ppoints <- pgo_list[types == "PLATEAUPOINT"]
+  plines <- pgo_list[types == "PLATEAULINE"]
+  pregions <- pgo_list[types == "PLATEAUREGION"]
+  pcompositions <- pgo_list[types == "PLATEAUCOMPOSITION"]
+  
+  ppoint <- create_empty_pgeometry("PLATEAUPOINT")
+  if(length(ppoints)){
+    ppoint <- spa_union_list(ppoints[!sapply(ppoints, fsr_is_empty)], "PLATEAUPOINT")
+  }
+  pline <- create_empty_pgeometry("PLATEAULINE")
+  if(length(plines)){
+    pline <- spa_union_list(plines[!sapply(plines, fsr_is_empty)], "PLATEAULINE")
+  }
+  pregion <- create_empty_pgeometry("PLATEAUREGION")
+  if(length(pregions)){
+    pregion <- spa_union_list(pregions[!sapply(pregions, fsr_is_empty)], "PLATEAUREGION")
+  }
+  pcomposition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+  if(length(pcompositions)){
+    pcomposition <- spa_union_list(pcompositions[!sapply(pcompositions, fsr_is_empty)], "PLATEAUCOMPOSITION")
+  }
+  
+  pgos <- c(ppoint, pline, pregion, pcomposition)
+  new("pcollection", supp = pcollection@supp, pgos = pgos)
+
+}
+
 #' @title Fuzzy geometric set operations
 #'
 #' @description Fuzzy geometric set operations are given as a family of functions that implements spatial plateau set operations.
@@ -467,11 +1014,12 @@ spa_length <- function(pgo){
 #'
 #' @usage
 #'
-#' spa_intersection(pgo1, pgo2, itype = "min")
+#' spa_intersection(pgo1, pgo2, itype = "min", as_pcomposition = FALSE)
 #'
 #' @param pgo1 A `pgeometry` object of any type.
-#' @param pgo2 A `pgeometry` object of the same type of `pgo1`.
+#' @param pgo2 A `pgeometry` object of any type.
 #' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
+#' @param as_pcomposition A logical value; if `TRUE`, it returns a spatial plateau composition object.
 #' 
 #' @name fsr_geometric_operations
 #'
@@ -511,6 +1059,7 @@ spa_length <- function(pgo){
 #' @references
 #'
 #' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
 #'
 #' @examples
 #'
@@ -546,146 +1095,169 @@ spa_length <- function(pgo){
 #'
 #' @import sf
 #' @export
-spa_intersection <- function(pgo1, pgo2, itype = "min"){
+spa_intersection <- function(pgo1, pgo2, itype = "min", as_pcomposition = FALSE){
 
-  if(pgo1@type != pgo2@type){
-    stop("Different spatial plateau data types.", call. = FALSE)
-  }
+  ##TODO should we add a short-circuit?
 
-  sigma <- match.fun(itype)
-  result <- create_empty_pgeometry(pgo1@type)
-  lcomps <- vector("list")
+  beta <- match.fun(itype)
+  comps <- list(point = list(), line = list(), region = list())
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
 
-  for(comp1 in pgo1@component){
-    obj_comp_p1 <- comp1@obj
-    md_comp_p1 <- comp1@md
+  if(type1 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION") && type2 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")){
 
-    for(comp2 in pgo2@component){
-      obj_comp_p2 <- comp2@obj
-      md_comp_p2 <- comp2@md
+    for(comp1 in pgo1@component){
+      for(comp2 in pgo2@component){
 
-      result_md = sigma(md_comp_p1, md_comp_p2)
+        result_md <- beta(comp1@md, comp2@md)
+        result_obj <- st_intersection(comp1@obj, comp2@obj)
+        comps <- result_handler(type1, type2, result_obj, result_md, comps, FALSE)
 
-      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
-
-      # check geom and pgo
-      lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
       }
+    }
+    ftype <- final_data_type(type1, type2)
+    pcomposition_builder(comps, as_pcomposition, ftype)
+    
+  }else{
+    sigma <- match.fun("spa_intersection")
+    heterogeneous_geom_comp(pgo1, pgo2, sigma, beta = itype, as_pcomposition = as_pcomposition)
+    
   }
+}
 
-  if(length(lcomps) > 0){
-    spa_add_component(result, lcomps)
-  } else {
-    result
+#' @noRd
+is_special_case <- function(type1, type2){
+  
+  if(type1 == "PLATEAULINE" && type2 == "PLATEAUREGION"){
+    TRUE
+  }else if(type1 == "PLATEAUREGION" && type2 == "PLATEAULINE"){
+    TRUE
+  }else{
+    FALSE
   }
+    
 }
 
 #' @name fsr_geometric_operations
 #' 
 #' @usage
 #' 
-#' spa_union(pgo1, pgo2, utype = "max")
+#' spa_union(pgo1, pgo2, utype = "max", as_pcomposition = FALSE)
 #' 
 #' @param utype A character value that refers to a t-conorm. The default value is `"max"`, which is the standard operator of the union.
 #' 
 #' @import sf
 #' @export
-spa_union <- function(pgo1, pgo2, utype = "max"){
-
-  if(pgo1@type != pgo2@type){
-    stop("Different spatial plateau data types.", call. = FALSE)
-  }
-
+spa_union <- function(pgo1, pgo2, utype = "max", as_pcomposition = FALSE){
+  
   tau <- match.fun(utype)
-  result <- create_empty_pgeometry(pgo1@type)
-  lcomps <- vector("list")
-
-  supp_intersected <- st_intersection(pgo1@supp, pgo2@supp)
-
-  for(comp1 in pgo1@component){
-    obj_comp_p1 <- comp1@obj
-    md_comp_p1 <- comp1@md
-
+  comps <- list(point = list(), line = list(), region = list())
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION") && type2 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")){
+    
+    if(!is_special_case(type1, type2)){
+      supp_intersected <- st_intersection(pgo1@supp, pgo2@supp)
+    }
+    
+    for(comp1 in pgo1@component){
+      obj_comp_p1 <- comp1@obj
+      md_comp_p1 <- comp1@md
+      
+      for(comp2 in pgo2@component){
+        obj_comp_p2 <- comp2@obj
+        md_comp_p2 <- comp2@md
+        
+        result_md <- tau(md_comp_p1, md_comp_p2)
+        result_obj <- st_intersection(obj_comp_p1, obj_comp_p2)
+        comps <- result_handler(type1, type2, result_obj, result_md, comps, TRUE)
+      }
+      
+      # Special case between a spatial plateau region and a spatial plateau line
+      # TODO Conduct a performance evaluation to compare both strategies (probabily the first case is faster)
+      if(is_special_case(type1, type2)){
+        sf_diff_1 <- st_difference(obj_comp_p1, pgo2@supp)
+      }else{
+        sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
+      }
+      comps <- result_handler(type1, type2, sf_diff_1, md_comp_p1, comps, FALSE)
+    }
+    
     for(comp2 in pgo2@component){
       obj_comp_p2 <- comp2@obj
       md_comp_p2 <- comp2@md
-
-      result_md = tau(md_comp_p1, md_comp_p2)
-
-      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
-
-      lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
+      
+      # Special case between a spatial plateau region and a spatial plateau line
+      if(is_special_case(type1, type2)){
+        sf_diff_2 <- st_difference(obj_comp_p2, pgo1@supp)
+      }else{
+        sf_diff_2 <- st_difference(obj_comp_p2, supp_intersected)
+      }
+      comps <- result_handler(type1, type2, sf_diff_2, md_comp_p2, comps, FALSE)
     }
-
-    sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
-    # check result type and appends to list if compatible
-    lcomps <- append_valid_comps(sf_diff_1, result, md_comp_p1, lcomps)
+    ftype <- final_data_type(type1, type2)
+    pcomposition_builder(comps, as_pcomposition, ftype)
+  }else{
+    sigma <- match.fun("spa_union")
+    heterogeneous_geom_comp(pgo1, pgo2, sigma, beta = utype, as_pcomposition = as_pcomposition)
+    
   }
-
-  for(comp2 in pgo2@component){
-    obj_comp_p2 <- comp2@obj
-    md_comp_p2 <- comp2@md
-
-    sf_diff_3 <- st_difference(obj_comp_p2, supp_intersected)
-    # check result type and appends to list if compatible
-    lcomps <- append_valid_comps(sf_diff_3, result, md_comp_p2, lcomps)
-  }
-
-  if(length(lcomps) > 0){
-    spa_add_component(result, lcomps)
-  } else {
-    result
-  }
+  
 }
 
 #' @name fsr_geometric_operations
 #' 
 #' @usage
 #' 
-#' spa_difference(pgo1, pgo2, dtype = "f_diff")
+#' spa_difference(pgo1, pgo2, dtype = "f_diff", as_pcomposition = FALSE)
 #' 
 #' @param dtype A character value that indicates the name of a difference operator. The default value is `"f_diff"`, which implements the standard fuzzy difference.
 #' 
 #' @import sf
 #' @export
-spa_difference <- function(pgo1, pgo2, dtype = "f_diff"){
-
-  if(pgo1@type != pgo2@type){
-    stop("Different spatial plateau data types.", call. = FALSE)
-  }
+spa_difference <- function(pgo1, pgo2, dtype = "f_diff", as_pcomposition = FALSE){
 
   nu <- match.fun(dtype)
-  result <- create_empty_pgeometry(pgo1@type)
-  lcomps <- vector("list")
-
-  supp_intersected <- st_intersection(pgo1@supp, pgo2@supp)
-
-  for(comp1 in pgo1@component){
-    obj_comp_p1 <- comp1@obj
-    md_comp_p1 <- comp1@md
-
-    for(comp2 in pgo2@component){
-      obj_comp_p2 <- comp2@obj
-      md_comp_p2 <- comp2@md
-
-      result_md = nu(md_comp_p1, md_comp_p2)
-
-      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
-
-      lcomps <- append_valid_comps(sf_result, result , result_md, lcomps)
+  comps <- list(point = list(), line = list(), region = list())
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION") && type2 %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")){
+    
+    if(!is_special_case(type1, type2)){
+      supp_intersected <- st_intersection(pgo1@supp, pgo2@supp)
     }
+    
+    for(comp1 in pgo1@component){
+      obj_comp_p1 <- comp1@obj
+      md_comp_p1 <- comp1@md
 
-    sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
-
-    # check result type and appends to list if compatible
-    lcomps <- append_valid_comps(sf_diff_1, result, md_comp_p1, lcomps)
+      for(comp2 in pgo2@component){
+        obj_comp_p2 <- comp2@obj
+        md_comp_p2 <- comp2@md
+        
+        result_md = nu(md_comp_p1, md_comp_p2)
+        result_obj = st_intersection(obj_comp_p1, obj_comp_p2)
+        comps <- result_handler(type1, type2, result_obj, result_md, comps, TRUE)
+        
+      }
+      # Special case between a spatial plateau region and a spatial plateau line
+      if(is_special_case(type1, type2)){
+        sf_diff_1 <- st_difference(obj_comp_p1, pgo2@supp)
+      }else{
+        sf_diff_1 <- st_difference(obj_comp_p1, supp_intersected)
+      }
+      comps <- result_handler(type1, type2, sf_diff_1, md_comp_p1, comps, FALSE)
+    }
+    ftype <- final_data_type(type1, type2)
+    pcomposition_builder(comps, as_pcomposition, ftype)
+     
+  }else{
+    sigma <- match.fun("spa_difference")
+    heterogeneous_geom_comp(pgo1, pgo2, sigma, beta = dtype, as_pcomposition = as_pcomposition)
   }
-
-  if(length(lcomps) > 0){
-    spa_add_component(result, lcomps)
-  } else {
-    result
-  }
+  
 }
 
 #' @name fsr_geometric_operations
@@ -701,42 +1273,19 @@ spa_difference <- function(pgo1, pgo2, dtype = "f_diff"){
 #' @export
 spa_common_points <- function(pline1, pline2, itype = "min"){
   
-  if(pline1@type != pline2@type){
+  .Deprecated("spa_intersection")
+  
+  type1 <- spa_get_type(pline1)
+  type2 <- spa_get_type(pline2)
+  
+  if(type1 != type2){
     stop("Different Spatial Plateau Types.", call. = FALSE)
   }
   
-  sigma <- match.fun(itype)
-  result <- create_empty_pgeometry(pline1@type)
-  lcomps <- vector("list")
+  result <- spa_intersection(pline1, pline2, itype = itype, as_pcomposition = TRUE)
   
-  for(comp1 in pline1@component){
-    obj_comp_p1 <- comp1@obj
-    md_comp_p1 <- comp1@md
-    
-    for(comp2 in pline2@component){
-      obj_comp_p2 <- comp2@obj
-      md_comp_p2 <- comp2@md
-      
-      result_md = sigma(md_comp_p1, md_comp_p2)
-      
-      sf_result <- st_intersection(obj_comp_p1, obj_comp_p2)
-      
-      if(!st_is_empty(sf_result) && st_geometry_type(sf_result) %in% c("POINT", "MULTIPOINT")){
-        result_comp <- new("component", obj = sf_result, md = result_md)
-        lcomps <- append(lcomps, result_comp)
-      } else if(!st_is_empty(sf_result) && st_geometry_type(sf_result) == "GEOMETRYCOLLECTION") {
-        type_geom = get_counter_ctype(pline1)
-        result_comp <- new("component", obj = st_union(st_collection_extract(sf_result, type = "POINT"))[[1]], md = result_md)
-        lcomps <- append(lcomps, result_comp)
-      }
-    }
-  }
+  result@ppoint
   
-  if(length(lcomps) > 0){
-    spa_add_component(result, lcomps)
-  } else {
-    result
-  }
 }
 
 #' @title Capturing the support of a `pgeometry` object
@@ -788,7 +1337,7 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
 #'
 #' @export
 spa_support <- function(pgo){
-  return(pgo@supp)
+  pgo@supp
 }
 
 #' @title Capturing the core of a `pgeometry` object
@@ -843,19 +1392,35 @@ spa_support <- function(pgo){
 #' @import sf utils
 #' @export
 spa_core <- function(pgo){
-
-  last_comp <- tail(pgo@component, 1)
-
-  if(last_comp[[1]]@md == 1){
-    return(last_comp[[1]]@obj)
+  
+  type <- spa_get_type(pgo)
+  
+  if(fsr_is_empty(pgo)){
+    sf_type <- get_counter_ctype(pgo)
+    
+    sfg_obj <- switch(sf_type,
+                      POINT = st_point(),
+                      LINESTRING = st_linestring(),
+                      POLYGON = st_polygon(),
+                      GEOMETRYCOLLECTION = st_geometrycollection())
+    return(sfg_obj)
+  }else{
+   
+    if(type == "PLATEAUCOMPOSITION"){
+      triple_core <- st_sfc(spa_core(pgo@ppoint), spa_core(pgo@pline), spa_core(pgo@pregion))
+      return(st_union(triple_core)[[1]])
+    }else if(type == "PLATEAUCOLLECTION"){
+      core_list <- lapply(pgo@pgos, spa_core)
+      return(st_union(st_sfc(core_list))[[1]])
+    }else{
+      last_comp <- tail(pgo@component, 1)
+      if(last_comp[[1]]@md == 1){
+        return(last_comp[[1]]@obj)
+      }else{
+        spa_core(create_empty_pgeometry(type))
+      }
+    } 
   }
-  sf_type <- get_counter_ctype(pgo)
-
-  sfg_obj <- switch(sf_type,
-                    POINT = st_point(),
-                    LINESTRING = st_linestring(),
-                    POLYGON = st_polygon())
-  sfg_obj
 }
 
 #' @title Check exact equality
@@ -866,8 +1431,8 @@ spa_core <- function(pgo){
 #'
 #' spa_exact_equal(pgo1, pgo2)
 #'
-#' @param pgo1 A `pgeometry` object of any type.
-#' @param pgo2 A `pgeometry` object of any type.
+#' @param pgo1 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
+#' @param pgo2 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
 #' 
 #' @details
 #'
@@ -904,6 +1469,18 @@ spa_core <- function(pgo){
 #' @import sf
 #' @export
 spa_exact_equal <- function(pgo1, pgo2){
+  
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION") || type2 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")){
+    stop("This function only deals with PLATEAUPOINT, PLATEAULINE, and PLATEAUREGION.")
+  }
+  
+  # Same type and both empty
+  if(type1 == type2 && all(sapply(c(pgo1, pgo2), fsr_is_empty))){
+    return(TRUE)
+  }
 
   comp_check <- function(comp1, comp2){
     if(st_equals(comp1@obj, comp2@obj, sparse=FALSE)[1] && (comp1@md == comp2@md)){
@@ -912,7 +1489,7 @@ spa_exact_equal <- function(pgo1, pgo2){
     return(FALSE)
   }
 
-  if((pgo1@type != pgo2@type) ||
+  if((type1 != type2) ||
      (spa_ncomp(pgo1) != spa_ncomp(pgo2)) ||
      (!(st_equals(pgo1@supp, pgo2@supp, sparse=FALSE)[1]))){
     return(FALSE)
@@ -934,8 +1511,8 @@ spa_exact_equal <- function(pgo1, pgo2){
 #'
 #' spa_exact_inside(pgo1, pgo2)
 #'
-#' @param pgo1 A `pgeometry` object of any type.
-#' @param pgo2 A `pgeometry` object of any type.
+#' @param pgo1 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
+#' @param pgo2 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
 #' 
 #' @details
 #'  
@@ -979,7 +1556,16 @@ spa_exact_equal <- function(pgo1, pgo2){
 #'
 #' @export
 spa_exact_inside <- function(pgo1, pgo2){
-  spa_exact_equal(spa_intersection(pgo1, pgo2), pgo1)
+  
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION") || type2 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")){
+    stop("This function only deals with PLATEAUPOINT, PLATEAULINE, and PLATEAUREGION.")
+  }
+  
+  intersected <- spa_intersection(pgo1, pgo2, as_pcomposition = FALSE)
+  spa_exact_equal(intersected, pgo1)
 }
 
 #' @noRd
@@ -1116,7 +1702,9 @@ spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
 
   check_spa_topological_condition(pgo1, pgo2)
 
-  r = spa_intersection(pgo1, pgo2, itype = itype)
+  r <- spa_intersection(pgo1, pgo2, itype = itype, as_pcomposition = TRUE)
+  r <- r@pregion
+  
   supp_pgo1 <- pgo1@supp
   supp_pgo2 <- pgo2@supp
 
@@ -1153,8 +1741,10 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   countour_pgo1 <- spa_contour(pgo1)
   countour_pgo2 <- spa_contour(pgo2)
 
-  p <- spa_common_points(countour_pgo1, countour_pgo2, itype = itype)
-  c <- spa_intersection(countour_pgo1, countour_pgo2, itype = itype)
+  # Common points
+  countour_int <- spa_intersection(countour_pgo1, countour_pgo2, itype = itype, as_pcomposition = TRUE)
+  p <- countour_int@ppoint
+  c <- countour_int@pline
 
   p_ncomp <- spa_ncomp(p)
   c_ncomp <- spa_ncomp(c)
@@ -1164,49 +1754,54 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   if((p_ncomp == 1) && !(st_is_empty(p_core)) ||
      (c_ncomp == 1) && !(st_is_empty(c_core))){
     result <- 1
-  }
-
-  supp_1 <- pgo1@supp
-  supp_2 <- pgo2@supp
-
-  pgo1_core <- spa_core(pgo1)
-  pgo2_core <- spa_core(pgo2)
-
-  if((st_disjoint(supp_1, supp_2, sparse=FALSE)[1]) ||
-    !(st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1]) ||
-    st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
-    spa_exact_inside(pgo1, pgo2) ||
-    spa_exact_inside(pgo2, pgo1) ||
-    spa_exact_equal(pgo1, pgo2)){
-
-    result <- 0
-  }
-
-  if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
-     st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
-     st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
-    result <- spa_avg_degree(p)
-  } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
-             st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
-             st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
-    pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = 'line')
-    pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = 'line')
-    bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
-
-    plength <- spa_length(bl)
-    length_support <- length(bl@supp)
-
-    result <- plength/length_support
-
-  } else {
-    pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = 'region')
-    pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = 'region')
-    br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
-    br_area <- spa_area(br)
-    area_support <- st_area(br@supp)
-
-    result <- br_area/area_support
-
+  }else{
+    
+    supp_1 <- pgo1@supp
+    supp_2 <- pgo2@supp
+    
+    pgo1_core <- spa_core(pgo1)
+    pgo2_core <- spa_core(pgo2)
+    
+    if((st_disjoint(supp_1, supp_2, sparse=FALSE)[1]) ||
+       !(st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1]) ||
+       st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
+       spa_exact_inside(pgo1, pgo2) ||
+       spa_exact_inside(pgo2, pgo1) ||
+       spa_exact_equal(pgo1, pgo2)){
+      
+      result <- 0
+    }else if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
+       st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
+       st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
+      result <- spa_avg_degree(p)
+    } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
+               st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
+               st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
+      pgo1_boundary <- spa_boundary(pgo1)
+      pgo1_boundary <- pgo1_boundary@pline
+      pgo2_boundary <- spa_boundary(pgo2)
+      pgo2_boundary <- pgo2_boundary@pline
+      bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype, as_pcomposition = TRUE)
+      bl <- bl@pline
+      
+      plength <- spa_length(bl)
+      length_support <- length(bl@supp)
+      
+      result <- plength/length_support
+      
+    } else {
+      pgo1_boundary <- spa_boundary(pgo1)
+      pgo1_boundary <- pgo1_boundary@pregion
+      pgo2_boundary <- spa_boundary(pgo2)
+      pgo2_boundary <- pgo2_boundary@pregion
+      br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype, as_pcomposition = TRUE)
+      br <- br@pregion
+      br_area <- spa_area(br)
+      area_support <- st_area(br@supp)
+      result <- br_area/area_support
+      
+    }
+    
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1229,18 +1824,20 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 
   if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
     result <- 1
-  }
-
-  r_overlap <- spa_overlap(pgo1, pgo2, itype = itype)
-  r_meet <- spa_meet(pgo1, pgo2)
-
-  if((r_overlap == 1) || (r_meet == 1) ||
-      spa_exact_inside(pgo1, pgo2) ||
-      spa_exact_inside(pgo2, pgo1) ||
-      spa_exact_equal(pgo2, pgo1))  {
-    result <- 0
-  } else {
-    result <- 1 - max(r_overlap, r_meet)
+  }else{
+    
+    r_overlap <- spa_overlap(pgo1, pgo2, itype = itype)
+    r_meet <- spa_meet(pgo1, pgo2)
+    
+    if((r_overlap == 1) || (r_meet == 1) ||
+       spa_exact_inside(pgo1, pgo2) ||
+       spa_exact_inside(pgo2, pgo1) ||
+       spa_exact_equal(pgo2, pgo1))  {
+      result <- 0
+    } else {
+      result <- 1 - max(r_overlap, r_meet)
+    }
+    
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1261,22 +1858,26 @@ spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
   if(spa_exact_equal(pgo1, pgo2)){
     result <- 1
-  }
-
-  supp_pgo1 <- pgo1@supp
-  supp_pgo2 <- pgo2@supp
-
-  if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
-     st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
-    result <- 0
-  } else {
-    r_diff <- spa_difference(pgo1, pgo2, dtype="f_abs_diff")
-    r_union <- spa_union(pgo1, pgo2, utype = utype)
-
-    r_spa_area <- spa_area(r_diff)
-    r_sfg_area <- st_area(r_union@supp)
-
-    result <- 1 - (r_spa_area/r_sfg_area)
+  }else{
+   
+    supp_pgo1 <- pgo1@supp
+    supp_pgo2 <- pgo2@supp
+    
+    if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+      result <- 0
+    } else {
+      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_abs_diff", as_pcomposition = TRUE)
+      r_diff <- r_diff@pregion
+      r_union <- spa_union(pgo1, pgo2, utype = utype, as_pcomposition = TRUE)
+      r_union <- r_union@pregion
+      
+      r_spa_area <- spa_area(r_diff)
+      r_sfg_area <- st_area(r_union@supp)
+      
+      result <- 1 - (r_spa_area/r_sfg_area)
+    } 
+    
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1295,20 +1896,23 @@ spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
   if(spa_exact_inside(pgo1, pgo2)){
     result <- 1
-  }
-
-  supp_pgo1 <- pgo1@supp
-  supp_pgo2 <- pgo2@supp
-
-  if(spa_equal(pgo1, pgo2, utype = utype) == 1 ||
-     st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
-     st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
-    result <- 0
-  } else {
-
-    r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff")
-
-    result <- 1 - (spa_area(r_diff)/st_area(supp_pgo1))
+  }else{
+    
+    supp_pgo1 <- pgo1@supp
+    supp_pgo2 <- pgo2@supp
+    
+    if(spa_equal(pgo1, pgo2, utype = utype) == 1 ||
+       st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+      result <- 0
+    } else {
+      
+      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff", as_pcomposition = TRUE)
+      r_diff <- r_diff@pregion
+      
+      result <- 1 - (spa_area(r_diff)/st_area(supp_pgo1))
+    }    
+    
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1386,19 +1990,28 @@ spa_contains <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 #' @import sf
 #' @export
 spa_contour <- function(pregion){
-  if(pregion@type != "PLATEAUREGION"){
+  
+  type <- spa_get_type(pregion)
+  
+  if(type != "PLATEAUREGION"){
     stop("pregion must be a PLATEAUREGION type.", call. = FALSE)
+  }
+  
+  if(fsr_is_empty(pregion)){
+    return(create_empty_pgeometry("PLATEAULINE"))
   }
 
   pregion_tibble <- as_tibble(pregion)
   pregion_tibble$boundary <- st_boundary(pregion_tibble$geometry)
   pregion_df <- as.data.frame(pregion_tibble)
-  pline <- create_pgeometry(pregion_df[,c(3,1)], "PLATEAULINE")
+  pline <- create_pgeometry(pregion_df[,c(3,2)], "PLATEAULINE")
   
   crisp_contour <- create_empty_pgeometry("PLATEAULINE")
   crisp_contour <- spa_add_component(crisp_contour, component_from_sfg(st_boundary(pregion@supp), 1))
   
-  spa_intersection(pline, crisp_contour)
+  result <- spa_intersection(pline, crisp_contour, as_pcomposition = TRUE)
+  result@pline
+  
 }
 
 pkg_env <- new.env()
@@ -1566,6 +2179,93 @@ soft_alpha_eval <- function(degree, alpha){
 
 #' @title Capturing the fuzzy boundary of a plateau region object
 #'
+#' @description This function yields the fuzzy boundary of a plateau region object.
+#'
+#' @usage
+#'
+#' spa_boundary(pgo)
+#'
+#' @param pgo A `pgeometry` object of type `PLATEAULINE`, or `PLATEAUREGION`.
+#'
+#' @details
+#'
+#' It employs the definition of _fuzzy boundary_ of a fuzzy region object in the context of spatial plateau algebra (as defined in the references). 
+#' The _fuzzy boundary_ of a fuzzy region object `A` has a heterogeneous nature since it consists of two parts:
+#' - a fuzzy line object that corresponds to the boundary of the core of `A`.
+#' - a fuzzy region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
+#' 
+#' This means that the function `spa_boundary` can yield these two parts of the fuzzy boundary of a plateau region object (the argument `pgeometry`):
+#' the boundary plateau line and the boundary plateau region (i.e., returns a `pgeometry` object of the type `PLATEAUCOMPOSITION` with these two plateau objects).
+#' 
+#' @return
+#'
+#' A `pcomposition` object that represents a fuzzy boundary of `pgeometry` object given as input.
+#'
+#' @references
+#'
+#' - [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#'
+#' @examples
+#'
+#' library(tibble)
+#' library(FuzzyR)
+#' 
+#' set.seed(123)
+#' 
+#' # some random points to create pgeometry objects by using the function spa_creator
+#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#'              y = runif(10, min = 0, max = 50), 
+#'              z = runif(10, min = 0, max = 100))
+#'
+#' classes <- c("category-1", "category-2")
+#' mf1 <- genmf("trapmf", c(0, 5, 20, 35))
+#' mf2 <- genmf("trimf", c(20, 80, 100))
+#' 
+#' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
+#' pregions$pgeometry[[1]]
+#' pregions$pgeometry[[2]]
+#' 
+#' # capturing and showing the boundary of each pgeometry object previously created
+#' (spa_boundary(pregions$pgeometry[[1]])) 
+#' (spa_boundary(pregions$pgeometry[[2]]))
+#'
+#' @import methods utils sf
+#' @export
+spa_boundary <- function(pgo){
+  
+  if(fsr_is_empty(pgo)){
+    return(create_empty_pgeometry("PLATEAUCOMPOSITION"))
+  }
+  
+  type <- spa_get_type(pgo)
+  if(!(type %in% c("PLATEAULINE", "PLATEAUREGION"))){
+    stop("pgo is not a PLATEAULINE or PLATEAUREGION object.", call. = FALSE)
+  }else{
+    comps <- list()
+    last_comp <- tail(pgo@component, 1)
+    if(last_comp[[1]]@md == 1){
+      # point or multipoint sf object (if pgo is a plateau line)
+      # linestring or multilinestring sf object (if pgo is a plateau region)
+      boundary_component <- st_boundary(last_comp[[1]]@obj)
+      comp <- new("component", obj = boundary_component, md = 1)
+      comps <- append(comps, comp)
+      n_comps <- spa_ncomp(pgo)
+      if(n_comps > 1){
+        # linestring or multilinestring sf object (if pgo is a plateau line)
+        # polygon or multipolygon sf object (if pgo is a plateau region)
+        comp <- head(pgo@component, n = n_comps-1)
+        comps <- append(comps, comp)
+      }
+    }else{
+      comps <- append(comps, pgo@component)
+    }
+    create_pgeometry(comps, type = "PLATEAUCOMPOSITION")
+  }
+}
+
+#' @title Capturing the fuzzy boundary of a plateau region object
+#'
 #' @description This function yields a specific part of the fuzzy boundary of a plateau region object.
 #'
 #' @usage
@@ -1627,11 +2327,15 @@ soft_alpha_eval <- function(degree, alpha){
 #' @import methods utils sf
 #' @export
 spa_boundary_pregion <- function(pregion, bound_part = "region"){
-
-  if(pregion@type != "PLATEAUREGION"){
+  
+  .Deprecated("spa_boundary")
+  
+  type <- spa_get_type(pregion)
+  
+  if(type != "PLATEAUREGION"){
     stop("pregion is not a PLATEAUREGION object.", call. = FALSE)
   }
-
+  
   if(bound_part == "line"){
     bpl <- create_empty_pgeometry("PLATEAULINE")
     last_comp <- tail(pregion@component, 1)
@@ -1649,7 +2353,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region"){
       bpr <- create_empty_pgeometry("PLATEAUREGION")
       bpr <- spa_add_component(bpr, head(pregion@component, n=n_comps-1))
     } else {
-      ret <- new("pgeometry", component = pregion@component, supp = pregion@supp, type = pregion@type)
+      ret <- new("pregion", component = pregion@component, supp = pregion@supp)
       return(ret)
     }
   }
@@ -1723,9 +2427,13 @@ f_abs_diff <- function(x, y){
 
 #' @noRd
 check_spa_topological_condition <- function(pgo1, pgo2){
-  if(pgo1@type != pgo2@type){
+  
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 != type2){
     stop("The spatial plateau objects have different types.", call. = FALSE)
-  } else if(pgo1@type != "PLATEAUREGION" || pgo2@type != "PLATEAUREGION") {
-    stop(paste0("This operator is not implemented to (", pgo1@type, " x ", pgo2@type, ") yet."), call. = FALSE)
+  } else if(type1 != "PLATEAUREGION" || type2 != "PLATEAUREGION") {
+    stop(paste0("This operator is not implemented to (", type1, " x ", type2, ") yet."), call. = FALSE)
   }
 }
