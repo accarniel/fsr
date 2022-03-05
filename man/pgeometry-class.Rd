@@ -8,18 +8,13 @@
 An S4 Class for representing a spatial plateau object
 }
 \details{
-A \code{pgeometry} object is composed of a list of \code{component} objects, an \code{sfg} object that represents
-the union of all crisp spatial objects of its components (i.e., the support), and its data
-type, which can be either \code{PLATEAUPOINT}, \code{PLATEAULINE}, or \code{PLATEAUREGION}.
+A \code{pgeometry} object is composed of an \code{sfg} object that represents the union
+of all crisp spatial objects of its components (i.e., the support).
 }
 \section{Slots}{
 
 \describe{
-\item{\code{component}}{A list of components.}
-
 \item{\code{supp}}{An \code{sfg} object that stores the union of the spatial objects of the components of the spatial plateau object.}
-
-\item{\code{type}}{The data type of the spatial plateau object.}
 }}
 
 \references{

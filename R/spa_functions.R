@@ -56,7 +56,7 @@
 #' # appending these components into a pgeometry object
 #' 
 #' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lcp <- component_from_sfg(st_linestring(lpts1), 0.4)
+#' lcp <- component_from_sfg(st_linestring(lpts), 0.4)
 #' pc <- spa_add_component(pc, list(lcp))
 #' pc
 #'
@@ -958,11 +958,11 @@ result_handler <- function(type1, type2, obj, md, comps, check_compatibility = F
 #' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION", is_valid = TRUE)
 #' 
 #' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
-#' pcollection1 <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION", is_valid = TRUE)
-#' pcollection2 <- create_pgeometry(list(pline, pregion, pcollection1), "PLATEAUCOLLECTION", is_valid = TRUE)
-#' pcollection2@pgos
+#' pcol1 <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' pcol2 <- create_pgeometry(list(pline, pregion, pcol1), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' pcol2
 #' 
-#' spa_flatten(pcollection2)@pgos
+#' spa_flatten(pcol2)
 #' 
 #' @import methods
 #' @export
@@ -1565,7 +1565,12 @@ spa_exact_inside <- function(pgo1, pgo2){
   }
   
   intersected <- spa_intersection(pgo1, pgo2, as_pcomposition = FALSE)
-  spa_exact_equal(intersected, pgo1)
+  if(spa_get_type(intersected) == 'PLATEAUCOMPOSITION') {
+    FALSE
+  } else {
+    # TODO implement the spa_exact_equal for PLATEAUCOMPOSITION
+    spa_exact_equal(intersected, pgo1)
+  }
 }
 
 #' @noRd
@@ -2297,6 +2302,7 @@ spa_boundary <- function(pgo){
 #'
 #' @examples
 #'
+#' \dontrun{
 #' library(tibble)
 #' library(FuzzyR)
 #' 
@@ -2315,6 +2321,8 @@ spa_boundary <- function(pgo){
 #' pregions$pgeometry[[1]]
 #' pregions$pgeometry[[2]]
 #' 
+#' # these functions are now deprecated, use `spa_boundary`
+#' 
 #' # capturing and showing the boundary plateau line of each pgeometry object previously created
 #' (spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
 #' (spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
@@ -2323,6 +2331,7 @@ spa_boundary <- function(pgo){
 #' # capturing and showing the boundary plateau region (this is the default behavior)
 #' (spa_boundary_pregion(pregions$pgeometry[[1]]))
 #' (spa_boundary_pregion(pregions$pgeometry[[2]]))
+#' }
 #'
 #' @import methods utils sf
 #' @export

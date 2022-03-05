@@ -16,7 +16,7 @@
 }
 \value{
 A tibble object of size \verb{n x 2} where \code{n} is the number of components of
-the \code{pgeometry} object and two columns in the format \verb{(md, geometry)}.
+the \code{pgeometry} object and two columns in the format \verb{(geometry, md)}.
 }
 \description{
 We can convert a \code{pgeometry} object into tabular data, such as a \code{tibble} or \code{data.frame} object,

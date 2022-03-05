@@ -8,7 +8,7 @@ create_empty_pgeometry(type)
 }
 \arguments{
 \item{type}{A character value indicating the data type of the \code{pgeometry} object.
-It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"} or \code{"PLATEAUREGION"}.}
+It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"}, \code{"PLATEAUREGION"}, \code{"PLATEAUCOMPOSITION"} or \code{"PLATEAUCOLLECTION"}.}
 }
 \value{
 A \code{pgeometry} object.
@@ -30,5 +30,11 @@ empty_plateau_line <- create_empty_pgeometry("PLATEAULINE")
 
 # Creating an Empty Plateau Region object
 empty_plateau_region <- create_empty_pgeometry("PLATEAUREGION")
+
+# Creating an Empty Plateau Composition object
+empty_plateau_composition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+
+# Creating an Empty Plateau Collection object
+empty_plateau_collection <- create_empty_pgeometry("PLATEAUCOLLECTION")
 
 }

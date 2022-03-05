@@ -7,9 +7,9 @@
 spa_exact_equal(pgo1, pgo2)
 }
 \arguments{
-\item{pgo1}{A \code{pgeometry} object of any type.}
+\item{pgo1}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
 
-\item{pgo2}{A \code{pgeometry} object of any type.}
+\item{pgo2}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
 }
 \value{
 A Boolean value that indicates if two \code{pgeometry} objects are exactly equal.

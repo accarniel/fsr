@@ -4,12 +4,14 @@
 \alias{spa_add_component}
 \title{Adding components to a \code{pgeometry} object}
 \usage{
-spa_add_component(pgo, components)
+spa_add_component(pgo, components, is_valid = FALSE)
 }
 \arguments{
 \item{pgo}{A \code{pgeometry} object of any type.}
 
 \item{components}{A \code{component} object or a list of \code{component} objects.}
+
+\item{is_valid}{A Boolean value to check if the user wants to validate the updated spatial plateau object at the end. If \code{is_valid = TRUE}, it calls \code{validObject} method.}
 }
 \value{
 A \code{pgeometry} object containing the \code{component} objects.
@@ -18,6 +20,9 @@ A \code{pgeometry} object containing the \code{component} objects.
 This function adds components to a spatial plateau object (i.e., \code{pgeometry} object).
 The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
 For instance, a \code{pgeometry} object of the type \code{PLATEAUREGION} accepts only components containing polygons (e.g., \code{POLYGON} or \code{MULTIPOLYGON}).
+In the case of \code{PLATEAUCOMPOSITION} object, formed by a triple (\code{PLATEAUPOINT}, \code{PLATEAULINE} and \code{PLATEAUREGION}), any type of component is compatible to be added.
+Thus, a component of type \code{POINT}, for example, will be added to the \code{PLATEAUPOINT} in which it is composed.
+On the other hand, as a \code{PLATEAUCOLLECTION} object can have multiple spatial objects of the same type, this function is not applicable to it.
 }
 \details{
 This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
@@ -29,6 +34,8 @@ However, this function assumes that a component is compatible with the \code{pge
 
 library(sf)
 
+# For a `PLATEAUPOINT` object.
+
 pts1 <- rbind(c(1, 2), c(3, 2))
 comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
 comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
@@ -38,6 +45,20 @@ comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)
 pp <- create_empty_pgeometry("PLATEAUPOINT")
 pp <- spa_add_component(pp, list(comp1, comp2))
 pp
+
+# For a `PLATEAUCOMPOSITION` object.
+
+pts <- rbind(c(1, 2), c(3, 2))
+pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
+pc
+
+# appending these components into a pgeometry object
+
+lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+lcp <- component_from_sfg(st_linestring(lpts), 0.4)
+pc <- spa_add_component(pc, list(lcp))
+pc
 
 }
 \references{

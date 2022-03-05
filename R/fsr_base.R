@@ -103,7 +103,7 @@ spa_is_valid <- function(object){
 
 #' An S4 Class for representing a plateau point object (subclass of `pgeometry`)
 #'
-#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot supp It is inherited from `pgeometry`.
 #' @slot component A list of components.
 #' 
 #' @details 
@@ -130,7 +130,7 @@ setValidity("ppoint", function(object){
 
 #' An S4 Class for representing a plateau line object (subclass of `pgeometry`)
 #'
-#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot supp It is inherited from `pgeometry`.
 #' @slot component A list of components.
 #' 
 #' @details 
@@ -157,7 +157,7 @@ setValidity("pline", function(object){
 
 #' An S4 Class for representing a plateau region object (subclass of `pgeometry`)
 #'
-#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot supp It is inherited from `pgeometry`.
 #' @slot component A list of components.
 #' 
 #' @details 
@@ -184,10 +184,10 @@ setValidity("pregion", function(object){
 
 #' An S4 Class for representing a plateau composition object (subclass of `pgeometry`)
 #'
-#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot supp It is inherited from `pgeometry`.
 #' @slot ppoint An S4 Class for representing a plateau point object.
-#' @slot ppline An S4 Class for representing a plateau line object.
-#' @slot ppregion An S4 Class for representing a plateau region object.
+#' @slot pline An S4 Class for representing a plateau line object.
+#' @slot pregion An S4 Class for representing a plateau region object.
 #' 
 #' @details 
 #' 
@@ -247,7 +247,7 @@ setValidity("pcomposition", function(object){
 
 #' An S4 Class for representing a plateau collection object (subclass of `pgeometry`)
 #'
-#' @contains `pgeometry` An S4 Class for representing a spatial plateau object.
+#' @slot supp It is inherited from `pgeometry`.
 #' @slot pgos A list of spatial plateau objects.
 #' 
 #' @details 

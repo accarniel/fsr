@@ -13,18 +13,14 @@ spa_avg_degree(pgo)
 
 spa_ncomp(pgo)
 
-spa_area(pr)
+spa_area(pgo)
 
-spa_perimeter(pr)
+spa_perimeter(pgo)
 
-spa_length(pl)
+spa_length(pgo)
 }
 \arguments{
-\item{pgo}{A \code{pgeometry} object of any type.}
-
-\item{pr}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
-
-\item{pl}{A \code{pgeometry} object of the type \code{PLATEAULINE}. It throws an error if a different type is given.}
+\item{pgo}{A \code{pgeometry} object of the type \code{PLATEAULINE}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION}. It throws a warning if a different type is given.}
 }
 \value{
 A numerical value.
@@ -46,9 +42,9 @@ The type-independent functions are:
 The remaining functions are \emph{type-dependent}. This means that the parameter have to be of a specific type.
 The type-dependent functions are:
 \itemize{
-\item \code{spa_area} computes the area of a plateau region object. Thus, its parameter has to be a \code{PLATEAUREGION} object.
-\item \code{spa_perimeter} computes the perimeter of a plateau region object. Thus, its parameter has to be a \code{PLATEAUREGION} object.
-\item \code{spa_length} computes the length of a plateau line object. Thus, its parameter has to be a \code{PLATEAULINE} object.
+\item \code{spa_area} computes the area of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
+\item \code{spa_perimeter} computes the perimeter of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
+\item \code{spa_length} computes the length of a plateau line, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAULINE}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
 }
 }
 \examples{
