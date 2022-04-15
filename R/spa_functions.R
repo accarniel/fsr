@@ -787,11 +787,14 @@ spa_support <- function(pgo){
 #' @export
 spa_core <- function(pgo){
 
-  last_comp <- tail(pgo@component, 1)
-
-  if(last_comp[[1]]@md == 1){
-    return(last_comp[[1]]@obj)
-  }
+  if(!fsr_is_empty(pgo)) {
+    last_comp <- tail(pgo@component, 1)
+    
+    if(last_comp[[1]]@md == 1){
+      return(last_comp[[1]]@obj)
+    }
+  } 
+  
   sf_type <- get_counter_ctype(pgo)
 
   sfg_obj <- switch(sf_type,
