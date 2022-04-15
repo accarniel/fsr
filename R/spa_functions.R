@@ -294,8 +294,12 @@ spa_avg_degree <- function(pgo){
   get_md <- function(comp){
     comp@md
   }
-  mds_vec <- unlist(lapply(pgo@component, get_md))
-  mean(mds_vec)
+  if(!fsr_is_empty(pgo)) {
+    mds_vec <- sapply(pgo@component, get_md)
+    mean(mds_vec)
+  } else {
+    0
+  }
 }
 
 #' @name fsr_numerical_operations
