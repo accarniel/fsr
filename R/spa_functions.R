@@ -1713,9 +1713,9 @@ spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   supp_pgo1 <- pgo1@supp
   supp_pgo2 <- pgo2@supp
 
-  result <- 0
+  result <- NULL
 
-  if(spa_ncomp(r) == 1 && !(st_is_empty(spa_core(r)))){
+  if(spa_ncomp(r) == 1 && !st_is_empty(spa_core(r))){
     result <- 1
   } else if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
             st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
@@ -1755,12 +1755,13 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   c_ncomp <- spa_ncomp(c)
   p_core <- spa_core(p)
   c_core <- spa_core(c)
+  
+  result <- NULL
 
-  if((p_ncomp == 1) && !(st_is_empty(p_core)) ||
-     (c_ncomp == 1) && !(st_is_empty(c_core))){
+  if((p_ncomp == 1 && !st_is_empty(p_core)) ||
+     (c_ncomp == 1 && !st_is_empty(c_core))){
     result <- 1
-  }else{
-    
+  } else {    
     supp_1 <- pgo1@supp
     supp_2 <- pgo2@supp
     
@@ -1775,7 +1776,7 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
        spa_exact_equal(pgo1, pgo2)){
       
       result <- 0
-    }else if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
+    } else if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
        st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
        st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
       result <- spa_avg_degree(p)
@@ -1790,7 +1791,7 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
       bl <- bl@pline
       
       plength <- spa_length(bl)
-      length_support <- length(bl@supp)
+      length_support <- st_length(bl@supp)
       
       result <- plength/length_support
       
@@ -1825,7 +1826,7 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 
   supp_pgo1 <- pgo1@supp
   supp_pgo2 <- pgo2@supp
-  result <- 0
+  result <- NULL
 
   if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
     result <- 1
@@ -1860,11 +1861,11 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgo1, pgo2)
+  result <- NULL
 
   if(spa_exact_equal(pgo1, pgo2)){
     result <- 1
-  }else{
-   
+  } else {   
     supp_pgo1 <- pgo1@supp
     supp_pgo2 <- pgo2@supp
     
@@ -1898,11 +1899,11 @@ spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgo1, pgo2)
+  result <- NULL
 
   if(spa_exact_inside(pgo1, pgo2)){
     result <- 1
-  }else{
-    
+  } else {    
     supp_pgo1 <- pgo1@supp
     supp_pgo2 <- pgo2@supp
     
