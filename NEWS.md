@@ -2,6 +2,10 @@
 
 Changes in the development version of the _fsr_ package
 
+## Bug fixes
+
+- Fix the fuzzy numerical operations when dealing with empty objects
+
 # fsr 1.0.1
 
 ## Major changes
