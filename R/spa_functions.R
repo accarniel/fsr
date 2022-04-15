@@ -1066,9 +1066,9 @@ spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   supp_pgo1 <- pgo1@supp
   supp_pgo2 <- pgo2@supp
 
-  result <- 0
+  result <- NULL
 
-  if(spa_ncomp(r) == 1 && !(st_is_empty(spa_core(r)))){
+  if(spa_ncomp(r) == 1 && !st_is_empty(spa_core(r))){
     result <- 1
   } else if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
             st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
@@ -1106,53 +1106,51 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   c_ncomp <- spa_ncomp(c)
   p_core <- spa_core(p)
   c_core <- spa_core(c)
+  
+  result <- NULL
 
-  if((p_ncomp == 1) && !(st_is_empty(p_core)) ||
-     (c_ncomp == 1) && !(st_is_empty(c_core))){
+  if((p_ncomp == 1 && !st_is_empty(p_core)) ||
+     (c_ncomp == 1 && !st_is_empty(c_core))) {
     result <- 1
-  }
-
-  supp_1 <- pgo1@supp
-  supp_2 <- pgo2@supp
-
-  pgo1_core <- spa_core(pgo1)
-  pgo2_core <- spa_core(pgo2)
-
-  if((st_disjoint(supp_1, supp_2, sparse=FALSE)[1]) ||
-    !(st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1]) ||
-    st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
-    spa_exact_inside(pgo1, pgo2) ||
-    spa_exact_inside(pgo2, pgo1) ||
-    spa_exact_equal(pgo1, pgo2)){
-
-    result <- 0
-  }
-
-  if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
-     st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
-     st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
-    result <- spa_avg_degree(p)
-  } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
-             st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
-             st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
-    pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = 'line')
-    pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = 'line')
-    bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
-
-    plength <- spa_length(bl)
-    length_support <- length(bl@supp)
-
-    result <- plength/length_support
-
   } else {
-    pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = 'region')
-    pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = 'region')
-    br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
-    br_area <- spa_area(br)
-    area_support <- st_area(br@supp)
-
-    result <- br_area/area_support
-
+    supp_1 <- pgo1@supp
+    supp_2 <- pgo2@supp
+  
+    pgo1_core <- spa_core(pgo1)
+    pgo2_core <- spa_core(pgo2)
+  
+    if(st_disjoint(supp_1, supp_2, sparse=FALSE)[1] ||
+      !st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
+      st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
+      spa_exact_inside(pgo1, pgo2) ||
+      spa_exact_inside(pgo2, pgo1) ||
+      spa_exact_equal(pgo1, pgo2)){
+  
+      result <- 0
+    } else if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
+       st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
+       st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
+      result <- spa_avg_degree(p)
+    } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
+               st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
+               st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
+      pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = "line")
+      pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = "line")
+      bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
+  
+      plength <- spa_length(bl)
+      length_support <- st_length(bl@supp)
+  
+      result <- plength/length_support
+    } else {
+      pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = "region")
+      pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = "region")
+      br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
+      br_area <- spa_area(br)
+      area_support <- st_area(br@supp)
+  
+      result <- br_area/area_support
+    }
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1171,22 +1169,23 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 
   supp_pgo1 <- pgo1@supp
   supp_pgo2 <- pgo2@supp
-  result <- 0
+  
+  result <- NULL
 
   if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
     result <- 1
-  }
-
-  r_overlap <- spa_overlap(pgo1, pgo2, itype = itype)
-  r_meet <- spa_meet(pgo1, pgo2)
-
-  if((r_overlap == 1) || (r_meet == 1) ||
-      spa_exact_inside(pgo1, pgo2) ||
-      spa_exact_inside(pgo2, pgo1) ||
-      spa_exact_equal(pgo2, pgo1))  {
-    result <- 0
   } else {
-    result <- 1 - max(r_overlap, r_meet)
+    r_overlap <- spa_overlap(pgo1, pgo2, itype = itype)
+    r_meet <- spa_meet(pgo1, pgo2)
+  
+    if(r_overlap == 1 || r_meet == 1 ||
+        spa_exact_inside(pgo1, pgo2) ||
+        spa_exact_inside(pgo2, pgo1) ||
+        spa_exact_equal(pgo2, pgo1))  {
+      result <- 0
+    } else {
+      result <- 1 - max(r_overlap, r_meet)
+    }
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1204,25 +1203,26 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgo1, pgo2)
-
+  result <- NULL
+  
   if(spa_exact_equal(pgo1, pgo2)){
     result <- 1
-  }
-
-  supp_pgo1 <- pgo1@supp
-  supp_pgo2 <- pgo2@supp
-
-  if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
-     st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
-    result <- 0
   } else {
-    r_diff <- spa_difference(pgo1, pgo2, dtype="f_abs_diff")
-    r_union <- spa_union(pgo1, pgo2, utype = utype)
-
-    r_spa_area <- spa_area(r_diff)
-    r_sfg_area <- st_area(r_union@supp)
-
-    result <- 1 - (r_spa_area/r_sfg_area)
+    supp_pgo1 <- pgo1@supp
+    supp_pgo2 <- pgo2@supp
+  
+    if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+      result <- 0
+    } else {
+      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_abs_diff")
+      r_union <- spa_union(pgo1, pgo2, utype = utype)
+  
+      r_spa_area <- spa_area(r_diff)
+      r_sfg_area <- st_area(r_union@supp)
+  
+      result <- 1 - (r_spa_area/r_sfg_area)
+    }
   }
   spa_eval_relation(ret, result, ...)
 }
@@ -1238,23 +1238,22 @@ spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 
   check_spa_topological_condition(pgo1, pgo2)
-
+  result <- NULL
+  
   if(spa_exact_inside(pgo1, pgo2)){
     result <- 1
-  }
-
-  supp_pgo1 <- pgo1@supp
-  supp_pgo2 <- pgo2@supp
-
-  if(spa_equal(pgo1, pgo2, utype = utype) == 1 ||
-     st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
-     st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
-    result <- 0
-  } else {
-
-    r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff")
-
-    result <- 1 - (spa_area(r_diff)/st_area(supp_pgo1))
+  } else { 
+    supp_pgo1 <- pgo1@supp
+    supp_pgo2 <- pgo2@supp
+  
+    if(spa_equal(pgo1, pgo2, utype = utype) == 1 ||
+       st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
+       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+      result <- 0
+    } else {
+      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff")
+      result <- 1 - (spa_area(r_diff)/st_area(supp_pgo1))
+    }
   }
   spa_eval_relation(ret, result, ...)
 }
