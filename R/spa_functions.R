@@ -319,20 +319,22 @@ spa_ncomp <- function(pgo){
 #'  
 #' @import sf
 #' @export
-spa_area <- function(pr){
-
-  if(pr@type != "PLATEAUREGION"){
-    stop("The input is not a PLATEAUREGION object.", call. = FALSE)
+spa_area <- function(pr) {
+  if(pr@type != "PLATEAUREGION") {
+    warning("The input is not a PLATEAUREGION object.", call. = FALSE)
+    0
+  } else if(!fsr_is_empty(pr)) {
+    area_comp <- function(comp){
+      md_comp = comp@md
+      area_obj = st_area(comp@obj)
+      area_obj * md_comp
+    }
+    
+    comps_areas <- sapply(pr@component, area_comp)
+    sum(comps_areas)
+  } else {
+    0
   }
-
-  area_comp <- function(comp){
-    md_comp = comp@md
-    area_obj = st_area(comp@obj)
-    area_obj * md_comp
-  }
-
-  comps_areas <- unlist(lapply(pr@component, area_comp))
-  sum(comps_areas)
 }
 
 #' @name fsr_numerical_operations
@@ -343,22 +345,24 @@ spa_area <- function(pr){
 #'  
 #' @import sf lwgeom
 #' @export
-spa_perimeter <- function(pr){
-  
-  if(pr@type != "PLATEAUREGION"){
-    stop("The input is not a PLATEAUREGION object.", call. = FALSE)
+spa_perimeter <- function(pr) {
+  if(pr@type != "PLATEAUREGION") {
+    warning("The input is not a PLATEAUREGION object.", call. = FALSE)
+    0
+  } else if(!fsr_is_empty(pr)) {
+    perimeter_comp <- function(comp) {
+      md_comp = comp@md
+      temp <- st_sfc(comp@obj)
+      st_set_crs(temp, 4326)
+      perimeter_obj = st_perimeter(temp)
+      perimeter_obj * md_comp
+    }
+    
+    comps_perimeter <- sapply(pr@component, perimeter_comp)
+    sum(comps_perimeter)
+  } else {
+    0
   }
-  
-  perimeter_comp <- function(comp){
-    md_comp = comp@md
-    temp <- st_sfc(comp@obj)
-    st_set_crs(temp, 4326)
-    perimeter_obj = st_perimeter(temp)
-    perimeter_obj * md_comp
-  }
-  
-  comps_perimeter <- unlist(lapply(pr@component, perimeter_comp))
-  sum(comps_perimeter)
 }
 
 #' @name fsr_numerical_operations
@@ -371,20 +375,22 @@ spa_perimeter <- function(pr){
 #'  
 #' @import sf
 #' @export
-spa_length <- function(pl){
-
-  if(pl@type != "PLATEAULINE"){
-    stop("The input is not a PLATEAULINE object.", call. = FALSE)
+spa_length <- function(pl) {
+  if(pl@type != "PLATEAULINE") {
+    warning("The input is not a PLATEAULINE object.", call. = FALSE)
+    0
+  } else if(!fsr_is_empty(pl)) {
+    length_comp <- function(comp){
+      md_comp = comp@md
+      length_obj = st_length(comp@obj)
+      length_obj * md_comp
+    }
+  
+    components_lenghts <- sapply(pl@component, length_comp)
+    sum(components_lenghts)
+  } else {
+    0
   }
-
-  length_comp <- function(comp){
-    md_comp = comp@md
-    length_obj = st_length(comp@obj)
-    length_obj * md_comp
-  }
-
-  components_lenghts <- unlist(lapply(pl@component, length_comp))
-  sum(components_lenghts)
 }
 
 
