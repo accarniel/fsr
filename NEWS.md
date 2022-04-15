@@ -6,6 +6,7 @@ Changes in the development version of the _fsr_ package
 
 - Fix the fuzzy numerical operations when dealing with empty objects
 - Fix the `spa_core` to return an empty crisp spatial object when the input has not a core
+- Fix some if statements and calculations in the fuzzy topological relationships
 
 # fsr 1.0.1
 
