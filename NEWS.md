@@ -1,6 +1,12 @@
-# fsr 1.0.1.9000 
+# fsr 1.0.1.9000 (development version)
 
-Changes in the development version of the _fsr_ package
+## Major changes
+
+- Add a new fuzzification policy in the `spa_creator` function based on the Multiple Endmember Spectral Mixture Analysis (MESMA) from the package `RStoolbox` (implementation from the issue [#32](https://github.com/accarniel/fsr/issues/32))
+
+## Minor changes
+
+- Add the parameter `dTolerance` in the function `spa_creator`. This parameter is employed by the package `sf` when computing the Voronoi diagram and Delaunay triangulation in the correspondingly construction policies.
 
 ## Bug fixes
 

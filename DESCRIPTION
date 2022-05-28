@@ -21,7 +21,9 @@ Imports: rlang (>= 0.4.11),
          pso (>= 1.0.3),
          e1071 (>= 1.7.3),
          utils (>= 3.6.3),
-         lwgeom (>= 0.2.6)
+         lwgeom (>= 0.2.6),
+         RStoolbox (>= 0.2.6),
+         raster (>= 3.5.15)
 Description: Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
     It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
     It implements underlying concepts defined in the following research papers: 
@@ -30,7 +32,7 @@ Description: Support for fuzzy spatial objects, their operations, and fuzzy spat
     (iii) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" <doi:10.1109/FUZZ-IEEE.2017.8015707>.
 License: GPL-3
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: no
 Encoding: UTF-8

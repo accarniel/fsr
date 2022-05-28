@@ -1,6 +1,6 @@
 #' Fuzzy set policy for the fuzzification stage, as described in the following paper
 #'
-#'  Carniel, A. C.; Schneider, M.
+#' Carniel, A. C.; Schneider, M.
 #' A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets.
 #' In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.
 #' <https://doi.org/10.1109/FUZZ-IEEE.2019.8858878>
@@ -120,6 +120,61 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
   result
 }
 
+#' Mesma policy, based based on the spectral mixture analysis which is implemented using the Multiple Endmember Spectral Mixture Analysis (MESMA) from the RStoolbox package.
+#'
+#' @param tbl A character vector to specify the full path of the satellite image in .tif format.
+#' @param class_samples A data.frame with end members of the interest classes to be mapped. Obtained via image satellite. In the columns: first column: inters classes; other columns: band names (same as satellite image) and rows must present the pixels value by interest class.
+#'
+#' @return a tibble containing `n` new attributes, where `n` corresponds to the classes.
+#'
+#' @examples
+#'
+#' library(e1071)
+#' set.seed(7)
+#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' fcp <- fuzzy_clustering_policy(tbl, 3)
+#' fcp
+#'
+#' @importFrom RStoolbox mesma
+#' @importFrom raster brick
+#' @importFrom raster nbands
+#' @importFrom raster as.data.frame
+#' @import tibble 
+#' @noRd
+mesma_policy <- function(tbl, class_samples, ...) {
+  if(!is.character(tbl)) {
+    stop("The path to the image must be a character vector", call. = FALSE)
+  }
+  
+  # first, we need to read the image by using the package raster  
+  img_brick <- brick(tbl)
+  
+  n_columns_dataframe <- ncol(class_samples)
+  nbands <- nbands(img_brick)
+  
+  if (n_columns_dataframe != nbands) { 
+    stop("Number of bands is different from the number of the dataframe columns", call. = FALSE)
+  }
+  
+  # second, we call the Multiple Endmember Spectral Mixture Analysis (MESMA) by using the package RStoolbox
+  # the mesma function has only one possible method (i.e., NNLS)
+  # mesma is one type of spectral mixture analysis 
+  probs <- mesma(img_brick, class_samples, method = "NNLS")
+
+  # then, we return the result of the mesma as a tibble
+  result <- as_tibble(raster::as.data.frame(probs, xy = TRUE))
+  result <- result[, c(1, 2, ncol(result), 3:(ncol(result)-1))]
+  
+  # we need to "regularize" the membership degrees
+  # all degrees greater than 1, will be 1
+  # all degrees lesser than 0, will be 0
+  result[ , 4:ncol(result)][result[ , 4:ncol(result)] > 1] <- 1
+  result[ , 4:ncol(result)][result[ , 4:ncol(result)] < 0] <- 0
+  
+  result
+}
+
+
 #' Auxiliary function to process and return a list containing either Voronoi cells or triangles from the Delaunay triangulation
 #'
 #' @param sf An `sf` object containing point objects. This sf object should be created from the tibble resulted from the fuzzification stage
@@ -150,13 +205,13 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 #'
 #' @import sf
 #' @noRd
-voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
+voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL, dTolerance = 0) {
   # it follows the example in https://r-spatial.github.io/sf/reference/geos_unary.html
 
   desired_op <- match.fun(op)
 
   # computing the desired operation provided by the param op
-  pols <- st_collection_extract(desired_op(do.call(c, st_geometry(sf))))
+  pols <- st_collection_extract(desired_op(do.call(c, st_geometry(sf)), dTolerance = dTolerance))
 
   # lets make a clipping to our base_poly, if it is provided
   if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
@@ -166,16 +221,16 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
   pols
 }
 
-
 #' Voronoi diagram policy for the construction stage, as described in the following paper
 #'
-#'  Carniel, A. C.; Schneider, M.
+#' Carniel, A. C.; Schneider, M.
 #' A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets.
 #' In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.
 #' <https://doi.org/10.1109/FUZZ-IEEE.2019.8858878>
 #'
 #' @param lp A data.frame or tibble with the labeled points in the format: (x, y, z, ...) where ... are attributes added by the fuzzification step
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
+#' @param dTolerance A numeric parameter that is applied to the `st_voronoi`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble in the format (class, pgeometry)
@@ -199,13 +254,13 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
 #'
 #' @import sf tibble
 #' @noRd
-voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
+voronoi_diagram_policy <- function(lp, base_poly = NULL, dTolerance = 0, ...) {
   pts <- st_as_sf(lp, coords = c(1, 2))
 
   cls <- colnames(lp)[-c(1:3)]
   pgo <- vector("list")
 
-  cells <- voronoi_delaunay_prep(pts, base_poly = base_poly)
+  cells <- voronoi_delaunay_prep(pts, base_poly = base_poly, dTolerance = dTolerance)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
 
   #producing the result: we have a plateau spatial object for each class
@@ -229,6 +284,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #' @param lp A data.frame or tibble with the labeled points in the format: (x, y, z, ...) where ... are attributes added by the fuzzification step
 #' @param tnorm A t-norm used to calculate the membership degree of the triangle. It should be the name of a vector function (e.g., "prod", "min").
 #' @param base_poly An `sfg` object that will be used to clip the generated polygons (optional argument)
+#' @param dTolerance A numeric parameter that is applied to the `st_voronoi`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble in the format (class, pgeometry)
@@ -255,7 +311,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
 #'
 #' @import sf methods tibble
 #' @noRd
-delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, ...) {
+delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, dTolerance = 0, ...) {
   #should we validate the possible acceptable functions?
   sigma <- match.fun(tnorm)
 
@@ -264,7 +320,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
   cls <- colnames(lp)[-c(1:3)]
   pgo <- vector("list")
 
-  triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = base_poly)
+  triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = base_poly, dTolerance = dTolerance)
   # getting the indexes of the points of each triangle as a sparse geometry binary predicate list
   triangs_p_int <- st_intersects(triangs, pts)
 
@@ -281,7 +337,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
 
 #' Convex hull policy for the construction stage, as described in the following paper
 #'
-#'  Carniel, A. C.; Schneider, M.
+#' Carniel, A. C.; Schneider, M.
 #' A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets.
 #' In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.
 #' <https://doi.org/10.1109/FUZZ-IEEE.2019.8858878>
@@ -363,7 +419,7 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
 #'
 #' spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 #'
-#' @param tbl A data.frame or tibble with the following format: (x, y, z)
+#' @param tbl A data.frame or tibble with the following format: (x, y, z). It can be also the full path to an image when using the _mesma_ policy.
 #' @param fuzz_policy The fuzzification policy to be employed by the algorithm. See details below.
 #' @param const_policy The construction policy to be used by the algorithm. See details below.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Parameters for the chosen policies. See details below.
@@ -375,10 +431,12 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
 #' The input `tbl` is a point dataset where each point represents the location of a phenomenon treated by the application.
 #' Further, each point is annotated with numerical data that describe its meaning in the application.
 #' Therefore, `tbl` must have three columns: (_x_, _y_, _z_). The columns _x_, _y_ are the pair of coordinates, and _z_ is the column containing domain-specific numeric values.
+#' 
+#' If you are using the _mesma_ policy, `tbl` must be a character vector that specifies the full path of the satellite image in GeoTIFF format (.tif).
 #'
 #' `fuzz_policy` refers to the method used by the **fuzzification stage**.
 #' This stage aims to assign membership degrees to each point of the dataset.
-#' It accepts two possible values only: either `"fsp"` (default) or "`fcp"`.
+#' It accepts three possible values only: `"fsp"` (default), `"fcp"`, and `"mesma"`.
 #'
 #' `"fsp"` stands for _fuzzy set policy_ and requires two parameters that should be informed in `...`:
 #' - `classes`: A character vector containing the name of classes
@@ -390,9 +448,12 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
 #' - `use_coords`: A Boolean value to indicate whether the columns (x, y) should be used in the clustering algorithm (default is `FALSE`)
 #' - `iter`: A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
 #' 
+#' `"mesma"` stands for _Multiple Endmember Spectral Mixture Analysis_, which is based on the spectral mixture analysis. Its additional required parameter is:
+#' - `class_samples`: A data.frame with end members of the interest classes to be mapped. It is obtained via image satellite. It follows the same structure of the parameter `em` of the function `mesma` from the `RStoolbox` package.
+#' 
 #' An optional and common parameter for both fuzzification stages is the `"digits"`. 
 #' This is an integer value that indicates the number of decimal digits of the membership degrees calculated by the fuzzification stage.
-#' That is, it is used to round such membership degrees to a specified number of decimal digits.
+#' That is, it is used to **round** membership degrees to the specified number of decimal places.
 #' Be careful with this optional parameter! If you specify a low value for `"digits"` some membership degrees could be rounded to 0 and thus, some components would not be created.
 #'
 #' `const_policy` refers to the method used by the **construction stage**.
@@ -401,17 +462,19 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
 #'
 #' `"voronoi"` stands for _Voronoi diagram policy_ and has one optional parameter that can be provided in `...`:
 #' - `base_poly`: An `sfg` object that will be used to clip the generated polygons (optional argument). If this parameter is not provided, the Voronoi is created by using a bounding box (standard behavior of `sf`).
+#' - `dTolerance`: It refers to the parameter employed by the function `st_voronoi` of the package `sf`. Try to use this parameter (e.g., `dTolerance = 0.1`) if you face TopologyExceptions (e.g., self-intersection). 
 #'
 #' `"delaunay"` stands for _Delaunay triangulation policy_, which accepts the following parameters in `...`:
 #' - `base_poly`: An `sfg` object that will be used to clip the generated triangles (optional argument).
 #' - `tnorm`: A t-norm used to calculate the membership degree of the triangle. It should be the name of a vector function.
 #' Possible values are `"min"` (default), and `"prod"`. 
-#' Note that it is possible to use your own t-norms. A t-norm should has the following signature: `FUN(x)` where
-#' - _x_ is a numeric vector. Such a function should return a single numeric value.
+#' Note that it is possible to use your own t-norms. A t-norm should has the following signature: `FUN(x)` where _x_ is a numeric vector. Such a function should return a single numeric value.
+#' - `dTolerance`: It refers to the parameter employed by the function `st_triangulate` of the package `sf`. Try to use this parameter (e.g., `dTolerance = 0.1`) if you face TopologyExceptions (e.g., self-intersection). 
 #' 
 #' `"convex_hull"` stands for _Convex hull policy_, which accepts the following parameters in `...`:
 #' - `M`: A numeric vector containing the membership degrees that will be used to create the components. The default is defined by `seq(0.05, 1, by = 0.05)`.
 #' - `d`: A numeric value representing the tolerance distance to compute the membership degree between the elements of `M` and the membership degrees of the points. The default is `0.05`.
+#' - `base_poly`: An `sfg` object that will be used to clip the generated polygons (optional argument).
 #'
 #' @return
 #'
@@ -459,16 +522,16 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 
   # first step is to apply the fuzzification step
   fuzz_stage <- switch(fuzz_policy,
-                       #fsp = fuzzy_set_policy(tbl = tbl, classes = params$classes, params$mfs),
                        fsp = do.call(fuzzy_set_policy, c(list(tbl = tbl), params)),
                        fcp = do.call(fuzzy_clustering_policy, c(list(tbl = tbl), params)),
+                       mesma = do.call(mesma_policy, c(list(tbl = tbl), params)),
                        stop(paste0("The fuzzification policy '", fuzz_policy, "' is not a supported policy.
-                                   The values are 'fsp' and 'fsc'."), call. = FALSE)
+                                   The values are 'fsp', 'fsc', 'mesma'."), call. = FALSE)
                        )
 
   # from https://stat.ethz.ch/R-manual/R-devel/library/base/html/integer.html
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
-  
+
   if(hasArg("digits")) {
     if(is.wholenumber(params$digits)) {
       fuzz_stage[ , 4:ncol(fuzz_stage)] <- round(fuzz_stage[ , 4:ncol(fuzz_stage)], params$digits)
@@ -478,7 +541,7 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
   }
   
   # second step is to apply the construction step
-  result <- switch (const_policy,
+  result <- switch(const_policy,
     voronoi = do.call(voronoi_diagram_policy, c(list(lp = fuzz_stage), params)),
     delaunay = do.call(delaunay_triangulation_policy, c(list(lp = fuzz_stage), params)),
     convex_hull = do.call(convex_hull_policy, c(list(lp = fuzz_stage), params)),
