@@ -120,7 +120,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
   result
 }
 
-#' Mesma policy, based based on the spectral mixture analysis which is implemented using the Multiple Endmember Spectral Mixture Analysis (MESMA) from the RStoolbox package.
+#' mesma policy, which is based on the spectral mixture analysis implemented using the Multiple Endmember Spectral Mixture Analysis (MESMA) from the RStoolbox package.
 #'
 #' @param tbl A character vector to specify the full path of the satellite image in .tif format.
 #' @param class_samples A data.frame with end members of the interest classes to be mapped. Obtained via image satellite. In the columns: first column: inters classes; other columns: band names (same as satellite image) and rows must present the pixels value by interest class.
