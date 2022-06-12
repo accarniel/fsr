@@ -53,50 +53,49 @@ setClass("pgeometry",
 )
 
 #' @noRd
-spa_is_valid <- function(object){
-  
-  if(!fsr_is_empty(object)){
-    
-    if(is.unsorted(sapply(object@component, attr, "md"))){
-      "The list of components is not in ascending order of membership degree."
-    } else{
-          
+spa_is_valid <- function(object) {
+  if(!fsr_is_empty(object)) {
+    degrees <- sapply(object@component, attr, "md")
+    if(anyDuplicated(degrees)) {
+      "The membership degrees of the components must be unique (i.e., duplicated degrees are not allowed)."
+    } else if(is.unsorted(degrees)) {
+      "The membership degrees of the components must be in ascending order."
+    } else {
       type <- spa_get_type(object)
       pgo <- compute_support(object@component, type)
       supp <- pgo[[2]]
       
-      if(!st_equals(object@supp, supp, sparse = FALSE)[1]){
+      if(!st_equals(object@supp, supp, sparse = FALSE)[1]) {
         "The support of the spatial plateau object is not correct."
-      } else{
-        
+      } else {
         # If all components in the list of components are valid
-        if(all(sapply(object@component, validObject))){
+        if(all(sapply(object@component, validObject))) {
           
           crisp_objs <- lapply(object@component, attr, "obj")
   
           disjunction <- st_disjoint(st_sfc(crisp_objs), sparse = FALSE)
           adjacency <- st_touches(st_sfc(crisp_objs), sparse = FALSE)
           
-          if(type == "PLATEAULINE"){
+          if(type == "PLATEAULINE") {
             intersection <- st_crosses(st_sfc(crisp_objs), sparse = FALSE)
             topology_matrix <- disjunction[upper.tri(disjunction, diag = FALSE)] |
                                adjacency[upper.tri(adjacency, diag = FALSE)] |
                                intersection[upper.tri(intersection, diag = FALSE)]
-          } else{
+          } else {
             topology_matrix <- disjunction[upper.tri(disjunction, diag = FALSE)] |
                                adjacency[upper.tri(adjacency, diag = FALSE)]
           }
           
-          # Checking disjunction, intersection (only for spatial plateau line) and adjacency between all crisp objects in the list of components
-          if(all(topology_matrix)){
+          # Checking disjointedness, intersection (only for spatial plateau line) and adjacency between all crisp objects in the list of components
+          if(all(topology_matrix)) {
               TRUE
-          } else{
+          } else {
             "All crisp spatial objects in the list of components must be disjoint or adjacent from each other."
           }
         }
       }
     }
-  } else{
+  } else {
     TRUE
   }
 }
