@@ -26,8 +26,8 @@ setValidity("component", function(object){
      inherits(object@obj, c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING", "POLYGON", "MULTIPOLYGON")) &&
      object@md > 0 && object@md <= 1){
     TRUE
-  } else{
-    "The component must be a pair of an sfg object and the membership degree in ]0,1]"
+  } else {
+    "The component must be a pair of an sfg object and a membership degree in ]0, 1]. The sfg object must be it should be either a `POINT`, `MULTIPOINT`, `LINESTRING`, `MULTILINESTRING`, `POLYGON` or `MULTIPOLYGON` object."
   }
 })
 
