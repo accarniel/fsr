@@ -403,7 +403,6 @@ component_to_text <- function(comp) {
 #'  
 #' @export
 spa_pwkt <- function(pgo) {
-  
   type <- spa_get_type(pgo)
 
   if(fsr_is_empty(pgo)){
@@ -411,24 +410,33 @@ spa_pwkt <- function(pgo) {
   }
 
   if(type == "PLATEAUCOMPOSITION"){
-    l <- c(spa_pwkt(pgo@ppoint), spa_pwkt(pgo@pline), spa_pwkt(pgo@pregion))
+    pwkt <- c(spa_pwkt(pgo@ppoint), spa_pwkt(pgo@pline), spa_pwkt(pgo@pregion))
   }else if(type == "PLATEAUCOLLECTION"){
-    l <- unlist(lapply(pgo@pgos, spa_pwkt))
+    pwkt <- unlist(lapply(pgo@pgos, spa_pwkt))
   }else{
-    l <- unlist(lapply(pgo@component, component_to_text))
+    pwkt <- unlist(lapply(pgo@component, component_to_text))
   }
   
-  l <- paste(type," (", paste(l, collapse = ", "), ")", sep="")
-  l
+  paste0(type," (", paste0(pwkt, collapse = ", "), ")")
 }
 
 
 #' @name PWKT
 #' @param x A `pgeometry` object of any type.
+#' @param width An integer value that indicates the number of characters to be printed. If it is 0 `NULL` or `NA`, then it will print everything.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
+#' 
 #' @export
-format.pgeometry <- function(x, ...) {
-  spa_pwkt(x)
+format.pgeometry <- function(x, ..., width = 30) {
+  if(is.null(width) || is.na(width)) {
+    width <- 0
+  }
+  pwkt <- spa_pwkt(x)
+  if(width > 0 && nchar(pwkt) > width) {
+    paste0(substr(pwkt, 1, width - 3), "...")
+  } else {
+    pwkt
+  }
 }
 
 #' @name PWKT
@@ -454,7 +462,6 @@ setMethod("show", "pgeometry", function(object) {
 setMethod("as.character", "pgeometry", function(x, ...) {
   spa_pwkt(x)
 })
-
 
 #' @name plot
 #' 

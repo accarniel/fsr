@@ -25,6 +25,7 @@ Changes in the development version of the _fsr_ package
 - Added a new external function called `spa_get_type` ([#27 - pedbrgs](https://github.com/accarniel/fsr/pull/27))
 - Added two external functions that handle pcollection objects: `pcollection_to_pcomposition` and `spa_flatten` ([#31 - pedbrgs](https://github.com/accarniel/fsr/pull/31))
 - Updated the functions that build pregion objects from point datasets
+- Updated the `format.pgeometry` for including the maximum number of characters that will are printed
 
 # Bug fixes
 
