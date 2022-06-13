@@ -1,36 +1,37 @@
 #' @title Creation of a component
 #'
-#' @description There are two functions that build a component from coordinate pairs or a 
-#' single `sfg` object labeled with a membership degree. This component can be added to a spatial plateau object. 
-#' A component consists of an `sfg` object and an associated membership degree.
-#' A component can be built in two different ways. By using the function `create_component`, the component is formed by 
-#' the means of a  numeric vector, list or matrix that represents a pair of coordinates. 
-#' By using the function `component_from_sfg`, the component is created from an `sfg`
-#' object. 
+#' @description This function builds an object of class `component`. 
+#' A component consists of a crisp spatial object (i.e., `sfg` object) labeled with a membership degree in \eqn{]0, 1]}.
+#' It is a flexible function since the crisp spatial object can be provided by using different formats.
 #'
 #' @usage
 #'
-#' create_component(raw_obj, md, type)
+#' create_component(obj, md, ...)
 #'
-#' @param raw_obj A vector, list or matrix containing the pairs of coordinates  to create the `sfg` object of the component.
-#' @param md A numeric value indicating the membership degree of the component. It has to be a value in \eqn{]0, 1]}.
-#' @param type A character value that indicates the type of the desired `sfg` object. 
-#' It should be either `"POINT"`, `"LINE"`, or `"REGION"`.
+#' @param obj A crisp spatial object in a specific format (see details below). 
+#' @param md A numeric value indicating the membership degree of the component. It must be a value in \eqn{]0, 1]}.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Different parameters that are used to convert a crisp spatial object from a specific representation (see more in details below).
 #'
 #' @name fsr_components
 #' 
 #' @details
 #'
-#' These functions create a `component` object, which is a pair of an `sfg` object and a membership degree in \eqn{]0, 1]}.
+#' The function `create_component` creates a `component` object. Internally, it is a pair of an `sfg` object and a membership degree in \eqn{]0, 1]}.
 #'
-#' The function `create_component` receives  three parameters: `raw_obj`, `md` and `type`. The use of `raw_obj` is 
-#' similar to the parameter of the family of functions of the `sf` package (`st` family) that creates spatial objects 
-#' from a numeric vector, matrix or list (e.g., the functions `st_point`, `st_multipoint`, etc.). The spatial data type 
-#' (i.e., the type of the `sfg` object) indicated by the parameter `type` represents simple and complex objects.
-#' For instance, `"POINT"` may refer to simple or complex point objects (internally, we can create a POINT or MULTIPOINT object). 
+#' For this, `obj` can be either:
+#' - an `sfg` object of type, 
+#' - a character vector containing the WKT representation of a crisp spatial object, 
+#' - a structure of class `"WKB"` with the WKB or EWKB representation of a crisp spatial object (if the EWKB representation is used, then you have to provide the additional parameter `EWKB = TRUE` in `...`),
+#' - a vector, list, or matrix containing coordinate pairs to be used when creating the `sfg` object. 
+#' This means that in this case it has a similar behavior to the family of functions `st` of the `sf` package (e.g., the functions `st_point`, `st_multipoint`, etc.). 
+#' Thus, you have to provide the additional parameter `type` in `...`, which should be either `"POINT"`, `"LINE"`, or `"REGION"`.  
 #'
-#' The `component_from_sfg` builds a `component` object by using the specification of two parameters that directly represents the 
-#' pair of an `sfg` object and its corresponding membership degree (i.e.,  `md` value).
+#' It is important to emphasize that the crisp spatial object must be a simple or complex point, line, or region (i.e., polygon) object. 
+#' That is, it should be a `POINT`, `MULTIPOINT`, `LINESTRING`, `MULTILINESTRING`, `POLYGON` or `MULTIPOLYGON` object.
+#' If other types of crisp spatial objects are given, an error will be thrown.
+#'
+#' The function `component_from_sfg` is now integrated with the function `create_component`. 
+#' Hence, `component_from_sfg` is deprecated.
 #' 
 #' @return
 #'
@@ -38,70 +39,95 @@
 #'
 #' @examples
 #'
-#' # Creating two components of the type POINT
-#' v1 = rbind(c(1,2), c(3,4))
-#' v2 = rbind(c(1,4), c(2,3),c(4,4))
+#' # first way: providing sfg objects
+#' library(sf)
+#' 
+#' pts <- rbind(c(1, 2), c(3, 2))
+#' comp1 <- create_component(st_multipoint(pts), 0.2) 
+#' 
+#' lpts <- rbind(c(2, 2), c(3, 3))
+#' comp2 <- create_component(st_linestring(lpts), 0.1) 
 #'
-#' md1 = 0.2
-#' md2 = 0.1
+#' matrix_obj <- matrix(c(1,1,8,1,8,8,1,8,1,1), ncol = 2, byrow = TRUE)
+#' rpts <- list(matrix_obj)
+#' comp3 <- create_component(st_polygon(rpts), 0.4)
+#' 
+#' # second way: providing WKT representations
+#' 
+#' comp4 <- create_component("POINT(10 35)", 0.5)
+#' comp5 <- create_component("MULTILINESTRING((-29 -27,-36 -31,-45 -33), (-45 -33,-46 -32))", 0.9)
+#' comp6 <- create_component("POLYGON((75 29, 77 29, 77 29, 75 29))", 1)
+#' 
+#' # third way: providing WKB representations
+#' 
+#' wkb = structure(list("0x0101000020e610000000000000000000000000000000000040"), class = "WKB")
+#' comp7 <- create_component(wkb, 0.8, EWKB = TRUE)
+#' 
+#' # fourth way: providing coordinates
 #'
-#' comp1 <- create_component(v1, md1, type="POINT")
-#' comp2 <- create_component(v2, md2, type="POINT")
+#' coords1 = rbind(c(2,2), c(3,3))
+#' coords2 = rbind(c(1,1), c(3,2))
 #'
-#' # Creating two components of the type LINE
-#'
-#' md3 = 0.45
-#' md4 = 0.32
-#'
-#' v3 = rbind(c(2,2), c(3,3))
-#' v4 = rbind(c(1,1), c(3,2))
-#'
-#' comp3 <- create_component(v3, md3, type="LINE")
-#' comp4 <- create_component(v4, md4, type="LINE")
-#'
-#' # Creating two components of the type REGION
-#'
-#' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-#' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-#' list_pols_1 <- list(p1,p2)
-#'
-#' p3 <- rbind(c(1,0), c(2,0), c(4,2), c(3,4), c(2,4), c(1,0))
-#' p4 <- rbind(c(2,2), c(2,3), c(3,4), c(2,2))
-#' list_pols_2 <- list(p3,p4)
-#'
-#' comp_pol1 <- create_component(list_pols_1, 0.4, "REGION")
-#' comp_pol2 <- create_component(list_pols_2, 0.6, "REGION")
-#'
+#' comp8 <- create_component(coords1, 0.45, type = "LINE")
+#' comp9 <- create_component(coords2, 0.32, type = "POINT")
+#' 
 #' @import sf methods
 #' @export
-create_component <- function(raw_obj, md, type){
+create_component <- function(obj, md, ...) {
+  params <- list(...)
+  sfg_obj <- NULL
   
-  if(type == "POINT"){
-    if(inherits(raw_obj, "numeric")){
-      obj_component <- st_point(raw_obj)
+  if(inherits(obj, c("sfg"))) {
+    # first possibility - obj is an sfg object
+    sfg_obj <- obj
+  } else if(is.character(obj)) {
+    # second possibility: obj is in the WKT representation
+    sfg_obj <- st_as_sfc(obj)[[1]]
+  } else if(inherits(obj, "WKB")) {
+    # third possibility: obj is in the WKB representation
+    EWKB <- FALSE
+    if(!is.null(params[["EWKB"]])) {
+        EWKB <- params$EWKB
     }
-    else if(inherits(raw_obj, "matrix")){
-      obj_component <- st_multipoint(raw_obj)
-    }
-  } else if(type == "LINE"){
-    if(inherits(raw_obj, "matrix")){
-      obj_component <- st_linestring(raw_obj)
-    }
-    else if(inherits(raw_obj, "list")){
-      obj_component <- st_multilinestring(raw_obj)
-    }
-  } else if(type == "REGION"){
-    if(inherits(raw_obj[[1]], "matrix")){
-      obj_component <- st_polygon(raw_obj)
-    }
-    else if(inherits(raw_obj[1], "list")){
-      obj_component <- st_multipolygon(raw_obj)
+    
+    sfg_obj <- st_as_sfc(obj, EWKB = EWKB)[[1]]
+  } else if (inherits(obj, c("numeric", "matrix", "list"))) {
+    # last type of format for obj
+    
+    if(is.null(params[["type"]])) {
+      stop("You should provide the desired type of the crisp spatial object by using the parameter `type`, which can be either `\"POINT\"`, `\"LINE\"`, or `\"REGION\"`.", call. = FALSE)
+    }  
+    type <- params$type
+    
+    if(type == "POINT"){
+      if(inherits(obj, "numeric")){
+        sfg_obj <- st_point(obj)
+      }
+      else if(inherits(obj, "matrix")){
+        sfg_obj <- st_multipoint(obj)
+      }
+    } else if(type == "LINE"){
+      if(inherits(obj, "matrix")){
+        sfg_obj <- st_linestring(obj)
+      }
+      else if(inherits(obj, "list")){
+        sfg_obj <- st_multilinestring(obj)
+      }
+    } else if(type == "REGION"){
+      if(inherits(obj[[1]], "matrix")){
+        sfg_obj <- st_polygon(obj)
+      }
+      else if(inherits(obj[1], "list")){
+        sfg_obj <- st_multipolygon(obj)
+      }
+    } else {
+      stop("Invalid type for the creation of the crisp spatial object. It must be either `\"POINT\"`, `\"LINE\"`, or `\"REGION\"`.", call. = FALSE)
     }
   } else {
-    stop("Invalid type for the component creation.", call. = FALSE)
+    stop("Invalid type for `obj`. It should be a valid representation of a crisp spatial object.", call. = FALSE)
   }
   
-  new("component", obj = obj_component, md = md)
+  new("component", obj = sfg_obj, md = md)
 }
 
 #' @name fsr_components
@@ -109,35 +135,16 @@ create_component <- function(raw_obj, md, type){
 #' @usage
 #' component_from_sfg(sfg, md) 
 #' 
-#' @param sfg An `sfg` object. It should be either `POINT`, `MULTIPOINT`, `LINESTRING`,
-#'  `MULTILINESTRING`, `POLYGON` or `MULTIPOLYGON` type. Other types of spatial objects are not allowed.
+#' @param sfg An `sfg` object. It should be either of type `POINT`, `MULTIPOINT`, `LINESTRING`,
+#'  `MULTILINESTRING`, `POLYGON` or `MULTIPOLYGON`. Other types of spatial objects are not allowed.
 #'  
-#' @examples
-#' 
-#' # Creating components with an sfg object
-#' library(sf)
-#' 
-#' # POINT
-#' md1 <- 0.2
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- component_from_sfg(st_multipoint(pts1), md1) 
-#' 
-#' # LINE
-#' md2 <- 0.1
-#' pts2 <- rbind(c(2, 2), c(3, 3))
-#' comp2 <- component_from_sfg(st_linestring(pts2), md2) 
-#'
-#' # REGION
-#' md3 <- 0.4
-#' matrix_object = matrix(c(1,1,8,1,8,8,1,8,1,1),ncol=2, byrow=TRUE)
-#' pts3 = list(matrix_object)
-#' comp3 = component_from_sfg(st_polygon(pts3), md3)
-#' 
 #' @import sf methods
 #' @export
-component_from_sfg <- function(sfg, md){
+component_from_sfg <- function(sfg, md) {
   
-  possible_geometries = c("sfc_POINT",
+  .Deprecated("create_component")
+  
+  possible_geometries <- c("sfc_POINT",
                           "sfc_MULTIPOINT",
                           "sfc_LINESTRING",
                           "sfc_MULTILINESTRING",

@@ -4,7 +4,7 @@ Changes in the development version of the _fsr_ package
 
 # Major changes
 
-- Create a new structure for the classes ([#26 - pedbrgs](https://github.com/accarniel/fsr/pull/26))
+- Created a new structure for the classes ([#26 - pedbrgs](https://github.com/accarniel/fsr/pull/26))
   - Added two new spatial plateau data types: `pcollection` and `pcomposition`
   - Redefined the class named pgeometry
   - Defined three spatial plateau data types that inherit from pgeometry: ppoint, pline, and pregion
@@ -18,6 +18,7 @@ Changes in the development version of the _fsr_ package
 - Updated the fuzzy geometric set operations (i.e., `spa_union`, `spa_intersection`, `spa_difference`). Now, these operations can receive ppoint, pline, pregion, pcomposition and pcollection objects as input. That means the operands of these operations can be two objects of different spatial plateau data types. Due to this update, a set of internal functions were also included ([#31 - pedbrgs](https://github.com/accarniel/fsr/pull/31))
 - Adapted the fuzzy topological relationships to call the updated functions (they still work on pregion objects only) 
 - Deprecated `spa_common_points` and `spa_boundary_pregion`. They will be removed in the next version of the package ([#31 - pedbrgs](https://github.com/accarniel/fsr/pull/31))
+- Improved the creation of components. We have refactored the function `create_component` and deprecated `component_from_sfg` (it will be removed in the next version of the package)
 
 # Minor changes
 
