@@ -449,7 +449,7 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
       stop("When x argument is a list, it must be a list of components or a list of spatial plateau objects.", call. = FALSE)
     }
       
-    # Type of spatial plateau object the user wants to create
+    # Type of spatial plateau object that the user wants to create
     type <- toupper(type)
   
     # Validating if the type is a pgeometry object
@@ -459,14 +459,11 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
       if(!length(x)){
         create_empty_pgeometry(type)
       } else{
-        
           # If all elements in the list are components
           if(is_list_components(x)){
-            
             # Spatial plateau object is a plateau point, plateau line or plateau region
             if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")){
-              
-              # Calculate support and order components according to the membership degree
+              # Calculate support and order components according to the membership degree of the components
               pgo <- compute_support(x, type)
               new_components <- pgo[[1]] 
               supp <- pgo[[2]]
@@ -475,7 +472,7 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
                 # For example, PLATEAUPOINT to ppoint
                 type <- paste0("p", substr(tolower(type), 8, nchar(type)))
                 new(type, supp = supp, component = new_components)  
-              } else{
+              } else {
                 spa_obj <- create_empty_pgeometry(type)
                 spa_obj@component <- new_components
                 spa_obj@supp <- supp
@@ -529,7 +526,7 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
               
             # Spatial plateau object is a plateau collection
             } else if(type == "PLATEAUCOLLECTION"){
-              stop("To create a PLATEAUCOLLECTION object you must pass a list of spatial plateau objects.", call. = FALSE)
+              stop("To create a PLATEAUCOLLECTION object, you must provide a list of spatial plateau objects.", call. = FALSE)
             }
           
           # If all elements in the list are spatial plateau objects
@@ -547,17 +544,17 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
               types <- lapply(x, function(pgo){paste0("PLATEAU", 
                        substr(toupper(is(pgo)[1]), 2, nchar(toupper(is(pgo)[1]))))})
               # Checking for spatial plateau objects of the same type in the list
-              if(any(duplicated(types))){
-                stop("To create a PLATEAUCOMPOSITION object you must pass a list of components or a list with different types of spatial plateau objects.", call. = FALSE)
+              if(anyDuplicated(types)){
+                stop("To create a PLATEAUCOMPOSITION object, you must provide a list of components or a list with different types of spatial plateau objects.", call. = FALSE)
               # Checking if there is no spatial plateau composition or spatial plateau collection in this list
               } else if("PLATEAUCOMPOSITION" %in% types || "PLATEAUCOLLECTION" %in% types){
                 if(length(x) == 1){
                   x[[1]]
-                } else{
+                } else {
                   stop("A PLATEAUCOMPOSITION object can not contain a PLATEAUCOMPOSITION or a PLATEAUCOLLECTION object.", call. = FALSE)
                 }
               # There is only a single spatial plateau point, a single spatial plateau line and a single spatial plateau region
-              } else{
+              } else {
                 ppoint <- pline <- pregion <- NULL
                 components <- c()
                 for(pgo in 1:length(x)){
@@ -583,11 +580,10 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
                 if(is.null(pregion)){
                   pregion <- create_empty_pgeometry("PLATEAUREGION")
                 }
-
                 
                 if(!length(unlist(components))){
                   create_empty_pgeometry(type)
-                }else{
+                } else {
                   pgo <- compute_support(unlist(components), type)
                   supp <- pgo[[2]]
                   if(is_valid){
@@ -606,8 +602,7 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
             } else if (type == "PLATEAUCOLLECTION"){
               
               obj_sf <- list()
-              for(supp_pgo in 1:length(x)){
-                
+              for(supp_pgo in 1:length(x)) {
                 object_sf <- x[[supp_pgo]]@supp
                 obj_sf[[supp_pgo]] <- object_sf
               }
@@ -622,7 +617,6 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
                 spa_obj@pgos <- x
                 spa_obj
               }
-              
             }
           }
           
@@ -637,13 +631,11 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
     new_components <- vector("list", nrow(x))
 
     for(i in 1:nrow(x)){
-      
       new_components[[i]] <- new("component", obj = x[[1]][[i]], md = x[[i, 2]])
       obj_comp <- new_components[[i]]@obj
-
     }
 
-    create_pgeometry(new_components, type)
+    create_pgeometry(new_components, type, is_valid = is_valid)
 
   } else{
     stop("The x argument must be of type list, data frame or tibble.", call. = FALSE)
