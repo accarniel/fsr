@@ -348,7 +348,7 @@ compute_support <- function(components, type){
 #'
 #' @usage
 #' 
-#' create_pgeometry(x, type, is_valid = FALSE)
+#' create_pgeometry(x, type, is_valid = TRUE)
 #'
 #' @param x A list of `component` objects, a list of `pgeometry` objects or a `data.frame`/`tibble`. For `PLATEAUPOINT`, `PLATEAULINE` and `PLATEAUREGION`, the type of each component must be the same for all components.
 #' @param type A character value that indicates the type of the desired `pgeometry` object. 
@@ -358,15 +358,26 @@ compute_support <- function(components, type){
 #'
 #' @details
 #' 
-#' The `create_pgeometry` function creates a `pgeometry` object of a given type. This object is built by using either a 
-#' list of `component` objects, a list of `pgeometry` objects or a `data.frame` (or `tibble`). 
+#' The function `create_pgeometry` creates a `pgeometry` object. 
+#' This object is built by using either a list of `component` objects, a list of `pgeometry` objects or a `data.frame` (or `tibble`). 
 #' If a `data.frame` is given, it must have two columns: the first one is a `sfc` object 
 #' and second one indicates the membership degree of each respective object of the `sfc` column.
+#' 
+#' By default, this function checks if the resulting spatial plateau object is valid. 
+#' That is, it checks whether all constraints defined by the Spatial Plateau Algebra are satisfied. 
+#' For instance, the components of a plateau point, plateau line, or plateau region must be adjacent or disjoint from each other and have to be unique membership degrees.
+#' 
+#' If you are sure that the component objects provided to this function satisfy all the constraints, then you can use `is_valid = FALSE` to improve the performance of this function.
 #' 
 #' @return
 #' 
 #' A `pgeometry` object.
 #' 
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#'  
 #' @examples
 #'
 #' library(sf)
@@ -446,7 +457,7 @@ compute_support <- function(components, type){
 #' 
 #' @import sf dplyr
 #' @export
-create_pgeometry <- function(x, type, is_valid = FALSE){
+create_pgeometry <- function(x, type, is_valid = TRUE){
 
   # Checking if x is a list
   if(inherits(x, "list")){
@@ -505,19 +516,19 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
               if(!length(points)){
                 ppoint <- create_empty_pgeometry("PLATEAUPOINT")
               } else{
-                ppoint <- create_pgeometry(points, "PLATEAUPOINT")  
+                ppoint <- create_pgeometry(points, "PLATEAUPOINT", is_valid = FALSE)  
               }
               
               if(!length(lines)){
                 pline <- create_empty_pgeometry("PLATEAULINE")
               } else{
-                pline <- create_pgeometry(lines, "PLATEAULINE")  
+                pline <- create_pgeometry(lines, "PLATEAULINE", is_valid = FALSE)  
               }
               
               if(!length(regions)){
                 pregion <- create_empty_pgeometry("PLATEAUREGION")
               } else{
-                pregion <- create_pgeometry(regions, "PLATEAUREGION") 
+                pregion <- create_pgeometry(regions, "PLATEAUREGION", is_valid = FALSE) 
               }
               
               if(is_valid){
@@ -569,11 +580,11 @@ create_pgeometry <- function(x, type, is_valid = FALSE){
                   components[[pgo]] <- x[[pgo]]@component
                   # Creating the triple
                   if(types[[pgo]] == "PLATEAUPOINT"){
-                    ppoint <- create_pgeometry(x[[pgo]]@component, "PLATEAUPOINT")
+                    ppoint <- create_pgeometry(x[[pgo]]@component, "PLATEAUPOINT", is_valid = FALSE)
                   } else if(types[[pgo]] == "PLATEAULINE"){
-                    pline <- create_pgeometry(x[[pgo]]@component, "PLATEAULINE")
+                    pline <- create_pgeometry(x[[pgo]]@component, "PLATEAULINE", is_valid = FALSE)
                   } else if(types[[pgo]] == "PLATEAUREGION"){
-                    pregion <- create_pgeometry(x[[pgo]]@component, "PLATEAUREGION")
+                    pregion <- create_pgeometry(x[[pgo]]@component, "PLATEAUREGION", is_valid = FALSE)
                   }
                 }
                 

@@ -50,7 +50,7 @@
 #' 
 #' pts <- rbind(c(1, 2), c(3, 2))
 #' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
-#' pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
+#' pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION")
 #' pc
 #' 
 #' # appending these components into a pgeometry object
@@ -609,12 +609,12 @@ heterogeneous_geom_comp <- function(pgo1, pgo2, sigma, beta, as_pcomposition){
     
   }else if(inherits(pgo1, c("ppoint", "pline", "pregion")) && inherits(pgo2, "pcomposition")){
     # Due to the recursive nature of this function, we cannot simplify one pgeometry object ONLY. 
-    # Otherwise, we would simplify this case that we explicity want to use a pcomposition with only one non-empty component.
-    pgo1 <- create_pgeometry(list(pgo1), "PLATEAUCOMPOSITION")
+    # Otherwise, we would simplify this case that we explicitly want to use a pcomposition with only one non-empty component.
+    pgo1 <- create_pgeometry(list(pgo1), "PLATEAUCOMPOSITION", is_valid = FALSE)
     sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
     
   }else if(inherits(pgo1, "pcomposition") && inherits(pgo2, c("ppoint", "pline", "pregion"))){
-    pgo2 <- create_pgeometry(list(pgo2), "PLATEAUCOMPOSITION")
+    pgo2 <- create_pgeometry(list(pgo2), "PLATEAUCOMPOSITION", is_valid = FALSE)
     sigma(pgo1, pgo2, beta, as_pcomposition = as_pcomposition)
     
   }else if(inherits(pgo1, "pcollection") && inherits(pgo2, "pcollection")){
@@ -707,15 +707,15 @@ get_pgos <- function(pcollection){
 #' 
 #' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 #' lcp <- component_from_sfg(st_linestring(lpts), 1)
-#' pline <- create_pgeometry(list(lcp), "PLATEAULINE", is_valid = TRUE)
+#' pline <- create_pgeometry(list(lcp), "PLATEAULINE")
 #' 
 #' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 #' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
 #' rcp <- component_from_sfg(st_polygon(list(rpts1, rpts2)), 0.7)
-#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION", is_valid = TRUE)
+#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
 #' 
-#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
-#' pcollection <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
+#' pcollection <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION")
 #' 
 #' pcollection_to_pcomposition(pcollection)
 #' 
@@ -950,16 +950,16 @@ result_handler <- function(type1, type2, obj, md, comps, check_compatibility = F
 #' 
 #' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 #' lcp <- component_from_sfg(st_linestring(lpts), 1)
-#' pline <- create_pgeometry(list(lcp), "PLATEAULINE", is_valid = TRUE)
+#' pline <- create_pgeometry(list(lcp), "PLATEAULINE")
 #' 
 #' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 #' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
 #' rcp <- component_from_sfg(st_polygon(list(rpts1, rpts2)), 0.7)
-#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION", is_valid = TRUE)
+#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
 #' 
-#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION", is_valid = TRUE)
-#' pcol1 <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION", is_valid = TRUE)
-#' pcol2 <- create_pgeometry(list(pline, pregion, pcol1), "PLATEAUCOLLECTION", is_valid = TRUE)
+#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
+#' pcol1 <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION")
+#' pcol2 <- create_pgeometry(list(pline, pregion, pcol1), "PLATEAUCOLLECTION")
 #' pcol2
 #' 
 #' spa_flatten(pcol2)
@@ -2010,7 +2010,7 @@ spa_contour <- function(pregion){
   pregion_tibble <- as_tibble(pregion)
   pregion_tibble$boundary <- st_boundary(pregion_tibble$geometry)
   pregion_df <- as.data.frame(pregion_tibble)
-  pline <- create_pgeometry(pregion_df[,c(3,2)], "PLATEAULINE")
+  pline <- create_pgeometry(pregion_df[,c(3,2)], "PLATEAULINE", is_valid = FALSE)
   
   crisp_contour <- create_empty_pgeometry("PLATEAULINE")
   crisp_contour <- spa_add_component(crisp_contour, component_from_sfg(st_boundary(pregion@supp), 1))
@@ -2266,7 +2266,7 @@ spa_boundary <- function(pgo){
     }else{
       comps <- append(comps, pgo@component)
     }
-    create_pgeometry(comps, type = "PLATEAUCOMPOSITION")
+    create_pgeometry(comps, type = "PLATEAUCOMPOSITION", is_valid = FALSE)
   }
 }
 
