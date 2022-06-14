@@ -333,8 +333,8 @@ component_to_text <- function(comp) {
 #'
 #' # For a `PLATEAUPOINT` object.
 #' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
-#' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+#' comp1 <- create_component(st_multipoint(pts1), 0.2) 
+#' comp2 <- create_component(st_point(c(1, 5)), 0.8)  
 #' 
 #' ppoint <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 #' 
@@ -346,9 +346,9 @@ component_to_text <- function(comp) {
 #' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 #' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 #'
-#' comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
-#' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
-#' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#' comp4 <- create_component(st_linestring(lpts1), 0.4)
+#' comp5 <- create_component(st_linestring(lpts2), 1)
+#' comp6 <- create_component(st_linestring(lpts3), 0.7)
 #'
 #' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
@@ -360,7 +360,7 @@ component_to_text <- function(comp) {
 #' p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
 #' pol1 <-st_polygon(list(p1, p2))
 #' 
-#' comp1 <- component_from_sfg(pol1, 0.2)
+#' comp1 <- create_component(pol1, 0.2)
 #' 
 #' pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 #' 
@@ -369,15 +369,15 @@ component_to_text <- function(comp) {
 #' # For a `PLATEAUCOMPOSITION` object.
 #' 
 #' ppts <- rbind(c(1, 2), c(3, 2))
-#' pcomp <- component_from_sfg(st_multipoint(ppts), 0.2) 
+#' pcomp <- create_component(st_multipoint(ppts), 0.2) 
 #' 
 #' lpts <- rbind(c(0, 0), c(1, 1))
-#' lcomp <- component_from_sfg(st_linestring(lpts), 0.4)
+#' lcomp <- create_component(st_linestring(lpts), 0.4)
 #' 
 #' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
 #' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
 #' pol <- st_polygon(list(rpts1, rpts2))
-#' rcomp <- component_from_sfg(pol, 0.2)
+#' rcomp <- create_component(pol, 0.2)
 #' 
 #' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
 #' 
@@ -386,13 +386,13 @@ component_to_text <- function(comp) {
 #' # For a `PLATEAUCOLLECTION` object.
 #' 
 #' lpts <- rbind(c(0, 0), c(1, 1))
-#' lcomp <- component_from_sfg(st_linestring(lpts), 0.4)
+#' lcomp <- create_component(st_linestring(lpts), 0.4)
 #' pline <- create_pgeometry(list(lcomp), "PLATEAULINE")
 #' 
 #' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
 #' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
 #' pol <- st_polygon(list(rpts1, rpts2))
-#' rcomp <- component_from_sfg(pol, 0.2)
+#' rcomp <- create_component(pol, 0.2)
 #' pregion <- create_pgeometry(list(rcomp), "PLATEAUREGION")
 #' 
 #' pcomposition <- create_pgeometry(list(pline, pregion), "PLATEAUCOMPOSITION")

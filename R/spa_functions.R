@@ -19,7 +19,7 @@
 #'
 #' This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
 #' The goal of this function is to insert a component or a list of components into a `pgeometry` object. 
-#' This insertion is based on the membership degree of the component (e.g., created by `component_from_sfg`). Thus, it preserves the properties of a spatial plateau object.
+#' This insertion is based on the membership degree of the component (e.g., created by `create_component`). Thus, it preserves the properties of a spatial plateau object.
 #' However, this function assumes that a component is compatible with the `pgeometry` object and its geometric format is valid (i.e., it does not overlap with existing components).
 #'  
 #' @return
@@ -37,8 +37,8 @@
 #' # For a `PLATEAUPOINT` object.
 #'
 #' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
-#' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+#' comp1 <- create_component(st_multipoint(pts1), 0.2) 
+#' comp2 <- create_component(st_point(c(1, 5)), 0.8)  
 #' 
 #' # appending these components into an empty pgeometry object
 #' 
@@ -49,14 +49,14 @@
 #' # For a `PLATEAUCOMPOSITION` object.
 #' 
 #' pts <- rbind(c(1, 2), c(3, 2))
-#' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+#' pcp <- create_component(st_multipoint(pts), 0.3)
 #' pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION")
 #' pc
 #' 
 #' # appending these components into a pgeometry object
 #' 
 #' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lcp <- component_from_sfg(st_linestring(lpts), 0.4)
+#' lcp <- create_component(st_linestring(lpts), 0.4)
 #' pc <- spa_add_component(pc, list(lcp))
 #' pc
 #'
@@ -207,9 +207,9 @@ spa_add_internal <- function(pgo, components) {
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' 
@@ -333,8 +333,8 @@ spa_eval <- function(pgo, point){
 #' library(tibble)
 #'
 #' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
-#' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+#' comp1 <- create_component(st_multipoint(pts1), 0.2) 
+#' comp2 <- create_component(st_point(c(1, 5)), 0.8)  
 #' 
 #' pp <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 #' 
@@ -370,9 +370,9 @@ spa_eval <- function(pgo, point){
 #' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 #' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 #' 
-#' cp1 <- component_from_sfg(st_linestring(lpts1), 0.4)
-#' cp2 <- component_from_sfg(st_linestring(lpts2), 1)
-#' cp3 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#' cp1 <- create_component(st_linestring(lpts1), 0.4)
+#' cp2 <- create_component(st_linestring(lpts2), 1)
+#' cp3 <- create_component(st_linestring(lpts3), 0.7)
 #' 
 #' pline <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAULINE")
 #' 
@@ -703,15 +703,15 @@ get_pgos <- function(pcollection){
 #' library(sf)
 #' 
 #' pts <- rbind(c(1, 2), c(3, 2))
-#' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+#' pcp <- create_component(st_multipoint(pts), 0.3)
 #' 
 #' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lcp <- component_from_sfg(st_linestring(lpts), 1)
+#' lcp <- create_component(st_linestring(lpts), 1)
 #' pline <- create_pgeometry(list(lcp), "PLATEAULINE")
 #' 
 #' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 #' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-#' rcp <- component_from_sfg(st_polygon(list(rpts1, rpts2)), 0.7)
+#' rcp <- create_component(st_polygon(list(rpts1, rpts2)), 0.7)
 #' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
 #' 
 #' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
@@ -946,15 +946,15 @@ result_handler <- function(type1, type2, obj, md, comps, check_compatibility = F
 #' library(sf)
 #' 
 #' pts <- rbind(c(1, 2), c(3, 2))
-#' pcp <- component_from_sfg(st_multipoint(pts), 0.3)
+#' pcp <- create_component(st_multipoint(pts), 0.3)
 #' 
 #' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lcp <- component_from_sfg(st_linestring(lpts), 1)
+#' lcp <- create_component(st_linestring(lpts), 1)
 #' pline <- create_pgeometry(list(lcp), "PLATEAULINE")
 #' 
 #' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
 #' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-#' rcp <- component_from_sfg(st_polygon(list(rpts1, rpts2)), 0.7)
+#' rcp <- create_component(st_polygon(list(rpts1, rpts2)), 0.7)
 #' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
 #' 
 #' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
@@ -1069,9 +1069,9 @@ spa_flatten <- function(pcollection){
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #'
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1)
 #' 
 #' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' 
@@ -1079,9 +1079,9 @@ spa_flatten <- function(pcollection){
 #' pts5 <- rbind(c(2, 3), c(1.2, 1.9), c(2, 1))
 #' pts6 <- rbind(c(3, 1), c(1.5, 0.5))
 #' 
-#' cp4 <- component_from_sfg(st_multipoint(pts4), 0.4)
-#' cp5 <- component_from_sfg(st_multipoint(pts5), 1)
-#' cp6 <- component_from_sfg(st_multipoint(pts6), 0.7)
+#' cp4 <- create_component(st_multipoint(pts4), 0.4)
+#' cp5 <- create_component(st_multipoint(pts5), 1)
+#' cp6 <- create_component(st_multipoint(pts6), 0.7)
 #' 
 #' pp2 <- create_pgeometry(list(cp4, cp5, cp6), "PLATEAUPOINT")
 #' 
@@ -1321,9 +1321,9 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp
@@ -1373,9 +1373,9 @@ spa_support <- function(pgo){
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp
@@ -1455,9 +1455,9 @@ spa_core <- function(pgo){
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
@@ -1539,9 +1539,9 @@ spa_exact_equal <- function(pgo1, pgo2){
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' # Creating two spatial plateau objects
 #' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
@@ -2013,7 +2013,7 @@ spa_contour <- function(pregion){
   pline <- create_pgeometry(pregion_df[,c(3,2)], "PLATEAULINE", is_valid = FALSE)
   
   crisp_contour <- create_empty_pgeometry("PLATEAULINE")
-  crisp_contour <- spa_add_component(crisp_contour, component_from_sfg(st_boundary(pregion@supp), 1))
+  crisp_contour <- spa_add_component(crisp_contour, create_component(st_boundary(pregion@supp), 1))
   
   result <- spa_intersection(pline, crisp_contour, as_pcomposition = TRUE)
   result@pline
