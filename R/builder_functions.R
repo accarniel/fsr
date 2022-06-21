@@ -217,14 +217,43 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL, dTole
 
 #' @import sf
 #' @noRd
-clip_op <- function(objs, base_poly) {
-  clipped_objs <- lapply(objs, function(x) { 
+regularization <- function(objs) {
+  invalid_indices <- !st_is_valid(objs)
+  # if there are invalid objects, then we regularize them
+  if(any(invalid_indices)) {
+    objs[invalid_indices] <- st_make_valid(objs[invalid_indices])
+    
+    regularized_objs <- lapply(objs, function(x) {
+      if(st_is(x, c("POLYGON", "MULTIPOLYGON"))) {
+        x
+      } else if(st_is(x, "GEOMETRYCOLLECTION")) {
+        extracted_pols <- suppressWarnings(st_collection_extract(collection, "POLYGON"))
+        if(inherits(extracted_pols, "sfg")){
+          extracted_pols
+        }else if(inherits(extracted_pols, "sfc")){
+          st_union(extracted_pols)[[1]]
+        }   
+      } else {
+        st_polygon()
+      }
+    })
+    st_sfc(regularized_objs)
+  } else {
+    objs
+  }
+}
+
+#' @import sf
+#' @noRd
+clip_op <- function(objs, base_poly, origin = "voronoi") {
+  clipped_objs <- lapply(objs, function(x) {
     int <- st_intersection(x, base_poly)
-    if(st_is_empty(int)) 
-      st_polygon() 
+    if(st_is_empty(int))
+      st_polygon()
     else 
       int 
   })
+  
   st_sfc(clipped_objs)
 }
 
@@ -269,6 +298,10 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, dTolerance = 0, ...) {
 
   cells <- voronoi_delaunay_prep(pts, base_poly = base_poly, dTolerance = dTolerance)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
+  
+  ## we need to check the validity of each cell
+  ## this is needed since, for some strange reason, the Voronoi diagram can produce invalid cells...
+  pts$cells <- regularization(pts$cells)
   
   # lets make a clipping to our base_poly, if it is provided
   if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
