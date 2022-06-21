@@ -217,44 +217,24 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL, dTole
 
 #' @import sf
 #' @noRd
-regularization <- function(objs) {
-  invalid_indices <- !st_is_valid(objs)
-  # if there are invalid objects, then we regularize them
-  if(any(invalid_indices)) {
-    objs[invalid_indices] <- st_make_valid(objs[invalid_indices])
-    
-    regularized_objs <- lapply(objs, function(x) {
-      if(st_is(x, c("POLYGON", "MULTIPOLYGON"))) {
-        x
-      } else if(st_is(x, "GEOMETRYCOLLECTION")) {
-        extracted_pols <- suppressWarnings(st_collection_extract(collection, "POLYGON"))
-        if(inherits(extracted_pols, "sfg")){
-          extracted_pols
-        }else if(inherits(extracted_pols, "sfc")){
-          st_union(extracted_pols)[[1]]
-        }   
-      } else {
-        st_polygon()
-      }
-    })
-    st_sfc(regularized_objs)
-  } else {
-    objs
-  }
-}
-
-#' @import sf
-#' @noRd
-clip_op <- function(objs, base_poly, origin = "voronoi") {
-  clipped_objs <- lapply(objs, function(x) {
-    int <- st_intersection(x, base_poly)
-    if(st_is_empty(int))
-      st_polygon()
-    else 
-      int 
-  })
+clip_op <- function(objs, base_poly) {
+  # first, we collect the indices of the objects that are not contained in the base_poly
+  # and another list of indices of the objects that are disjoint to base_poly
+  not_contained_objs <- unlist(!st_contains(base_poly, objs))
+  disjoint_objs <- unlist(st_disjoint(base_poly, objs))
+  # we capture those elements that need to be effectively clipped
+  to_clip <- not_contained_objs[!(not_contained_objs %in% disjoint_objs)]
   
-  st_sfc(clipped_objs)
+  # for those disjoint objects, we simply set an empty polygon
+  if(length(disjoint_objs) > 0) {
+    objs[disjoint_objs] <- st_polygon()
+  }
+  # for those objects to_clip we perform the intersection
+  if(length(to_clip) > 0) {
+    objs[intersection] <- st_intersection(objs[intersection], base_poly)
+  }
+  
+  objs
 }
 
 #' Voronoi diagram policy for the construction stage, as described in the following paper
@@ -298,10 +278,6 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, dTolerance = 0, ...) {
 
   cells <- voronoi_delaunay_prep(pts, base_poly = base_poly, dTolerance = dTolerance)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
-  
-  ## we need to check the validity of each cell
-  ## this is needed since, for some strange reason, the Voronoi diagram can produce invalid cells...
-  pts$cells <- regularization(pts$cells)
   
   # lets make a clipping to our base_poly, if it is provided
   if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
@@ -590,6 +566,19 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
     } else {
       stop("The argument 'digits' has to be an integer value.", call. = FALSE)
     }
+  }
+  
+  # a short validation for base_poly, which should be an sfg object
+  if(hasArg("base_poly")) {
+    if(!is.null(params$base_poly)) {
+      if(!inherits(params$base_poly, c("sfg", "sfc"))) {
+        stop("The argument 'base_poly' should be an sfg object.", call. = FALSE)
+      } 
+      if(inherits(params$base_poly, "sfc")) {
+        warning("The argument 'base_poly' is an sfc. We will take only its first element without considering its CRS.", call. = FALSE)
+        params$base_poly <- params$base_poly[[1]]
+      }
+    } 
   }
   
   # second step is to apply the construction step
