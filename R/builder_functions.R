@@ -231,7 +231,7 @@ clip_op <- function(objs, base_poly) {
   }
   # for those objects to_clip we perform the intersection
   if(length(to_clip) > 0) {
-    objs[intersection] <- st_intersection(objs[intersection], base_poly)
+    objs[to_clip] <- st_intersection(objs[to_clip], base_poly)
   }
   
   objs
