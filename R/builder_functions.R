@@ -207,18 +207,25 @@ mesma_policy <- function(tbl, class_samples, ...) {
 #' @noRd
 voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL, dTolerance = 0) {
   # it follows the example in https://r-spatial.github.io/sf/reference/geos_unary.html
-
   desired_op <- match.fun(op)
 
   # computing the desired operation provided by the param op
   pols <- st_collection_extract(desired_op(do.call(c, st_geometry(sf)), dTolerance = dTolerance))
 
-  # lets make a clipping to our base_poly, if it is provided
-  if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
-    pols <- st_intersection(pols, base_poly)
-  }
-
   pols
+}
+
+#' @import sf
+#' @noRd
+clip_op <- function(objs, base_poly) {
+  clipped_objs <- lapply(objs, function(x) { 
+    int <- st_intersection(x, base_poly)
+    if(st_is_empty(int)) 
+      st_polygon() 
+    else 
+      int 
+  })
+  st_sfc(clipped_objs)
 }
 
 #' Voronoi diagram policy for the construction stage, as described in the following paper
@@ -262,6 +269,12 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, dTolerance = 0, ...) {
 
   cells <- voronoi_delaunay_prep(pts, base_poly = base_poly, dTolerance = dTolerance)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
+  
+  # lets make a clipping to our base_poly, if it is provided
+  if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
+    # note that empty objects are not considered in the creation of a pgeometry object
+    pts$cells <- clip_op(pts$cells, base_poly)
+  }
 
   #producing the result: we have a plateau spatial object for each class
   for(class in cls){
@@ -323,6 +336,12 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, d
   triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = base_poly, dTolerance = dTolerance)
   # getting the indexes of the points of each triangle as a sparse geometry binary predicate list
   triangs_p_int <- st_intersects(triangs, pts)
+  
+  # lets make a clipping to our base_poly, if it is provided
+  if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
+    # note that empty objects are not considered in the creation of a pgeometry object
+    triangs <- clip_op(triangs, base_poly)
+  }
 
   #producing the result: we have a plateau spatial object for each class
   for(class in cls){

@@ -13,6 +13,7 @@
 - Fix the fuzzy numerical operations when dealing with empty objects
 - Fix the `spa_core` to return an empty crisp spatial object when the input has not a core
 - Fix some if statements and calculations in the fuzzy topological relationships
+- Fix the clipping operation in the `spa_creator` when using the construction policies based on the Voronoi diagram and Delaunay triangulation
 
 # fsr 1.0.1
 
