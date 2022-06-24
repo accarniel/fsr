@@ -149,7 +149,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 #'
 #' @import sf
 #' @noRd
-voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
+voronoi_delaunay_prep <- function(sf, op = "st_voronoi") {
   # it follows the example in https://r-spatial.github.io/sf/reference/geos_unary.html
 
   desired_op <- match.fun(op)
@@ -157,14 +157,30 @@ voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL) {
   # computing the desired operation provided by the param op
   pols <- suppressWarnings(st_collection_extract(desired_op(do.call(c, st_geometry(sf)))))
 
-  # lets make a clipping to our base_poly, if it is provided
-  if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
-    pols <- st_intersection(pols, base_poly)
-  }
-
   pols
 }
 
+#' @import sf
+#' @noRd
+clip_op <- function(objs, base_poly) {
+  # first, we collect the indices of the objects that are not contained in the base_poly
+  # and another list of indices of the objects that are disjoint to base_poly
+  not_contained_objs <- unlist(!st_contains(base_poly, objs))
+  disjoint_objs <- unlist(st_disjoint(base_poly, objs))
+  # we capture those elements that need to be effectively clipped
+  to_clip <- not_contained_objs[!(not_contained_objs %in% disjoint_objs)]
+  
+  # for those disjoint objects, we simply set an empty polygon
+  if(length(disjoint_objs) > 0) {
+    objs[disjoint_objs] <- st_polygon()
+  }
+  # for those objects to_clip we perform the intersection
+  if(length(to_clip) > 0) {
+    objs[to_clip] <- st_intersection(objs[to_clip], base_poly)
+  }
+  
+  objs
+}
 
 #' Voronoi diagram policy for the construction stage, as described in the following paper
 #'
@@ -204,8 +220,14 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, ...) {
   cls <- colnames(lp)[-c(1:3)]
   pgo <- vector("list")
 
-  cells <- voronoi_delaunay_prep(pts, base_poly = base_poly)
+  cells <- voronoi_delaunay_prep(pts)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
+  
+  # lets make a clipping to our base_poly, if it is provided
+  if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
+    # note that empty objects are not considered in the creation of a pgeometry object
+    pts$cells <- clip_op(pts$cells, base_poly)
+  }
 
   #producing the result: we have a plateau spatial object for each class
   for(class in cls){
@@ -264,9 +286,15 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, .
   cls <- colnames(lp)[-c(1:3)]
   pgo <- vector("list")
 
-  triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = base_poly)
+  triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate")
   # getting the indexes of the points of each triangle as a sparse geometry binary predicate list
   triangs_p_int <- st_intersects(triangs, pts)
+  
+  # lets make a clipping to our base_poly, if it is provided
+  if(!is.null(base_poly) && any(class(base_poly) %in% c("POLYGON", "MULTIPOLYGON"))) {
+    # note that empty objects are not considered in the creation of a pgeometry object
+    triangs <- clip_op(triangs, base_poly)
+  }
 
   #producing the result: we have a plateau spatial object for each class
   for(class in cls){
@@ -382,6 +410,19 @@ spa_creator <- function(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
                        stop(paste0("The fuzzification policy '", fuzz_policy, "' is not a supported policy.
                                    The values are 'fsp' and 'fsc'."), call. = FALSE)
                        )
+  
+  # a short validation for base_poly, which should be an sfg object
+  if(hasArg("base_poly")) {
+    if(!is.null(params$base_poly)) {
+      if(!inherits(params$base_poly, c("sfg", "sfc"))) {
+        stop("The argument 'base_poly' should be an sfg object.", call. = FALSE)
+      } 
+      if(inherits(params$base_poly, "sfc")) {
+        warning("The argument 'base_poly' is an sfc. We will take only its first element without considering its CRS.", call. = FALSE)
+        params$base_poly <- params$base_poly[[1]]
+      }
+    } 
+  }
 
   # second step is to apply the construction step
   result <- switch (const_policy,

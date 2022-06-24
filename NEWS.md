@@ -30,6 +30,7 @@ Changes in the development version of the _fsr_ package
 # Bug fixes
 
 - Fix the method that implements the Delaunay triangulation policy. It now generates empty pregion objects when it is not possible to build triangles from the fuzzified point dataset.
+- Fix the clipping operation in the spa_creator when using the construction policies based on the Voronoi diagram and Delaunay triangulation.
 
 # fsr 1.0.0
 
