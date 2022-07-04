@@ -1,4 +1,4 @@
-# fsr 1.0.1.9000 (development version)
+# fsr 1.0.2
 
 ## Minor changes
 
