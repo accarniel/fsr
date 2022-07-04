@@ -7,7 +7,7 @@
 spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 }
 \arguments{
-\item{tbl}{A data.frame or tibble with the following format: (x, y, z). It can be also the full path to an image when using the \emph{mesma} policy.}
+\item{tbl}{A data.frame or tibble with the following format: (x, y, z).}
 
 \item{fuzz_policy}{The fuzzification policy to be employed by the algorithm. See details below.}
 
@@ -29,11 +29,9 @@ The input \code{tbl} is a point dataset where each point represents the location
 Further, each point is annotated with numerical data that describe its meaning in the application.
 Therefore, \code{tbl} must have three columns: (\emph{x}, \emph{y}, \emph{z}). The columns \emph{x}, \emph{y} are the pair of coordinates, and \emph{z} is the column containing domain-specific numeric values.
 
-If you are using the \emph{mesma} policy, \code{tbl} must be a character vector that specifies the full path of the satellite image in GeoTIFF format (.tif).
-
 \code{fuzz_policy} refers to the method used by the \strong{fuzzification stage}.
 This stage aims to assign membership degrees to each point of the dataset.
-It accepts three possible values only: \code{"fsp"} (default), \code{"fcp"}, and \code{"mesma"}.
+It accepts three possible values only: \code{"fsp"} (default), or \code{"fcp"}.
 
 \code{"fsp"} stands for \emph{fuzzy set policy} and requires two parameters that should be informed in \code{...}:
 \itemize{
@@ -49,11 +47,6 @@ It accepts three possible values only: \code{"fsp"} (default), \code{"fcp"}, and
 \item \code{iter}: A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
 }
 
-\code{"mesma"} stands for \emph{Multiple Endmember Spectral Mixture Analysis}, which is based on the spectral mixture analysis. Its additional required parameter is:
-\itemize{
-\item \code{class_samples}: A data.frame with end members of the interest classes to be mapped. It is obtained via image satellite. It follows the same structure of the parameter \code{em} of the function \code{mesma} from the \code{RStoolbox} package.
-}
-
 An optional and common parameter for both fuzzification stages is the \code{"digits"}.
 This is an integer value that indicates the number of decimal digits of the membership degrees calculated by the fuzzification stage.
 That is, it is used to \strong{round} membership degrees to the specified number of decimal places.
@@ -66,7 +59,7 @@ It accepts two possible values only: either \code{"voronoi"} (default) or "\verb
 \code{"voronoi"} stands for \emph{Voronoi diagram policy} and has one optional parameter that can be provided in \code{...}:
 \itemize{
 \item \code{base_poly}: An \code{sfg} object that will be used to clip the generated polygons (optional argument). If this parameter is not provided, the Voronoi is created by using a bounding box (standard behavior of \code{sf}).
-\item \code{dTolerance}: It refers to the parameter employed by the function \code{st_voronoi} of the package \code{sf}. Try to use this parameter (e.g., \code{dTolerance = 0.1}) if you face TopologyExceptions (e.g., self-intersection).
+\item \code{d_tolerance}: It refers to the parameter \code{dTolerance} employed by the function \code{st_voronoi} of the package \code{sf}.
 }
 
 \code{"delaunay"} stands for \emph{Delaunay triangulation policy}, which accepts the following parameters in \code{...}:
@@ -75,7 +68,7 @@ It accepts two possible values only: either \code{"voronoi"} (default) or "\verb
 \item \code{tnorm}: A t-norm used to calculate the membership degree of the triangle. It should be the name of a vector function.
 Possible values are \code{"min"} (default), and \code{"prod"}.
 Note that it is possible to use your own t-norms. A t-norm should has the following signature: \code{FUN(x)} where \emph{x} is a numeric vector. Such a function should return a single numeric value.
-\item \code{dTolerance}: It refers to the parameter employed by the function \code{st_triangulate} of the package \code{sf}. Try to use this parameter (e.g., \code{dTolerance = 0.1}) if you face TopologyExceptions (e.g., self-intersection).
+\item \code{d_tolerance}: It refers to the parameter \code{dTolerance} employed by the function \code{st_triangulate} of the package \code{sf}.
 }
 
 \code{"convex_hull"} stands for \emph{Convex hull policy}, which accepts the following parameters in \code{...}:

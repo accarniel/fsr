@@ -12,7 +12,7 @@ Many spatial objects (i.e., geographical objects) in reality may have inexact lo
 Unfortunately, spatial fuzziness has so far not found its way into *spatial data science projects* due to a lack of complete implementations of software packages that can handle fuzzy spatial objects. Motivated by this lack of support, the _fsr_ package has the following advantages:
 
 - It is an implementation of the [fuzzy spatial data types, operations, and predicates](https://ieeexplore.ieee.org/document/7737976) of the [Spatial Plateau Algebra (SPA)](https://ieeexplore.ieee.org/document/8491565).
-- It offers the [construction of fuzzy spatial objects as spatial plateau objects](https://ieeexplore.ieee.org/document/8858878) from real point datasets and satellite images.
+- It offers the [construction of fuzzy spatial objects as spatial plateau objects](https://ieeexplore.ieee.org/document/8858878) from real spatial datasets.
 - It has families of functions that permit users to conduct exploratory (spatial) data analysis by issuing geometric operations and topological predicates on fuzzy spatial objects.
 - It provides methods for designing [fuzzy spatial inference models](https://ieeexplore.ieee.org/document/8015707) to discover new findings from fuzzy spatial objects.
 - It deploys algorithms to determine and only evaluate a subset of points that really contributes to finding the final but approximated answer to a user’s query window inference.
@@ -22,8 +22,6 @@ Unfortunately, spatial fuzziness has so far not found its way into *spatial data
 To cite this package in publications use:
 
 - [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (ACM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255?cid=99658676659) 
-
-This paper describes _fsr_ and its internal structures.
 
 ## Installing
 
@@ -43,4 +41,4 @@ install_github("accarniel/fsr")
 
 ## Contributing and Contact
 
-The project welcomes contributions from three different perspectives. You can contribute to _fsr_ by making Issues or Pull Requests on this GitHub Repository. Alternatively, contact Anderson Carniel by sending an email to accarniel@ufscar.br. When a Pull Request or email is sent, Anderson Carniel will check it as soon as possible.
+The project welcomes contributions from three different perspectives. You can contribute to _fsr_ by making Issues or Pull Requests on this GitHub Repository. Alternatively, contact Anderson Carniel by sending an email to <accarniel@ufscar.br>. When a Pull Request or email is sent, Anderson Carniel will check it as soon as possible.
