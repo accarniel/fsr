@@ -1,8 +1,10 @@
+# fsr 1.0.2.9000 (development version)
+
 # fsr 1.0.2
 
 ## Minor changes
 
-- Add the parameter `d_tolerance` in the function `spa_creator`. This parameter is employed by the package `sf` when computing the Voronoi diagram and Delaunay triangulation in the corresponding construction policies.
+- Add the parameter `d_tolerance` in the function `spa_creator`. This parameter is employed by the package `sf` when computing the Voronoi diagram and Delaunay triangulation in the corresponding construction policies
 
 ## Bug fixes
 
