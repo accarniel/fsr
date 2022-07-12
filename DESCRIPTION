@@ -36,8 +36,12 @@ Roxygen: list(markdown = TRUE)
 NeedsCompilation: no
 Encoding: UTF-8
 Collate: 
-    'fsr_base.R'
-    'builder_functions.R'
-    'fsi_functions.R'
-    'utility_functions.R'
-    'spa_functions.R'
+    'data_types.R'
+    'internal_functions.R'
+    'basic_functions.R'
+    'construction_module.R'
+    'general_operations.R'
+    'fuzzy_numerical_operations.R'
+    'fuzzy_geom_set_operations.R'    
+    'fuzzy_topological_relations.R'
+    'fsi_module.R'
