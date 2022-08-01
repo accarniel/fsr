@@ -1,3 +1,35 @@
+#' This function computes the geometric union of a list of components (i.e., support) for a given type of spatial plateau object. 
+#' It throws an error if any component is not compatible with the given spatial plateau data type.
+#' 
+#' @import sf
+#' @noRd
+compute_support <- function(components, type) {
+  
+  md_value <- c()
+  obj_sf <- list()
+  
+  for(comp in 1:length(components)) {
+    md <- components[[comp]]@md
+    obj_comp <- components[[comp]]@obj
+    
+    if(!is_compatible(obj_comp, type)) {
+      stop("Input component type error. Please verify if your component type is correct.", call. = FALSE)
+    }
+    if(md > 0 && md <= 1) {
+      md_value[comp] <- md
+    } else {
+      stop("There is a component with a invalid membership degree.", call. = FALSE)
+    }
+    obj_sf[[comp]] <- obj_comp
+  }
+  order_comps <- order(md_value)
+  new_components <- components[order_comps]
+  
+  supp <- st_union(st_sfc(obj_sf))
+  
+  return(list(new_components, supp[[1]]))
+}
+
 #' search_by_md finds the index of the component of a plateau plateau object based on a given membership degree
 #'
 #' This function uses an interactive version of the binary search algorithm.
@@ -29,21 +61,20 @@ search_by_md <- function(components, low, high, m){
 #' @import sf
 #' @noRd
 is_compatible <- function(sfg, ptype) {
-  ptype = toupper(ptype)
+  ptype <- toupper(ptype)
   ret <- FALSE
-  if(class(sfg)[1] == "XY") {
-    sfg_type = class(sfg)[2]
-    if((sfg_type == "POINT" || sfg_type == "MULTIPOINT") && 
-       ptype == "PLATEAUPOINT") {
-        ret <- TRUE
-    } else if((sfg_type == "LINESTRING" || sfg_type == "MULTILINESTRING") &&
-               ptype=="PLATEAULINE") {
-        ret <- TRUE
-    } else if((sfg_type == "POLYGON" || sfg_type == "MULTIPOLYGON") &&
-              ptype=="PLATEAUREGION") {
-        ret <- TRUE
+  if(inherits(sfg, "sfg")) {
+    if(inherits(sfg, c("POINT", "MULTIPOINT")) && ptype == "PLATEAUPOINT") {
+      ret <- TRUE
+    } else if(inherits(sfg, c("LINESTRING", "MULTILINESTRING")) && ptype == "PLATEAULINE") {
+      ret <- TRUE
+    } else if(inherits(sfg, c("POLYGON", "MULTIPOLYGON")) && ptype == "PLATEAUREGION") {
+      ret <- TRUE
+    } else if(inherits(sfg, c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING", "POLYGON", "MULTIPOLYGON")) &&
+              (ptype == "PLATEAUCOMPOSITION" || ptype == "PLATEAUCOLLECTION")) {
+      ret <- TRUE
     }
-  } else{
+  } else {
     stop("Component is not a sfg data type", call. = FALSE)
   }
   ret
@@ -59,6 +90,18 @@ is_pgeometry <- function(type) {
   }
 }
 
+#' @noRd
+is_list_pgos <- function(x) {
+  types <- lapply(x, function(pgo){paste0("PLATEAU", 
+                                          substr(toupper(is(pgo)[1]), 2, nchar(toupper(is(pgo)[1]))))})
+  all(unlist(lapply(types, is_pgeometry)))
+}
+
+#' @noRd
+is_list_components <- function(x) {
+  types <- lapply(lapply(x, is), function(x) x[[1]])
+  all(unlist(types) == "component")
+}
 
 #' @noRd
 get_counter_ctype <- function(pgo){
