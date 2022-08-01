@@ -1,3 +1,44 @@
+#' @title Getting the type of a spatial plateau object
+#'
+#' @description This function gets the type of a spatial plateau object.
+#' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, `"PLATEAUREGION"`, `"PLATEAUCOMPOSITION"`, or `"PLATEAUCOLLECTION"`.
+#'
+#' @usage
+#' 
+#' spa_get_type(pgo)
+#'
+#' @param pgo A `pgeometry` object of any type. 
+#'
+#' @details
+#' 
+#' The `spa_get_type` function gets the type of a spatial plateau object given as input.
+#' For instance, if the `pgo` is a object of the class `ppoint` (subclass of `pgeometry`), the return will be "PLATEAUPOINT".
+#' 
+#' @return
+#' 
+#' The type of a spatial plateau object as a character object (i.e., a string).
+#' 
+#' @examples
+#' library(sf)
+#' 
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pcomp1 <- create_component(st_multipoint(pts1), 0.4)
+#' pcomp2 <- create_component(st_multipoint(pts2), 0.3)
+#' ppoint <- create_pgeometry(list(pcomp1, pcomp2), "PLATEAUPOINT")
+#' 
+#' spa_get_type(ppoint) 
+#' @export
+spa_get_type <- function(pgo) {
+  type <- toupper(is(pgo)[1])
+  type <- paste0("PLATEAU", substr(type, 2, nchar(type)))
+  if(is_pgeometry(type)) {
+    type
+  } else {
+    stop("Invalid spatial plateau data type", call. = FALSE)
+  }
+}
+
 #' @title The PWKT of a spatial plateau object
 #'
 #' @description This function gives the Plateau Well-Known Text (PWKT) representation of a `pgeometry` object. 
@@ -12,10 +53,10 @@
 #'
 #' @details
 #'
-#' It gives the textual representation for a `pgeometry` object, 
-#' combining the Well-Known Text (WKT) representation for crisp vector geometry
-#' objects and the formal definitions of the tree spatial plateau data types.
-#' (i.e. `PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`).
+#' It returns the textual representation for a `pgeometry` object, 
+#' which combines the Well-Known Text (WKT) representation for crisp vector geometry
+#' objects and the formal definitions of the spatial plateau data types.
+#' (i.e. `PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`, `PLATEAUCOMPOSITION`, and `PLATEAUCOLLECTION`).
 #'
 #' @return
 #'
@@ -24,15 +65,15 @@
 #' @references
 #'
 #' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
 #'
 #' @examples
-#'
 #' library(sf)
 #'
 #' # For a `PLATEAUPOINT` object.
 #' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
-#' comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+#' comp1 <- create_component(st_multipoint(pts1), 0.2) 
+#' comp2 <- create_component(st_point(c(1, 5)), 0.8)  
 #' 
 #' ppoint <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 #' 
@@ -44,9 +85,9 @@
 #' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 #' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 #'
-#' comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
-#' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
-#' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#' comp4 <- create_component(st_linestring(lpts1), 0.4)
+#' comp5 <- create_component(st_linestring(lpts2), 1)
+#' comp6 <- create_component(st_linestring(lpts3), 0.7)
 #'
 #' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
@@ -54,42 +95,89 @@
 #'
 #' # For a `PLATEAUREGION` object.
 #' 
-#' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-#' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-#' pol1 <-st_polygon(list(p1,p2))
+#' p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+#' p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+#' pol1 <-st_polygon(list(p1, p2))
 #' 
-#' comp1 <- component_from_sfg(pol1, 0.2)
+#' comp1 <- create_component(pol1, 0.2)
 #' 
 #' pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 #' 
 #' spa_pwkt(pregion)
 #' 
+#' # For a `PLATEAUCOMPOSITION` object.
 #' 
-#' @import sf
+#' ppts <- rbind(c(1, 2), c(3, 2))
+#' pcomp <- create_component(st_multipoint(ppts), 0.2) 
+#' 
+#' lpts <- rbind(c(0, 0), c(1, 1))
+#' lcomp <- create_component(st_linestring(lpts), 0.4)
+#' 
+#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+#' pol <- st_polygon(list(rpts1, rpts2))
+#' rcomp <- create_component(pol, 0.2)
+#' 
+#' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
+#' 
+#' spa_pwkt(pcomposition)
+#' 
+#' # For a `PLATEAUCOLLECTION` object.
+#' 
+#' lpts <- rbind(c(0, 0), c(1, 1))
+#' lcomp <- create_component(st_linestring(lpts), 0.4)
+#' pline <- create_pgeometry(list(lcomp), "PLATEAULINE")
+#' 
+#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+#' pol <- st_polygon(list(rpts1, rpts2))
+#' rcomp <- create_component(pol, 0.2)
+#' pregion <- create_pgeometry(list(rcomp), "PLATEAUREGION")
+#' 
+#' pcomposition <- create_pgeometry(list(pline, pregion), "PLATEAUCOMPOSITION")
+#' 
+#' pcollection <- create_pgeometry(list(pline, pregion, pcomposition), "PLATEAUCOLLECTION")
+#'  
+#' spa_pwkt(pcollection)  
 #' @export
 spa_pwkt <- function(pgo) {
-
-  if(fsr_is_empty(pgo)){
-    return(paste0(pgo@type, " EMPTY"))
+  type <- spa_get_type(pgo)
+  
+  if(fsr_is_empty(pgo)) {
+    return(paste0(type, " EMPTY"))
   }
-
+  
   component_to_text <- function(comp) {
     paste0("(", st_as_text(comp@obj), ", ", comp@md, ")")
   }
-
-  l <- unlist(lapply(pgo@component, component_to_text))
-
-  l <- paste(pgo@type," (", paste(l, collapse = ", "), ")", sep="")
-  l
+  
+  if(type == "PLATEAUCOMPOSITION") {
+    pwkt <- c(spa_pwkt(pgo@ppoint), spa_pwkt(pgo@pline), spa_pwkt(pgo@pregion))
+  } else if(type == "PLATEAUCOLLECTION") {
+    pwkt <- unlist(lapply(pgo@pgos, spa_pwkt))
+  } else {
+    pwkt <- unlist(lapply(pgo@component, component_to_text))
+  }
+  
+  paste0(type," (", paste0(pwkt, collapse = ", "), ")")
 }
-
 
 #' @name PWKT
 #' @param x A `pgeometry` object of any type.
+#' @param width An integer value that indicates the number of characters to be printed. If it is 0 `NULL` or `NA`, then it will print everything.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
+#' 
 #' @export
-format.pgeometry <- function(x, ...) {
-  spa_pwkt(x)
+format.pgeometry <- function(x, ..., width = 30) {
+  if(is.null(width) || is.na(width)) {
+    width <- 0
+  }
+  pwkt <- spa_pwkt(x)
+  if(width > 0 && nchar(pwkt) > width) {
+    paste0(substr(pwkt, 1, width - 3), "...")
+  } else {
+    pwkt
+  }
 }
 
 #' @name PWKT

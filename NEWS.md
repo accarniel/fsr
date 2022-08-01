@@ -7,11 +7,14 @@
   - Redefined the class named `pgeometry`.
   - Defined three spatial plateau data types that are subclasses of `pgeometry`: `ppoint`, `pline`, and `pregion`.
   - Specified validity methods for all classes according to the rules of the Spatial Plateau Algebra
-  - These modifications are based on the pull requests performed by Pedro V. A. B. de Venâncio, who will be added as a contributor of the package `fsr` ([#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26) and [#27 - @pedbrgs](https://github.com/accarniel/fsr/pull/27))
+  - These modifications are based on the pull requests performed by Pedro V. A. B. de Venâncio, who will be added as a contributor of the package `fsr` ([#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26) and [#27 - @pedbrgs](https://github.com/accarniel/fsr/pull/27)).
+- Added a new external function called `spa_get_type` (based on the pull request [#27 - pedbrgs](https://github.com/accarniel/fsr/pull/27)).
 
 ## Minor changes
 
 - Better organization of the source code by creating more R scripts and rearranging the functions and classes in them.
+- Updated the function `format.pgeometry` to include the maximum number of characters that will are shown.
+- Updated the function `spa_pwkt` to deal with the new classes (based on the pull request [#26 - pedbrgs](https://github.com/accarniel/fsr/pull/26)).
 
 ## Change in the list of authors
 

@@ -50,13 +50,15 @@ is_compatible <- function(sfg, ptype) {
 }
 
 #' @noRd
-is_pgeometry <- function(type){
-  if(!(type %in% c('PLATEAUPOINT', 'PLATEAULINE', 'PLATEAUREGION'))){
-    FALSE
-  } else {
+is_pgeometry <- function(type) {
+  if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION", 
+                 "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
     TRUE
+  } else {
+    FALSE
   }
 }
+
 
 #' @noRd
 get_counter_ctype <- function(pgo){
