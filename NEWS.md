@@ -16,8 +16,9 @@
 ## Minor changes
 
 - Better organization of the source code by creating more R scripts and rearranging the functions and classes in them.
-- Updated the function `format.pgeometry` to include the maximum number of characters that will are shown.
+- Updated the function `format.pgeometry` to include a parameter that determines the maximum number of characters that are shown.
 - Updated the function `spa_pwkt` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
+- Updated the function `fsr_is_empty` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
 
 ## Change in the list of authors
 

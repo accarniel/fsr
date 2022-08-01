@@ -20,7 +20,6 @@ It checks if a pgeometry object has any component or not. If the number of compo
 it returns  \code{TRUE}. Otherwise, it returns \code{FALSE}.
 }
 \examples{
-
 # Creating an empty pgeometry object 
 pgo1 <- create_empty_pgeometry("PLATEAULINE")
 
@@ -33,12 +32,11 @@ library(sf)
 md <- 0.4
 pts <- rbind(c(1, 1), c(2, 3), c(2, 1))
 
-comp <- component_from_sfg(st_multipoint(pts), md)
+comp <- create_component(st_multipoint(pts), md)
 
 # Adding the component to the pgeometry object
 pgo1 <- spa_add_component(pgo1, comp)
 
 # Checking if it is still empty
-fsr_is_empty(pgo1) 
-
+fsr_is_empty(pgo1)  
 }

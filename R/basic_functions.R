@@ -1019,7 +1019,6 @@ create_pgeometry <- function(x, type, is_valid = TRUE) {
 #' A Boolean value that indicates if a `pgeometry` is empty.
 #' 
 #' @examples
-#'
 #' # Creating an empty pgeometry object 
 #' pgo1 <- create_empty_pgeometry("PLATEAULINE")
 #' 
@@ -1032,19 +1031,38 @@ create_pgeometry <- function(x, type, is_valid = TRUE) {
 #' md <- 0.4
 #' pts <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' 
-#' comp <- component_from_sfg(st_multipoint(pts), md)
+#' comp <- create_component(st_multipoint(pts), md)
 #' 
 #' # Adding the component to the pgeometry object
 #' pgo1 <- spa_add_component(pgo1, comp)
 #' 
 #' # Checking if it is still empty
-#' fsr_is_empty(pgo1) 
-#' 
+#' fsr_is_empty(pgo1)  
 #' @import sf
 #' @export
-fsr_is_empty <- function(pgo){
-  if(st_is_empty(pgo@supp) && !length(pgo@component)){
-    TRUE
+fsr_is_empty <- function(pgo) {
+  if(st_is_empty(pgo@supp)) {
+    type <- toupper(class(pgo)[1])
+    type <- paste0("PLATEAU", substr(type, 2, nchar(type)))
+    if(type == "PLATEAUCOLLECTION") {
+      if(length(pgo@pgos) == 0) {
+        TRUE
+      } else {
+        FALSE
+      }
+    } else if(type == "PLATEAUCOMPOSITION") {
+      if(fsr_is_empty(pgo@ppoint) && fsr_is_empty(pgo@pline) && fsr_is_empty(pgo@pregion)) {
+        TRUE
+      } else {
+        FALSE
+      }
+    } else {
+      if(length(pgo@component) == 0) {
+        TRUE
+      } else {
+        FALSE
+      }
+    }
   } else {
     FALSE
   }
