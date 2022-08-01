@@ -9,7 +9,7 @@ An S4 Class for representing a component of a spatial plateau object
 }
 \details{
 A \code{component} object is composed of two attributes. The first one is a crisp spatial
-object and the second one a membership degree in ]0, 1] of this  \code{component}.
+object and the second one is the membership degree in ]0, 1] of this  \code{component}.
 }
 \section{Slots}{
 
