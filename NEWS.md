@@ -5,7 +5,7 @@
 - Defined a new hierarchical structure for defining the spatial plateau data types:
   - Added two new spatial plateau data types: `pcollection` and `pcomposition`.
   - Redefined the class named `pgeometry`.
-  - Defined three spatial plateau data types that inherit from `pgeometry`: `ppoint`, `pline`, and `pregion`.
+  - Defined three spatial plateau data types that are subclasses of `pgeometry`: `ppoint`, `pline`, and `pregion`.
   - Specified validity methods for all classes according to the rules of the Spatial Plateau Algebra
   - These modifications are based on the pull requests performed by Pedro V. A. B. de Venâncio, who will be added as a contributor of the package `fsr` ([#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26) and [#27 - @pedbrgs](https://github.com/accarniel/fsr/pull/27))
 
