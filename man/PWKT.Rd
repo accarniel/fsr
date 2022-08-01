@@ -10,7 +10,7 @@
 \usage{
 spa_pwkt(pgo)
 
-\method{format}{pgeometry}(x, ...)
+\method{format}{pgeometry}(x, ..., width = 30)
 
 \S4method{show}{pgeometry}(object)
 
@@ -23,6 +23,8 @@ spa_pwkt(pgo)
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Unused.}
 
+\item{width}{An integer value that indicates the number of characters to be printed. If it is 0 \code{NULL} or \code{NA}, then it will print everything.}
+
 \item{object}{A \code{pgeometry} object of any type.}
 }
 \value{
@@ -32,19 +34,18 @@ A character value with the textual representation of a given \code{pgeometry} ob
 This function gives the Plateau Well-Known Text (PWKT) representation of a \code{pgeometry} object.
 }
 \details{
-It gives the textual representation for a \code{pgeometry} object,
-combining the Well-Known Text (WKT) representation for crisp vector geometry
-objects and the formal definitions of the tree spatial plateau data types.
-(i.e. \code{PLATEAUPOINT}, \code{PLATEAULINE}, \code{PLATEAUREGION}).
+It returns the textual representation for a \code{pgeometry} object,
+which combines the Well-Known Text (WKT) representation for crisp vector geometry
+objects and the formal definitions of the spatial plateau data types.
+(i.e. \code{PLATEAUPOINT}, \code{PLATEAULINE}, \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, and \code{PLATEAUCOLLECTION}).
 }
 \examples{
-
 library(sf)
 
 # For a `PLATEAUPOINT` object.
 pts1 <- rbind(c(1, 2), c(3, 2))
-comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
-comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+comp1 <- create_component(st_multipoint(pts1), 0.2) 
+comp2 <- create_component(st_point(c(1, 5)), 0.8)  
 
 ppoint <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 
@@ -56,9 +57,9 @@ lpts1 <- rbind(c(0, 0), c(1, 1))
 lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 
-comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
-comp5 <- component_from_sfg(st_linestring(lpts2), 1)
-comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+comp4 <- create_component(st_linestring(lpts1), 0.4)
+comp5 <- create_component(st_linestring(lpts2), 1)
+comp6 <- create_component(st_linestring(lpts3), 0.7)
 
 pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
@@ -66,18 +67,52 @@ spa_pwkt(pline)
 
 # For a `PLATEAUREGION` object.
 
-p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-pol1 <-st_polygon(list(p1,p2))
+p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+pol1 <-st_polygon(list(p1, p2))
 
-comp1 <- component_from_sfg(pol1, 0.2)
+comp1 <- create_component(pol1, 0.2)
 
 pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 
 spa_pwkt(pregion)
 
+# For a `PLATEAUCOMPOSITION` object.
 
+ppts <- rbind(c(1, 2), c(3, 2))
+pcomp <- create_component(st_multipoint(ppts), 0.2) 
+
+lpts <- rbind(c(0, 0), c(1, 1))
+lcomp <- create_component(st_linestring(lpts), 0.4)
+
+rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+pol <- st_polygon(list(rpts1, rpts2))
+rcomp <- create_component(pol, 0.2)
+
+pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
+
+spa_pwkt(pcomposition)
+
+# For a `PLATEAUCOLLECTION` object.
+
+lpts <- rbind(c(0, 0), c(1, 1))
+lcomp <- create_component(st_linestring(lpts), 0.4)
+pline <- create_pgeometry(list(lcomp), "PLATEAULINE")
+
+rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
+rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
+pol <- st_polygon(list(rpts1, rpts2))
+rcomp <- create_component(pol, 0.2)
+pregion <- create_pgeometry(list(rcomp), "PLATEAUREGION")
+
+pcomposition <- create_pgeometry(list(pline, pregion), "PLATEAUCOMPOSITION")
+
+pcollection <- create_pgeometry(list(pline, pregion, pcomposition), "PLATEAUCOLLECTION")
+ 
+spa_pwkt(pcollection)  
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\href{https://ieeexplore.ieee.org/document/9177620}{Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.}
 }
