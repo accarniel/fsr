@@ -4,8 +4,7 @@ Title: Handling Fuzzy Spatial Data
 Version: 1.0.2.9000
 Authors@R: c(
     person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("rth", "aut", "cre"), comment = c(ORCID = "0000-0002-8297-9894")),
-    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("rtm", "aut"), , comment = c(ORCID = "0000-0003-2594-9733")),
-    person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("rtm", "aut")),
+    person("Pedro", "Venâncio", email = "pedrovinicius@ufmg.br", role = c("ctb"), , comment = c(ORCID = "0000-0003-4665-562X")),
     person("Markus", "Schneider", email = "mschneid@cise.ufl.edu", role = c("rth")))
 URL: https://accarniel.github.io/fsr/,
      https://github.com/accarniel/fsr    

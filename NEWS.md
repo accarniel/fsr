@@ -7,11 +7,16 @@
   - Redefined the class named `pgeometry`.
   - Defined three spatial plateau data types that inherit from `pgeometry`: `ppoint`, `pline`, and `pregion`.
   - Specified validity methods for all classes according to the rules of the Spatial Plateau Algebra
-  - These modifications are based on the pull requests performed by Pedro V. A. B. de Venâncio, who will be added as a contributor of the package `fsr` ([#26 - pedbrgs](https://github.com/accarniel/fsr/pull/26) and [#27 - pedbrgs](https://github.com/accarniel/fsr/pull/27))
+  - These modifications are based on the pull requests performed by Pedro V. A. B. de Venâncio, who will be added as a contributor of the package `fsr` ([#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26) and [#27 - @pedbrgs](https://github.com/accarniel/fsr/pull/27))
 
 ## Minor changes
 
 - Better organization of the source code by creating more R scripts and rearranging the functions and classes in them.
+
+## Change in the list of authors
+
+- Added Pedro Vinícius Almeida Borges de Venâncio (@pedbrgs) as a contributor to the `fsr`.
+- We are grateful for the contributions of Felippe Galdino (@ocfgaldino) and Juliana Strieder Philippsen (@JulianaStrieder) in the first version of the package (1.0.0, 1.0.1, and 1.0.2). Their participation in the package was concluded; thus, they were removed from the list of authors in the next version of the package, which will include several changes, improvements, and new methods.
 
 # fsr 1.0.2
 
