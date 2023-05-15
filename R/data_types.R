@@ -235,7 +235,6 @@ setValidity("pcomposition", function(object) {
   } else {
     TRUE
   }
-  
 })
 
 #' An S4 Class for representing a plateau collection (subclass of `pgeometry`)
