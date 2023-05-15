@@ -104,6 +104,23 @@ is_list_components <- function(x) {
 }
 
 #' @noRd
+get_components <- function(x) {
+  types <- lapply(x, spa_get_type)
+  components <- c()
+  
+  for(pgo in 1:length(x)) {
+    if(types[[pgo]] == "PLATEAUCOMPOSITION") {
+      components[[pgo]] <- c(x[[pgo]]@ppoint@component, x[[pgo]]@pline@component, x[[pgo]]@pregion@component)
+    } else if(types[[pgo]] == "PLATEAUCOLLECTION") {
+      components[[pgo]] <- get_components(x[[pgo]]@pgos)
+    } else {
+      components[[pgo]] <- x[[pgo]]@component
+    }
+  }
+  components
+}
+
+#' @noRd
 get_counter_ctype <- function(pgo){
   ptype <- pgo@type
   

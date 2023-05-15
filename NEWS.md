@@ -11,7 +11,9 @@
 - Added a new external function called `spa_get_type` (based on the pull request [#27 - @pedbrgs](https://github.com/accarniel/fsr/pull/27)).
 - Updated and improved functions that create `pgeometry` objects: `create_pgeometry` and `create_empty_pgeometry` ([#27 - @pedbrgs](https://github.com/accarniel/fsr/pull/27)).
   - Updated some related internal functions (`is_compatible` and `is_pgeometry`). 
-  - Added other internal functions (`compute_support`, `is_list_pgos`, and `is_list_components`).
+  - Added other internal functions (`compute_support`, `is_list_pgos`, `is_list_components`, and `get_components`).
+- Improved the creation of components. We have redesigned the function `create_component` and deprecated `component_from_sfg` (it will be removed in the next version of the package).
+- Enhanced the function `fsr_plot` and added the support for `pcollection` and `pcomposition` objects.
 
 ## Minor changes
 
@@ -19,6 +21,7 @@
 - Updated the function `format.pgeometry` to include a parameter that determines the maximum number of characters that are shown.
 - Updated the function `spa_pwkt` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
 - Updated the function `fsr_is_empty` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
+- Updated the function `as_tibble` to deal with the new classes.
 
 ## Change in the list of authors
 
