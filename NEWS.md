@@ -22,6 +22,7 @@
 - Updated the function `spa_pwkt` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
 - Updated the function `fsr_is_empty` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
 - Updated the function `as_tibble` to deal with the new classes.
+- Extended fuzzy numerical operations to deal with the new classes (based on the pull request [#30 - @pedbrgs](https://github.com/accarniel/fsr/pull/30)).
 
 ## Change in the list of authors
 
@@ -50,7 +51,7 @@
 ## Minor changes
 
 - Added the publication that describes the [fsr package](https://dl.acm.org/doi/abs/10.1145/3474717.3484255) into `CITATION`.
-- Added an optional parameter in the function `spa_creator` named `digits` (an improved update based on the pull request [#2, @leticiabohnert](https://github.com/accarniel/fsr/pull/28)).
+- Added an optional parameter in the function `spa_creator` named `digits` (an improved update based on the pull request [#28 - @leticiabohnert](https://github.com/accarniel/fsr/pull/28)).
 
 ## Bug fixes
 
