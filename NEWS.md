@@ -14,6 +14,7 @@
   - Added other internal functions (`compute_support`, `is_list_pgos`, `is_list_components`, and `get_components`).
 - Improved the creation of components. We have redesigned the function `create_component` and deprecated `component_from_sfg` (it will be removed in the next version of the package).
 - Enhanced the function `fsr_plot` and added the support for `pcollection` and `pcomposition` objects.
+- Added two new external functions that handle `pcollection` objects: `spa_flatten` and `pcollection_to_pcomposition` (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)). They are also used by fuzzy geometric set operations on `pcollection` objects.
 
 ## Minor changes
 

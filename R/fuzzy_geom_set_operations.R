@@ -1,3 +1,206 @@
+# we include the functions `spa_flatten` and `pcollection_to_pcomposition` in this file because they are related to fuzzy geometric set operations on `pcollection` objects.
+# TODO we can create another category of functions, e.g., type-specific operations.
+
+#' @title Flatten a fuzzy spatial collection
+#'
+#' @description This function gathers all the fuzzy spatial objects of a `PLATEAUCOLLECTION` and 
+#' reorganizes them into a single flattened fuzzy spatial object containing a quadruple
+#' (`PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`, `PLATEAUCOMPOSITION`) that preserves the identity of sub-objects.
+#'
+#' @usage
+#'
+#' spa_flatten(pcol)
+#'
+#' @param pcol A `pcollection` object.
+#'
+#' @details
+#'
+#' It gives a single flattened fuzzy spatial object, aggregating all spatial plateau objects by their types.
+#' In the case of a two-level hierarchy, i.e., there is a `PLATEAUCOLLECTION` inside the other, 
+#' the function is applied recursively in the lower levels until the quadruple is built. 
+#' The t-conorm considered in the aggregation is the `max` operator.
+#'
+#' @return
+#'
+#' A spatial plateau collection object.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#'
+#' @examples
+#' library(sf)
+#' 
+#' pts <- rbind(c(1, 2), c(3, 2))
+#' pcp <- create_component(st_multipoint(pts), 0.3)
+#' 
+#' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lcp <- create_component(st_linestring(lpts), 1)
+#' pline <- create_pgeometry(list(lcp), "PLATEAULINE")
+#' 
+#' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+#' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+#' rcp <- create_component(st_polygon(list(rpts1, rpts2)), 0.7)
+#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
+#' 
+#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
+#' pcol1 <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION")
+#' pcol2 <- create_pgeometry(list(pline, pregion, pcol1), "PLATEAUCOLLECTION")
+#' pcol2
+#' 
+#' spa_flatten(pcol2)
+#' @import methods
+#' @export
+spa_flatten <- function(pcol) {
+  if(fsr_is_empty(pcol)) {
+    return(pcol)
+  }
+  
+  pgo_list <- get_pgos_from_pcollection(pcol)
+  types <- lapply(pgo_list, spa_get_type)
+  
+  ppoints <- pgo_list[types == "PLATEAUPOINT"]
+  plines <- pgo_list[types == "PLATEAULINE"]
+  pregions <- pgo_list[types == "PLATEAUREGION"]
+  pcompositions <- pgo_list[types == "PLATEAUCOMPOSITION"]
+  
+  ppoint <- create_empty_pgeometry("PLATEAUPOINT")
+  if(length(ppoints)) {
+    ppoint <- internal_union_list(ppoints[!sapply(ppoints, fsr_is_empty)], "PLATEAUPOINT")
+  }
+  pline <- create_empty_pgeometry("PLATEAULINE")
+  if(length(plines)) {
+    pline <- internal_union_list(plines[!sapply(plines, fsr_is_empty)], "PLATEAULINE")
+  }
+  pregion <- create_empty_pgeometry("PLATEAUREGION")
+  if(length(pregions)) {
+    pregion <- internal_union_list(pregions[!sapply(pregions, fsr_is_empty)], "PLATEAUREGION")
+  }
+  pcomposition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+  if(length(pcompositions)) {
+    pcomposition <- internal_union_list(pcompositions[!sapply(pcompositions, fsr_is_empty)], "PLATEAUCOMPOSITION")
+  }
+  
+  pgos <- c(ppoint, pline, pregion, pcomposition)
+  new("pcollection", supp = pcol@supp, pgos = pgos)
+}
+
+
+#' @title Convert a spatial plateau collection into a spatial plateau composition
+#'
+#' @description This function gathers all the fuzzy spatial objects of a `PLATEAUCOLLECTION` and 
+#' reorganizes them into an equivalent fuzzy spatial composition object.
+#'
+#' @usage
+#'
+#' pcollection_to_pcomposition(pcol)
+#'
+#' @param pcol A `pcollection` object.
+#'
+#' @details
+#'
+#' It gives a fuzzy spatial composition object equivalent to the spatial collection object given as input
+#' aggregating all spatial plateau objects by type.
+#'
+#' @return
+#'
+#' A spatial plateau composition object.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#'
+#' @examples
+#' library(sf)
+#' 
+#' pts <- rbind(c(1, 2), c(3, 2))
+#' pcp <- create_component(st_multipoint(pts), 0.3)
+#' 
+#' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
+#' lcp <- create_component(st_linestring(lpts), 1)
+#' pline <- create_pgeometry(list(lcp), "PLATEAULINE")
+#' 
+#' rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+#' rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+#' rcp <- create_component(st_polygon(list(rpts1, rpts2)), 0.7)
+#' pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
+#' 
+#' pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
+#' pcollection <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION")
+#' 
+#' pcollection_to_pcomposition(pcollection)
+#' @import sf
+#' @export
+pcollection_to_pcomposition <- function(pcol) {
+  project <- function(pcol) {
+    types <- sapply(pcol@pgos, spa_get_type)
+    ppoint <- pcol@pgos[types == "PLATEAUPOINT"]
+    if(!length(ppoint)) {
+      ppoint <- create_empty_pgeometry("PLATEAUPOINT")
+    } else {
+      ppoint <- ppoint[[1]]
+    }
+    pline <- pcol@pgos[types == "PLATEAULINE"]
+    if(!length(pline)) {
+      pline <- create_empty_pgeometry("PLATEAULINE")
+    } else {
+      pline <- pline[[1]]
+    }
+    pregion <- pcol@pgos[types == "PLATEAUREGION"]
+    if(!length(pregion)) {
+      pregion <- create_empty_pgeometry("PLATEAUREGION")
+    } else {
+      pregion <- pregion[[1]]
+    }
+    pcomposition <- pcol@pgos[types == "PLATEAUCOMPOSITION"]
+    if(!length(pcomposition)) {
+      pcomposition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+    } else {
+      pcomposition <- pcomposition[[1]]
+    }
+    list(ppoint = ppoint, pline = pline, pregion = pregion, pcomposition = pcomposition)
+  }
+  
+  # Step (i): removes the hierarchy of the operand object and flattens it.
+  pcol <- spa_flatten(pcol)
+  
+  # Step (ii): we form the fuzzy geometric union of all fuzzy point objects, 
+  # fuzzy line objects, and fuzzy region objects respectively that can be found 
+  # in the flattened fuzzy spatial collection object.
+  quad <- project(pcol)
+  ppoint <- spa_union(quad$ppoint, quad$pcomposition@ppoint)
+  pline <- spa_union(quad$pline, quad$pcomposition@pline)
+  pregion <- spa_union(quad$pregion, quad$pcomposition@pregion)
+  
+  # Step (iii): takes these two objects and transforms each of them into another fuzzy 
+  # spatial collection object. Their single fuzzy point, single fuzzy line, and single 
+  # fuzzy region sub-objects fulfill the topological constraints of disjointedness or 
+  # adjacency required in the definition of the data type fcomposition. Note that the 
+  # fuzzy union operation has the effect of only preserving those lower-dimensional 
+  # objects that are not located in higher-dimensional objects.
+  
+  # Spatial plateau point
+  pcomposition <- spa_union(ppoint, pline, as_pcomposition = TRUE)
+  pcomposition <- spa_union(pcomposition@ppoint, pregion, as_pcomposition = TRUE)
+  ppoint <- pcomposition@ppoint
+  # Spatial plateau line
+  pcomposition <- spa_union(pline, pregion, as_pcomposition = TRUE)
+  pline <- pcomposition@pline
+  
+  # Spatial plateau region
+  pregion <- pcomposition@pregion
+  
+  # TODO check if we really to compute the support here since it would be the same support as the support of pcol
+  supp <- st_union(st_sfc(ppoint@supp, pline@supp, pregion@supp))
+  
+  result <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+  result@supp <- supp[[1]]
+  result@ppoint <- ppoint
+  result@pline <- pline
+  result@pregion <- pregion
+  result
+}
+
 #' @title Fuzzy geometric set operations
 #'
 #' @description Fuzzy geometric set operations are given as a family of functions that implements spatial plateau set operations.
