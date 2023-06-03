@@ -6,8 +6,8 @@
 #'
 #' spa_exact_equal(pgo1, pgo2)
 #'
-#' @param pgo1 A `pgeometry` object of any type.
-#' @param pgo2 A `pgeometry` object of any type.
+#' @param pgo1 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
+#' @param pgo2 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
 #' 
 #' @details
 #'
@@ -23,16 +23,15 @@
 #' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#'
 #' library(sf)
 #'
 #' pts1 <- rbind(c(1, 2), c(3, 2))
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
@@ -40,25 +39,36 @@
 #' spa_exact_equal(pp1, pp2)
 #' 
 #' spa_exact_equal(pp1, pp1)
-#'
 #' @import sf
 #' @export
-spa_exact_equal <- function(pgo1, pgo2){
-
-  comp_check <- function(comp1, comp2){
-    if(st_equals(comp1@obj, comp2@obj, sparse=FALSE)[1] && (comp1@md == comp2@md)){
-      return(TRUE)
-    }
-    return(FALSE)
+spa_exact_equal <- function(pgo1, pgo2) {
+  
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION") || type2 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
+    stop("This function only deals with PLATEAUPOINT, PLATEAULINE, and PLATEAUREGION.")
   }
-
-  if((pgo1@type != pgo2@type) ||
+  
+  # Same type and both empty
+  if(type1 == type2 && all(sapply(c(pgo1, pgo2), fsr_is_empty))) {
+    return(TRUE)
+  }
+  
+  comp_check <- function(comp1, comp2) {
+    if(st_equals(comp1@obj, comp2@obj, sparse=FALSE)[1] && (comp1@md == comp2@md)) {
+      TRUE
+    }
+    FALSE
+  }
+  
+  if((type1 != type2) ||
      (spa_ncomp(pgo1) != spa_ncomp(pgo2)) ||
-     (!(st_equals(pgo1@supp, pgo2@supp, sparse=FALSE)[1]))){
+     (!(st_equals(pgo1@supp, pgo2@supp, sparse=FALSE)[1]))) {
     return(FALSE)
   } else {
     for(i in 1:spa_ncomp(pgo1)){
-      if(!(comp_check(pgo1@component[[i]], pgo2@component[[i]]))){
+      if(!(comp_check(pgo1@component[[i]], pgo2@component[[i]]))) {
         return(FALSE)
       }
     }
@@ -74,8 +84,8 @@ spa_exact_equal <- function(pgo1, pgo2){
 #'
 #' spa_exact_inside(pgo1, pgo2)
 #'
-#' @param pgo1 A `pgeometry` object of any type.
-#' @param pgo2 A `pgeometry` object of any type.
+#' @param pgo1 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
+#' @param pgo2 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
 #' 
 #' @details
 #'  
@@ -102,9 +112,9 @@ spa_exact_equal <- function(pgo1, pgo2){
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' # Creating two spatial plateau objects
 #' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
@@ -119,13 +129,29 @@ spa_exact_equal <- function(pgo1, pgo2){
 #'
 #' @export
 spa_exact_inside <- function(pgo1, pgo2){
-  spa_exact_equal(spa_intersection(pgo1, pgo2), pgo1)
+  
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION") || type2 %in% c("PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
+    stop("This function only deals with PLATEAUPOINT, PLATEAULINE, and PLATEAUREGION.")
+  }
+  
+  intersected <- spa_intersection(pgo1, pgo2, as_pcomposition = FALSE)
+  if(spa_get_type(intersected) == "PLATEAUCOMPOSITION") {
+    FALSE
+  } else {
+    # TODO implement the spa_exact_equal for PLATEAUCOMPOSITION
+    spa_exact_equal(intersected, pgo1)
+  }
 }
 
+#' Returns the desired type of result of a fuzzy topological relationship
+#' 
 #' @noRd
-spa_eval_relation <- function(ret, result, ...){
+spa_eval_relation <- function(ret, result, ...) {
   
-  aux_function <- function(degree){
+  aux_function <- function(degree) {
     classes <- pkg_env$ftopological_classes
     mfs <- pkg_env$ftopological_mfs
     
@@ -149,6 +175,21 @@ spa_eval_relation <- function(ret, result, ...){
            return(e_mode(list_res[[term]]))
          },
          stop("Return type does not exist.", call. = FALSE))
+}
+
+#' Checks if we can evaluate the fuzzy topological relationship
+#' 
+#' @noRd
+check_spa_topological_condition <- function(pgo1, pgo2) {
+  
+  type1 <- spa_get_type(pgo1)
+  type2 <- spa_get_type(pgo2)
+  
+  if(type1 != type2) {
+    stop("The spatial plateau objects have different types.", call. = FALSE)
+  } else if(type1 != "PLATEAUREGION" || type2 != "PLATEAUREGION") {
+    stop(paste0("This operator is not implemented to (", type1, " x ", type2, ") yet."), call. = FALSE)
+  }
 }
 
 #' @title Fuzzy topological relationships
@@ -252,16 +293,18 @@ spa_eval_relation <- function(ret, result, ...){
 #' 
 #' @import sf
 #' @export
-spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
-
+spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...) {
+  
   check_spa_topological_condition(pgo1, pgo2)
-
-  r = spa_intersection(pgo1, pgo2, itype = itype)
+  
+  r <- spa_intersection(pgo1, pgo2, itype = itype, as_pcomposition = TRUE)
+  r <- r@pregion
+  
   supp_pgo1 <- pgo1@supp
   supp_pgo2 <- pgo2@supp
-
+  
   result <- NULL
-
+  
   if(spa_ncomp(r) == 1 && !st_is_empty(spa_core(r))){
     result <- 1
   } else if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
@@ -273,9 +316,8 @@ spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
   } else {
     result <- spa_area(r)/st_area(st_intersection(supp_pgo1, supp_pgo2))
   }
-
+  
   spa_eval_relation(ret, result, ...)
-
 }
 
 #' @name fsr_topological_relationships
@@ -287,67 +329,75 @@ spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
 #' @import sf
 #' @export
 spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
-
+  
   check_spa_topological_condition(pgo1, pgo2)
-
+  
   countour_pgo1 <- spa_contour(pgo1)
   countour_pgo2 <- spa_contour(pgo2)
-
-  p <- spa_common_points(countour_pgo1, countour_pgo2, itype = itype)
-  c <- spa_intersection(countour_pgo1, countour_pgo2, itype = itype)
-
+  
+  countour_int <- spa_intersection(countour_pgo1, countour_pgo2, itype = itype, as_pcomposition = TRUE)
+  # Common points
+  p <- countour_int@ppoint
+  # Common border lines
+  c <- countour_int@pline
+  
   p_ncomp <- spa_ncomp(p)
   c_ncomp <- spa_ncomp(c)
   p_core <- spa_core(p)
   c_core <- spa_core(c)
   
   result <- NULL
-
+  
   if((p_ncomp == 1 && !st_is_empty(p_core)) ||
      (c_ncomp == 1 && !st_is_empty(c_core))) {
     result <- 1
-  } else {
+  } else {    
     supp_1 <- pgo1@supp
     supp_2 <- pgo2@supp
-  
+    
     pgo1_core <- spa_core(pgo1)
     pgo2_core <- spa_core(pgo2)
-  
-    if(st_disjoint(supp_1, supp_2, sparse=FALSE)[1] ||
-      !st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
-      st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
-      spa_exact_inside(pgo1, pgo2) ||
-      spa_exact_inside(pgo2, pgo1) ||
-      spa_exact_equal(pgo1, pgo2)){
-  
+    
+    if((st_disjoint(supp_1, supp_2, sparse=FALSE)[1]) ||
+       !(st_disjoint(pgo1_core, pgo2_core, sparse=FALSE)[1]) ||
+       st_touches(pgo1_core, pgo2_core, sparse=FALSE)[1] ||
+       spa_exact_inside(pgo1, pgo2) ||
+       spa_exact_inside(pgo2, pgo1) ||
+       spa_exact_equal(pgo1, pgo2)) {
       result <- 0
     } else if(st_relate(supp_1, supp_2, pattern = "F**0*****", sparse=FALSE)[1] ||
-       st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
-       st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]){
+              st_relate(supp_1, supp_2, pattern = "F***0****", sparse=FALSE)[1] ||
+              st_relate(supp_1, supp_2, pattern = "F0*******", sparse=FALSE)[1]) {
       result <- spa_avg_degree(p)
     } else if (st_relate(supp_1, supp_2, pattern = "F**1*****", sparse=FALSE)[1] ||
                st_relate(supp_1, supp_2, pattern = "F***1****", sparse=FALSE)[1] ||
-               st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]){
-      pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = "line")
-      pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = "line")
-      bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
-  
+               st_relate(supp_1, supp_2, pattern = "F1*******", sparse=FALSE)[1]) {
+      pgo1_boundary <- spa_boundary(pgo1)
+      pgo1_boundary <- pgo1_boundary@pline
+      pgo2_boundary <- spa_boundary(pgo2)
+      pgo2_boundary <- pgo2_boundary@pline
+      bl <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype, as_pcomposition = TRUE)
+      bl <- bl@pline
+      
       plength <- spa_length(bl)
       length_support <- st_length(bl@supp)
-  
+      
       result <- plength/length_support
     } else {
-      pgo1_boundary <- spa_boundary_pregion(pgo1, bound_part = "region")
-      pgo2_boundary <- spa_boundary_pregion(pgo2, bound_part = "region")
-      br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype)
+      pgo1_boundary <- spa_boundary(pgo1)
+      pgo1_boundary <- pgo1_boundary@pregion
+      pgo2_boundary <- spa_boundary(pgo2)
+      pgo2_boundary <- pgo2_boundary@pregion
+      br <- spa_intersection(pgo1_boundary, pgo2_boundary, itype = itype, as_pcomposition = TRUE)
+      br <- br@pregion
       br_area <- spa_area(br)
       area_support <- st_area(br@supp)
-  
       result <- br_area/area_support
     }
   }
   spa_eval_relation(ret, result, ...)
 }
+
 
 #' @name fsr_topological_relationships
 #' 
@@ -357,7 +407,7 @@ spa_meet <- function(pgo1, pgo2, itype = "min", ret = "degree", ...){
 #' 
 #' @import sf
 #' @export
-spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
+spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...) {
 
   check_spa_topological_condition(pgo1, pgo2)
 
@@ -366,16 +416,15 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
   
   result <- NULL
 
-  if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+  if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1]) {
     result <- 1
   } else {
     r_overlap <- spa_overlap(pgo1, pgo2, itype = itype)
     r_meet <- spa_meet(pgo1, pgo2)
-  
     if(r_overlap == 1 || r_meet == 1 ||
         spa_exact_inside(pgo1, pgo2) ||
         spa_exact_inside(pgo2, pgo1) ||
-        spa_exact_equal(pgo2, pgo1))  {
+        spa_exact_equal(pgo2, pgo1)) {
       result <- 0
     } else {
       result <- 1 - max(r_overlap, r_meet)
@@ -394,27 +443,29 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...){
 #' 
 #' @import sf
 #' @export
-spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
-
+spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...) {
+  
   check_spa_topological_condition(pgo1, pgo2)
   result <- NULL
   
-  if(spa_exact_equal(pgo1, pgo2)){
+  if(spa_exact_equal(pgo1, pgo2)) {
     result <- 1
-  } else {
+  } else {   
     supp_pgo1 <- pgo1@supp
     supp_pgo2 <- pgo2@supp
-  
+    
     if(st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
-       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]) {
       result <- 0
     } else {
-      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_abs_diff")
-      r_union <- spa_union(pgo1, pgo2, utype = utype)
-  
+      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_abs_diff", as_pcomposition = TRUE)
+      r_diff <- r_diff@pregion
+      r_union <- spa_union(pgo1, pgo2, utype = utype, as_pcomposition = TRUE)
+      r_union <- r_union@pregion
+      
       r_spa_area <- spa_area(r_diff)
       r_sfg_area <- st_area(r_union@supp)
-  
+      
       result <- 1 - (r_spa_area/r_sfg_area)
     }
   }
@@ -429,23 +480,25 @@ spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
 #' 
 #' @import sf
 #' @export
-spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
-
+spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...) {
+  
   check_spa_topological_condition(pgo1, pgo2)
   result <- NULL
   
-  if(spa_exact_inside(pgo1, pgo2)){
+  if(spa_exact_inside(pgo1, pgo2)) {
     result <- 1
-  } else { 
+  } else {    
     supp_pgo1 <- pgo1@supp
     supp_pgo2 <- pgo2@supp
-  
+    
     if(spa_equal(pgo1, pgo2, utype = utype) == 1 ||
        st_disjoint(supp_pgo1, supp_pgo2, sparse=FALSE)[1] ||
-       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]){
+       st_touches(supp_pgo1, supp_pgo2, sparse=FALSE)[1]) {
       result <- 0
     } else {
-      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff")
+      r_diff <- spa_difference(pgo1, pgo2, dtype = "f_bound_diff", as_pcomposition = TRUE)
+      r_diff <- r_diff@pregion
+      
       result <- 1 - (spa_area(r_diff)/st_area(supp_pgo1))
     }
   }
@@ -532,16 +585,14 @@ pkg_env$ftopological_mfs <- c(FuzzyR::genmf("trapmf", c(0, 0, 0.03, 0.08)),
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #'
 #' @export
-spa_set_classification <- function(classes, mfs){
-
-  if(!(length(classes) == length(mfs))){
+spa_set_classification <- function(classes, mfs) {
+  if(!(length(classes) == length(mfs))) {
     stop("Classes and topological_mfs have different lengths.", call. = FALSE)
-  } else if(!is.character(classes)){
+  } else if(!is.character(classes)) {
     stop("Classes need to be a character vector.", call. = FALSE)
-  } else if(any(sapply(mfs, function(x) !(is.function(x))))){
-    stop("The parameter mfs have to be a list of functions (generated by FuzzyR::genmf).", call. = FALSE)
+  } else if(any(sapply(mfs, function(x) !(is.function(x))))) {
+    stop("The parameter mfs have to be a list of membership functions.", call. = FALSE)
   }
-
   pkg_env$ftopological_classes <- classes
   pkg_env$ftopological_mfs <- mfs
 }

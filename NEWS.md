@@ -25,6 +25,7 @@
 - Updated the function `fsr_is_empty` to deal with the new classes (based on the pull request [#26 - @pedbrgs](https://github.com/accarniel/fsr/pull/26)).
 - Updated the function `as_tibble` to deal with the new classes.
 - Extended fuzzy numerical operations to deal with the new classes (based on the pull request [#30 - @pedbrgs](https://github.com/accarniel/fsr/pull/30)).
+- Updated fuzzy topological relationships due to the changes in other operators (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)).
 
 ## Change in the list of authors
 
