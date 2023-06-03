@@ -138,25 +138,17 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 #' voro <- voronoi_delaunay_prep(pts)
 #' voro
 #'
-#' #getting the CH as base_poly
-#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
-#' voro2 <- voronoi_delaunay_prep(pts, base_poly = ch)
-#' voro2
-#'
-#' del <- voronoi_delaunay_prep(pts, op = "st_triangulate")
-#' del
-#'
-#' del2 <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = ch)
+#' del2 <- voronoi_delaunay_prep(pts, op = "st_triangulate")
 #' del2
 #'
 #' @import sf
 #' @noRd
-voronoi_delaunay_prep <- function(sf, op = "st_voronoi", base_poly = NULL, d_tolerance = 0) {
+voronoi_delaunay_prep <- function(sf, op = "st_voronoi", d_tolerance = 0) {
   # it follows the example in https://r-spatial.github.io/sf/reference/geos_unary.html
   desired_op <- match.fun(op)
 
   # computing the desired operation provided by the param op
-  pols <- st_collection_extract(desired_op(do.call(c, st_geometry(sf)), dTolerance = d_tolerance))
+  pols <- suppressWarnings(st_collection_extract(desired_op(do.call(c, st_geometry(sf)))))
 
   pols
 }
@@ -222,7 +214,7 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, d_tolerance = 0, ...) {
   cls <- colnames(lp)[-c(1:3)]
   pgo <- vector("list")
 
-  cells <- voronoi_delaunay_prep(pts, base_poly = base_poly, d_tolerance = d_tolerance)
+  cells <- voronoi_delaunay_prep(pts, d_tolerance = d_tolerance)
   pts$cells <- cells[unlist(st_intersects(pts, cells))]
   
   # lets make a clipping to our base_poly, if it is provided
@@ -234,9 +226,10 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, d_tolerance = 0, ...) {
   #producing the result: we have a plateau spatial object for each class
   for(class in cls){
     # we create list of components for each class
-    lcomps <- apply(pts[, c(class, "cells")], MARGIN = 1, FUN = function(x) new("component", obj = x[[2]], md = x[[1]]))
-
-    pgo <- append(pgo, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
+    lcomps <- apply(pts[, c(class, "cells")], MARGIN = 1, FUN = function(x) { if(x[[1]] > 0) new("component", obj = x[[2]], md = x[[1]]) })
+    lcomps <- lcomps[!sapply(lcomps, is.null)]
+    
+    pgo <- append(pgo, spa_add_internal(create_empty_pgeometry("PLATEAUREGION"), lcomps))
   }
 
   tibble(class = cls, pgeometry = pgo)
@@ -288,7 +281,7 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, d
   cls <- colnames(lp)[-c(1:3)]
   pgo <- vector("list")
 
-  triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", base_poly = base_poly, d_tolerance = d_tolerance)
+  triangs <- voronoi_delaunay_prep(pts, op = "st_triangulate", d_tolerance = d_tolerance)
   # getting the indexes of the points of each triangle as a sparse geometry binary predicate list
   triangs_p_int <- st_intersects(triangs, pts)
   
@@ -300,10 +293,20 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, d
 
   #producing the result: we have a plateau spatial object for each class
   for(class in cls){
-    # we create list of components for each class
-    lcomps <- lapply(seq_along(triangs_p_int), function(index) new("component", obj = triangs[[index]], md = sigma( pts[triangs_p_int[[index]], class][[1]] )))
-
-    pgo <- append(pgo, spa_add_component(create_empty_pgeometry("PLATEAUREGION"), lcomps))
+    if(any(!st_is_empty(triangs))) {
+      lcomps <- list()
+      for(index in seq_along(triangs_p_int)) {
+        m <- sigma( pts[triangs_p_int[[index]], class][[1]] )
+        if(m > 0) {
+          lcomps <- append(lcomps, new("component", obj = triangs[[index]], md = m))
+        }
+      }
+      lcomps <- lcomps[!sapply(lcomps, is.null)]
+      
+      pgo <- append(pgo, spa_add_internal(create_empty_pgeometry("PLATEAUREGION"), lcomps))
+    } else {
+      pgo <- append(pgo, create_empty_pgeometry("PLATEAUREGION"))
+    }
   }
 
   tibble(class = cls, pgeometry = pgo)

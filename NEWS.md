@@ -29,6 +29,7 @@
 - Updated the function `as_tibble` to deal with the new classes.
 - Extended fuzzy numerical operations to deal with the new classes (based on the pull request [#30 - @pedbrgs](https://github.com/accarniel/fsr/pull/30)).
 - Updated fuzzy topological relationships due to the changes in other operators (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)).
+- Minor changes in functions of the construction module to use improved operations when manipulating spatial plateau objects.
 
 ## Change in the list of authors
 
