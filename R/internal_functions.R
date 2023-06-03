@@ -150,35 +150,6 @@ append_valid_comps <- function(sfg, pgo, md, lcomps){
   lcomps
 }
 
-#' @noRd
-check_spa_topological_condition <- function(pgo1, pgo2){
-  if(pgo1@type != pgo2@type){
-    stop("The spatial plateau objects have different types.", call. = FALSE)
-  } else if(pgo1@type != "PLATEAUREGION" || pgo2@type != "PLATEAUREGION") {
-    stop(paste0("This operator is not implemented to (", pgo1@type, " x ", pgo2@type, ") yet."), call. = FALSE)
-  }
-}
-
-#' Computes the standard union of a list of spatial plateau objects
-#' 
-#' @noRd
-internal_union_list <- function(pgos, type) {
-  if(length(pgos) == 0) {
-    create_empty_pgeometry(type)
-  } else if(length(pgos) == 1) {
-    pgos[[1]]
-  } else {
-    result <- pgos[[1]]
-    for(pgo in pgos[2:length(pgos)]){
-      result <- spa_union(result, pgo, utype = "max", as_pcomposition = FALSE)
-      if(fsr_is_empty(result)){
-        result <- create_empty_pgeometry(type)
-      }
-    }
-    result
-  }
-}
-
 #' Captures all spatial plateau objects from a `pcollection` object as a list
 #' 
 #' @noRd
