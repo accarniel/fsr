@@ -15,7 +15,10 @@
 - Improved the creation of components. We have redesigned the function `create_component` and deprecated `component_from_sfg` (it will be removed in the next version of the package).
 - Enhanced the function `fsr_plot` and added the support for `pcollection` and `pcomposition` objects.
 - Added two new external functions that handle `pcollection` objects: `spa_flatten` and `pcollection_to_pcomposition` (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)). They are also used by fuzzy geometric set operations on `pcollection` objects.
-- Enhanced fuzzy geometric set operations, which can now handle different data types as input (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)). Deprecated `spa_common_points` - you can use `spa_intersection` to get the common points of two plateau line objects.
+- Enhanced fuzzy geometric set operations, which can now handle different data types as input (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)). 
+- Deprecated `spa_common_points` - you can use `spa_intersection` to get the common points of two plateau line objects.
+- Enhanced general operations (e.g., `spa_core`, `spa_boundary`) to deal with the new spatial plateau data types (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)). 
+- Deprecated `spa_boundary_pregion` - you can use `spa_boundary` to get the boundary of a spatial plateau object.
 
 ## Minor changes
 
