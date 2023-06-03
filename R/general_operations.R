@@ -403,6 +403,136 @@ spa_core <- function(pgo) {
   }
 }
 
+#' @title Return a crisp spatial object formed by geometric parts of a `pgeometry` object
+#'
+#' @description This function yields a crisp spatial object (as an `sfg` object) formed by the geometric parts of the components of the `pgeometry` given as input that satisfy a filter condition based on their membership degrees
+#'
+#' @usage
+#'
+#' spa_range(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = TRUE)
+#'
+#' @param pgo A `pgeometry` object of any type.
+#'
+#' @name fsr_filter_operations
+#'
+#' @details
+#'
+#' Given a spatial plateau object as input, these operations return a crisp spatial object formed by the geometric parts of the components of the input that satisfy a filter 
+#' condition based on their membership degrees. The filter condition of each operations is detailed as follows:
+#' 
+#' - `spa_alpha_cut` selects all components that have membership degrees greater than or equal to a given value in $[0, 1]$ indicated by the parameter `alpha`. 
+#' - `spa_strict_alpha_cut` picks a subset of components that have membership values greater than the parameter `alpha` (a value in $]0, 1]$). 
+#' - `spa_range` generalizes these two operations and allows one to pick all components that have membership degrees belonging to a given open or closed interval. 
+#' The parameters `lside_closed` and `rside_closed`, respectively, determine whether the left and right side (parameters `lvalue` and `rvalue`) of the interval is open (`false`) or closed (`true`). 
+#' For example, to represent the right open interval $[0.5, 0.8[$, the following parameter values should be given: `lvalue = 0.5, rvalue = 0.8, lside_closed = TRUE, rside_closed = FALSE`.
+#'
+#' @return
+#'
+#' An `sfg` object that represents the geometric union of the components extracted after applying the specific filter condition.
+#'
+#' @references
+#'
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#'
+#' @examples
+#' library(sf)
+#'
+#' pts1 <- rbind(c(1, 2), c(3, 2))
+#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
+#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' 
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' 
+#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' 
+#' pp_alpha_cut <- spa_alpha_cut(pp, 0.6)
+#' pp_alpha_cut
+#' 
+#' pp_strict_alpha_cut <- spa_strict_alpha_cut(pp, 0.6)
+#' pp_strict_alpha_cut
+#' 
+#' pp_range <- spa_range(pp, 0.4, 0.8, true, true)
+#' pp_range
+#' @import sf
+#' @export
+spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = TRUE) {
+  type <- spa_get_type(pgo)
+  if(fsr_is_empty(pgo)) {
+    sf_type <- get_counter_ctype(pgo)
+    sfg_obj <- switch(sf_type,
+                      POINT = st_point(),
+                      LINESTRING = st_linestring(),
+                      POLYGON = st_polygon(),
+                      GEOMETRYCOLLECTION = st_geometrycollection())
+    return(sfg_obj)
+  } else {
+    if(type == "PLATEAUCOMPOSITION") {
+      triple <- st_sfc(spa_range(pgo@ppoint), spa_range(pgo@pline), spa_range(pgo@pregion))
+      return(st_union(triple)[[1]])
+    } else if(type == "PLATEAUCOLLECTION") {
+      range_list <- lapply(pgo@pgos, spa_range)
+      return(st_union(st_sfc(range_list))[[1]])
+    } else{
+      # filtering out elements that do not satisfy the condition
+      filtered_list <- pgo@component[lapply(pgo@component, function(x) {
+        md <- x@md
+        if (lside_closed) {
+          if (rside_closed) {
+            md >= lvalue & md <= rvalue
+          } else {
+            md >= lvalue & md < rvalue
+          }
+        } else {
+          if (rside_closed) {
+            md > lvalue & md <= rvalue
+          } else {
+            md > lvalue & md < rvalue
+          }
+        }
+      })]
+      if(length(filtered_list) > 0) {
+        return(st_union(st_sfc(filtered_list))[[1]])
+      } else {
+        spa_core(create_empty_pgeometry(type))
+      }
+    } 
+  }
+}
+
+#' @name fsr_filter_operations
+#' 
+#' @usage
+#' 
+#' spa_alpha_cut(pgo, alpha) 
+#' 
+#' @param alpha A numeric value. For `spa_alpha_cut`, it must be in $[0, 1]$. For `spa_strict_alpha_cut`, it must be in $]0, 1]$.
+#' 
+#' @import sf
+#' @export
+spa_alpha_cut <- function(pgo, alpha) {
+  if(alpha < 0 && alpha > 1) {
+    stop("'alpha' must be in [0, 1]", call. = FALSE)
+  }
+  spa_range(pgo, alpha, 1, TRUE, TRUE)
+}
+
+#' @name fsr_filter_operations
+#' 
+#' @usage
+#' 
+#' spa_strict_alpha_cut(pgo, alpha) 
+#' 
+#' @import sf
+#' @export
+spa_strict_alpha_cut <- function(pgo, alpha) {
+  if(alpha <= 0 && alpha > 1) {
+    stop("'alpha' must be in ]0, 1]", call. = FALSE)
+  }
+  spa_range(pgo, alpha, 1, FALSE, TRUE)
+}
+
 #' @title Capturing the fuzzy boundary of a plateau region object
 #'
 #' @description This function yields a specific part of the fuzzy boundary of a plateau region object.

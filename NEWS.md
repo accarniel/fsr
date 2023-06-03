@@ -19,6 +19,7 @@
 - Deprecated `spa_common_points` - you can use `spa_intersection` to get the common points of two plateau line objects.
 - Enhanced general operations (e.g., `spa_core`, `spa_boundary`) to deal with the new spatial plateau data types (based on the pull request [#31 - @pedbrgs](https://github.com/accarniel/fsr/pull/31)). 
 - Deprecated `spa_boundary_pregion` - you can use `spa_boundary` to get the boundary of a spatial plateau object.
+- Added three new general operations: `spa_alpha_cut`, `spa_strict_alpha_cut`, and `spa_range`.
 
 ## Minor changes
 
