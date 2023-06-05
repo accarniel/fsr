@@ -964,8 +964,7 @@ create_pgeometry <- function(x, type, is_valid = TRUE) {
               stop("To create a PLATEAUPOINT, PLATEAULINE or PLATEAUREGION object you must pass a list of components or a list with only one spatial plateau object.", call. = FALSE)
             }
           } else if (type == "PLATEAUCOMPOSITION") {
-            types <- lapply(x, function(pgo){paste0("PLATEAU", 
-                                                    substr(toupper(is(pgo)[1]), 2, nchar(toupper(is(pgo)[1]))))})
+            types <- lapply(x, spa_get_type)
             # Checking for spatial plateau objects of the same type in the list
             if(anyDuplicated(types)) {
               stop("To create a PLATEAUCOMPOSITION object, you must provide a list of components or a list with different types of spatial plateau objects.", call. = FALSE)
