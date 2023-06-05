@@ -73,7 +73,7 @@ spa_exact_equal <- function(pgo1, pgo2) {
       }
     }
   }
-  return(TRUE)
+  TRUE
 }
 
 #' @title Check exact containment
@@ -437,13 +437,13 @@ spa_disjoint <- function(pgo1, pgo2, itype="min", ret = "degree", ...) {
 #' 
 #' @usage
 #' 
-#' spa_equal(pgo1, pgo2, utype = "max", ret = 'degree', ...) 
+#' spa_equal(pgo1, pgo2, utype = "max", ret = "degree", ...) 
 #' 
 #' @param utype A character value that indicates the name of a function implementing a t-conorm. The default value is `"max"`, which is the standard operator of the union.
 #' 
 #' @import sf
 #' @export
-spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...) {
+spa_equal <- function(pgo1, pgo2, utype = "max", ret = "degree", ...) {
   
   check_spa_topological_condition(pgo1, pgo2)
   result <- NULL
@@ -476,11 +476,11 @@ spa_equal <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...) {
 #' 
 #' @usage
 #' 
-#' spa_inside(pgo1, pgo2, utype = "max", ret = 'degree', ...) 
+#' spa_inside(pgo1, pgo2, utype = "max", ret = "degree", ...) 
 #' 
 #' @import sf
 #' @export
-spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...) {
+spa_inside <- function(pgo1, pgo2, utype = "max", ret = "degree", ...) {
   
   check_spa_topological_condition(pgo1, pgo2)
   result <- NULL
@@ -509,10 +509,10 @@ spa_inside <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...) {
 #' 
 #' @usage
 #' 
-#' spa_contains(pgo1, pgo2, utype = "max", ret = 'degree', ...) 
+#' spa_contains(pgo1, pgo2, utype = "max", ret = "degree", ...) 
 #' 
 #' @export
-spa_contains <- function(pgo1, pgo2, utype = "max", ret = 'degree', ...){
+spa_contains <- function(pgo1, pgo2, utype = "max", ret = "degree", ...){
   spa_inside(pgo2, pgo1, utype = utype, ret = ret, ...)
 }
 

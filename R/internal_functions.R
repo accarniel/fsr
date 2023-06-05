@@ -122,14 +122,13 @@ get_components <- function(x) {
 
 #' @noRd
 get_counter_ctype <- function(pgo){
-  ptype <- pgo@type
-  
-  type <- switch(ptype,
-                 PLATEAUPOINT = "POINT",
-                 PLATEAULINE = "LINESTRING",
-                 PLATEAUREGION = "POLYGON")
-  
-  type
+  ptype = spa_get_type(pgo)
+  switch(ptype,
+         PLATEAUPOINT = "POINT",
+         PLATEAULINE = "LINESTRING",
+         PLATEAUREGION = "POLYGON",
+         PLATEAUCOMPOSITION = "GEOMETRYCOLLECTION",
+         PLATEAUCOLLECTION = "GEOMETRYCOLLECTION")
 }
 
 #' @import sf methods

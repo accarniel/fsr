@@ -231,6 +231,16 @@ result_handler <- function(type1, type2, obj, md, comps, check_compatibility = F
     append(comps, comp)
   }
   
+  # helper function that makes the union of all objects of a particular data type inside a geometrycollection
+  obj_union <- function(obj, geom_type){
+    objs <- suppressWarnings(st_collection_extract(obj, geom_type))
+    if(inherits(objs, "sfg")){
+      objs
+    }else if(inherits(objs, "sfc")){
+      st_union(objs)[[1]]
+    }
+  }
+  
   if(!st_is_empty(obj) && md > 0 && md <= 1) {
     geom_type <- st_geometry_type(obj)
     # the compatibility is only checked during the intersection of components in the first phase of a geometric set operation (union and difference)
@@ -414,6 +424,22 @@ agg_combination_matrix <- function(cm, as_pcomposition = FALSE) {
     agg_cm@pline <- lresult
     agg_cm@pregion <- rresult
     agg_cm
+  }
+}
+
+#' Determines the final spatial plateau data type of a geometric set operation when dealing with homogeneous objects
+#' 
+#' @noRd
+final_data_type <- function(type1, type2) {
+  if(type1 == type2) {
+    type1
+  } else {
+    if(any(c(type1, type2) == "PLATEAUPOINT")) {
+      "PLATEAUPOINT"
+    } else {
+      # plateau line and plateau region
+      "PLATEAULINE" 
+    }
   }
 }
 

@@ -150,7 +150,7 @@ spa_area <- function(pgo) {
     } else if(type == "PLATEAUCOMPOSITION") {
       spa_area(pgo@pregion)
     } else if(type == "PLATEAUCOLLECTION") {
-      pgos <- get_pgos(pgo)
+      pgos <- get_pgos_from_pcollection(pgo)
       pgos <- pgos[sapply(pgos, spa_get_type) %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")]
       sum(sapply(pgos, spa_area))
     }
@@ -188,7 +188,7 @@ spa_perimeter <- function(pgo) {
     } else if(type == "PLATEAUCOMPOSITION") {
       spa_perimeter(pgo@pregion)
     } else if(type == "PLATEAUCOLLECTION") {
-      pgos <- get_pgos(pgo)
+      pgos <- get_pgos_from_pcollection(pgo)
       pgos <- pgos[sapply(pgos, spa_get_type) %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")]
       sum(sapply(pgos, spa_perimeter))
     }
@@ -224,7 +224,7 @@ spa_length <- function(pgo) {
     } else if(type == "PLATEAUCOMPOSITION") {
       spa_length(pgo@pline)
     } else if(type == "PLATEAUCOLLECTION") {
-      pgos <- get_pgos(pgo)
+      pgos <- get_pgos_from_pcollection(pgo)
       pgos <- pgos[sapply(pgos, spa_get_type) %in% c("PLATEAULINE", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")]
       sum(sapply(pgos, spa_length))
     }

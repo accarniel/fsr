@@ -321,7 +321,7 @@ spa_eval <- function(pgo, point) {
 #'
 #' @export
 spa_support <- function(pgo){
-  return(pgo@supp)
+  pgo@supp
 }
 
 #' @title Capturing the core of a `pgeometry` object
