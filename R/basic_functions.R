@@ -39,6 +39,18 @@ spa_get_type <- function(pgo) {
   }
 }
 
+#' Checks if a given string is a valid spatial plateau data type
+#'
+#' @noRd
+is_pgeometry <- function(type) {
+  if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION", 
+                 "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
+    TRUE
+  } else {
+    FALSE
+  }
+}
+
 #' @title The PWKT of a spatial plateau object
 #'
 #' @description This function gives the Plateau Well-Known Text (PWKT) representation of a `pgeometry` object. 
@@ -268,6 +280,23 @@ tibble::as_tibble
 #' @import sf tibble
 #' @export
 as_tibble.pgeometry <- function(x, ...) {
+  # helper function that returns all components of a pgeometry objects as a single list
+  get_components <- function(x) {
+    types <- lapply(x, spa_get_type)
+    components <- c()
+    
+    for(pgo in 1:length(x)) {
+      if(types[[pgo]] == "PLATEAUCOMPOSITION") {
+        components[[pgo]] <- c(x[[pgo]]@ppoint@component, x[[pgo]]@pline@component, x[[pgo]]@pregion@component)
+      } else if(types[[pgo]] == "PLATEAUCOLLECTION") {
+        components[[pgo]] <- get_components(x[[pgo]]@pgos)
+      } else {
+        components[[pgo]] <- x[[pgo]]@component
+      }
+    }
+    components
+  }
+  
   components <- unlist(get_components(list(x)))
   
   md <- sapply(components, attr, "md")
@@ -828,6 +857,17 @@ create_empty_pgeometry <- function(type) {
 #' @import sf dplyr
 #' @export
 create_pgeometry <- function(x, type, is_valid = TRUE) {
+  # some helper functions to check the type of x
+  is_list_pgos <- function(x) {
+    types <- lapply(x, spa_get_type)
+    all(unlist(lapply(types, is_pgeometry)))
+  }
+  
+  is_list_components <- function(x) {
+    types <- lapply(lapply(x, is), function(x) x[[1]])
+    all(unlist(types) == "component")
+  }
+  
   # Checking if x is a list
   if(inherits(x, "list")) {
     
@@ -1010,7 +1050,6 @@ create_pgeometry <- function(x, type, is_valid = TRUE) {
     
     for(i in 1:nrow(x)) {
       new_components[[i]] <- new("component", obj = x[[1]][[i]], md = x[[i, 2]])
-      obj_comp <- new_components[[i]]@obj
     }
     
     create_pgeometry(new_components, type, is_valid = is_valid)

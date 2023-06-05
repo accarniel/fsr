@@ -1,4 +1,28 @@
-#' This function computes the geometric union of a list of components (i.e., support) for a given type of spatial plateau object. 
+#' Checks if an `sfg` object is compatible with a given spatial plateau data type
+#'
+#' @import sf
+#' @noRd
+is_compatible <- function(sfg, ptype) {
+  ptype <- toupper(ptype)
+  ret <- FALSE
+  if(inherits(sfg, "sfg")) {
+    if(inherits(sfg, c("POINT", "MULTIPOINT")) && ptype == "PLATEAUPOINT") {
+      ret <- TRUE
+    } else if(inherits(sfg, c("LINESTRING", "MULTILINESTRING")) && ptype == "PLATEAULINE") {
+      ret <- TRUE
+    } else if(inherits(sfg, c("POLYGON", "MULTIPOLYGON")) && ptype == "PLATEAUREGION") {
+      ret <- TRUE
+    } else if(inherits(sfg, c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING", "POLYGON", "MULTIPOLYGON")) &&
+              (ptype == "PLATEAUCOMPOSITION" || ptype == "PLATEAUCOLLECTION")) {
+      ret <- TRUE
+    }
+  } else {
+    stop("Component is not a sfg data type", call. = FALSE)
+  }
+  ret
+}
+
+#' Computes the geometric union of a list of components (i.e., support) for a given type of spatial plateau object. 
 #' It throws an error if any component is not compatible with the given spatial plateau data type.
 #' 
 #' @import sf
@@ -27,126 +51,7 @@ compute_support <- function(components, type) {
   
   supp <- st_union(st_sfc(obj_sf))
   
-  return(list(new_components, supp[[1]]))
-}
-
-#' search_by_md finds the index of the component of a plateau plateau object based on a given membership degree
-#'
-#' This function uses an interactive version of the binary search algorithm.
-#'
-#' @param components List of components
-#' @param low First index of the list to start the binary search
-#' @param high Last index of the list to end the binary search
-#' @param m Membership degree to be located
-#'
-#' @return If found, returns a vector with TRUE and the index position.
-#' If not found, returns a vector with FALSE and the first position given (low)
-#'
-#' @import dplyr
-#' @noRd
-search_by_md <- function(components, low, high, m){
-  while(low <= high){
-    mid = floor((low + high)/2)
-    if(near(m, components[[mid]]@md)){
-      return(c(TRUE,mid))
-    } else if(m < components[[mid]]@md){
-      high = mid - 1
-    } else{
-      low = mid + 1
-    }
-  }
-  return(c(FALSE, low))
-}
-
-#' @import sf
-#' @noRd
-is_compatible <- function(sfg, ptype) {
-  ptype <- toupper(ptype)
-  ret <- FALSE
-  if(inherits(sfg, "sfg")) {
-    if(inherits(sfg, c("POINT", "MULTIPOINT")) && ptype == "PLATEAUPOINT") {
-      ret <- TRUE
-    } else if(inherits(sfg, c("LINESTRING", "MULTILINESTRING")) && ptype == "PLATEAULINE") {
-      ret <- TRUE
-    } else if(inherits(sfg, c("POLYGON", "MULTIPOLYGON")) && ptype == "PLATEAUREGION") {
-      ret <- TRUE
-    } else if(inherits(sfg, c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING", "POLYGON", "MULTIPOLYGON")) &&
-              (ptype == "PLATEAUCOMPOSITION" || ptype == "PLATEAUCOLLECTION")) {
-      ret <- TRUE
-    }
-  } else {
-    stop("Component is not a sfg data type", call. = FALSE)
-  }
-  ret
-}
-
-#' @noRd
-is_pgeometry <- function(type) {
-  if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION", 
-                 "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
-    TRUE
-  } else {
-    FALSE
-  }
-}
-
-#' @noRd
-is_list_pgos <- function(x) {
-  types <- lapply(x, function(pgo){paste0("PLATEAU", 
-                                          substr(toupper(is(pgo)[1]), 2, nchar(toupper(is(pgo)[1]))))})
-  all(unlist(lapply(types, is_pgeometry)))
-}
-
-#' @noRd
-is_list_components <- function(x) {
-  types <- lapply(lapply(x, is), function(x) x[[1]])
-  all(unlist(types) == "component")
-}
-
-#' @noRd
-get_components <- function(x) {
-  types <- lapply(x, spa_get_type)
-  components <- c()
-  
-  for(pgo in 1:length(x)) {
-    if(types[[pgo]] == "PLATEAUCOMPOSITION") {
-      components[[pgo]] <- c(x[[pgo]]@ppoint@component, x[[pgo]]@pline@component, x[[pgo]]@pregion@component)
-    } else if(types[[pgo]] == "PLATEAUCOLLECTION") {
-      components[[pgo]] <- get_components(x[[pgo]]@pgos)
-    } else {
-      components[[pgo]] <- x[[pgo]]@component
-    }
-  }
-  components
-}
-
-#' @noRd
-get_counter_ctype <- function(pgo){
-  ptype = spa_get_type(pgo)
-  switch(ptype,
-         PLATEAUPOINT = "POINT",
-         PLATEAULINE = "LINESTRING",
-         PLATEAUREGION = "POLYGON",
-         PLATEAUCOMPOSITION = "GEOMETRYCOLLECTION",
-         PLATEAUCOLLECTION = "GEOMETRYCOLLECTION")
-}
-
-#' @import sf methods
-#' @noRd
-append_valid_comps <- function(sfg, pgo, md, lcomps){
-  if(!st_is_empty(sfg) && is_compatible(sfg, pgo@type)){
-    result_comp <- new("component", obj = sfg, md = md)
-    lcomps <- append(lcomps, result_comp)
-  } else if(!st_is_empty(sfg) && st_geometry_type(sfg) == "GEOMETRYCOLLECTION") {
-    type_geom = get_counter_ctype(pgo)
-    union_obj <- st_union(st_collection_extract(sfg, type = type_geom))
-    if(inherits(union_obj, "sfc")) {
-      union_obj <- union_obj[[1]]
-    }
-    result_comp <- new("component", obj = union_obj, md = md)
-    lcomps <- append(lcomps, result_comp)
-  }
-  lcomps
+  list(new_components, supp[[1]])
 }
 
 #' Captures all spatial plateau objects from a `pcollection` object as a list

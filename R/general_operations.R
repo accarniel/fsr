@@ -96,6 +96,31 @@ spa_add_component <- function(pgo, components, is_valid = FALSE) {
 #' @noRd
 spa_add_internal <- function(pgo, components) {
   
+  #' search_by_md finds the index of the component of a plateau plateau object based on a given membership degree
+  #'
+  #' This function uses an interactive version of the binary search algorithm.
+  #'
+  #' @param components List of components
+  #' @param low First index of the list to start the binary search
+  #' @param high Last index of the list to end the binary search
+  #' @param m Membership degree to be located
+  #'
+  #' @return If found, returns a vector with TRUE and the index position.
+  #' If not found, returns a vector with FALSE and the first position given (low)
+  search_by_md <- function(components, low, high, m){
+    while(low <= high){
+      mid = floor((low + high)/2)
+      if(near(m, components[[mid]]@md)){
+        return(c(TRUE,mid))
+      } else if(m < components[[mid]]@md){
+        high = mid - 1
+      } else{
+        low = mid + 1
+      }
+    }
+    return(c(FALSE, low))
+  }
+  
   type <- spa_get_type(pgo)
   
   for(component in components) {
@@ -322,6 +347,19 @@ spa_eval <- function(pgo, point) {
 #' @export
 spa_support <- function(pgo){
   pgo@supp
+}
+
+#' Gets the crisp spatial data type compatible with the given pgeometry object
+#'
+#' @noRd
+get_counter_ctype <- function(pgo){
+  ptype = spa_get_type(pgo)
+  switch(ptype,
+         PLATEAUPOINT = "POINT",
+         PLATEAULINE = "LINESTRING",
+         PLATEAUREGION = "POLYGON",
+         PLATEAUCOMPOSITION = "GEOMETRYCOLLECTION",
+         PLATEAUCOLLECTION = "GEOMETRYCOLLECTION")
 }
 
 #' @title Capturing the core of a `pgeometry` object
