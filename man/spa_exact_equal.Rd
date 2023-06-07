@@ -7,9 +7,9 @@
 spa_exact_equal(pgo1, pgo2)
 }
 \arguments{
-\item{pgo1}{A \code{pgeometry} object of any type.}
+\item{pgo1}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
 
-\item{pgo2}{A \code{pgeometry} object of any type.}
+\item{pgo2}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
 }
 \value{
 A Boolean value that indicates if two \code{pgeometry} objects are exactly equal.
@@ -22,16 +22,15 @@ It is a Boolean function that checks \emph{fuzzy equality} in the spatial platea
 Two components are equal if they have the same membership degree and they are (spatially) equal (i.e., their \code{sfg} objects have the same geometric format - this means that the order of the points can be different).
 }
 \examples{
-
 library(sf)
 
 pts1 <- rbind(c(1, 2), c(3, 2))
 pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 pts3 <- rbind(c(2, 2), c(3, 3))
 
-cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+cp1 <- create_component(st_multipoint(pts1), 0.3)
+cp2 <- create_component(st_multipoint(pts2), 0.6)
+cp3 <- create_component(st_multipoint(pts3), 1.0)
 
 pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
@@ -39,7 +38,6 @@ pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
 spa_exact_equal(pp1, pp2)
 
 spa_exact_equal(pp1, pp1)
-
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

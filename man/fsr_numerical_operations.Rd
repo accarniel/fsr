@@ -13,24 +13,20 @@ spa_avg_degree(pgo)
 
 spa_ncomp(pgo)
 
-spa_area(pr)
+spa_area(pgo)
 
-spa_perimeter(pr)
+spa_perimeter(pgo)
 
-spa_length(pl)
+spa_length(pgo)
 }
 \arguments{
-\item{pgo}{A \code{pgeometry} object of any type.}
-
-\item{pr}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
-
-\item{pl}{A \code{pgeometry} object of the type \code{PLATEAULINE}. It throws an error if a different type is given.}
+\item{pgo}{A \code{pgeometry} object of the type \code{PLATEAULINE}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION}. It throws a warning if a different type is given.}
 }
 \value{
 A numerical value.
 }
 \description{
-Fuzzy numerical operations are given as a family of functions that implements spatial plateau metric operations.
+Fuzzy numerical operations are given as a family of functions that implements spatial plateau numerical operations.
 These functions extract metric properties from spatial plateau objects,
 such as the area of a plateau region object and the length of a plateau line object.
 }
@@ -46,19 +42,18 @@ The type-independent functions are:
 The remaining functions are \emph{type-dependent}. This means that the parameter have to be of a specific type.
 The type-dependent functions are:
 \itemize{
-\item \code{spa_area} computes the area of a plateau region object. Thus, its parameter has to be a \code{PLATEAUREGION} object.
-\item \code{spa_perimeter} computes the perimeter of a plateau region object. Thus, its parameter has to be a \code{PLATEAUREGION} object.
-\item \code{spa_length} computes the length of a plateau line object. Thus, its parameter has to be a \code{PLATEAULINE} object.
+\item \code{spa_area} computes the area of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
+\item \code{spa_perimeter} computes the perimeter of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
+\item \code{spa_length} computes the length of a plateau line, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAULINE}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
 }
 }
 \examples{
-
 library(sf)
 library(tibble)
 
 pts1 <- rbind(c(1, 2), c(3, 2))
-comp1 <- component_from_sfg(st_multipoint(pts1), 0.2) 
-comp2 <- component_from_sfg(st_point(c(1, 5)), 0.8)  
+comp1 <- create_component(st_multipoint(pts1), 0.2) 
+comp2 <- create_component(st_point(c(1, 5)), 0.8)  
 
 pp <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
 
@@ -94,14 +89,13 @@ lpts1 <- rbind(c(0, 0), c(1, 1))
 lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 
-cp1 <- component_from_sfg(st_linestring(lpts1), 0.4)
-cp2 <- component_from_sfg(st_linestring(lpts2), 1)
-cp3 <- component_from_sfg(st_linestring(lpts3), 0.7)
+cp1 <- create_component(st_linestring(lpts1), 0.4)
+cp2 <- create_component(st_linestring(lpts2), 1)
+cp3 <- create_component(st_linestring(lpts3), 0.7)
 
 pline <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAULINE")
 
 spa_length(pline)
-
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

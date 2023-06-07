@@ -28,7 +28,6 @@ This evaluation depends on the following basic cases:
 }
 }
 \examples{
-
 library(tibble)
 library(sf)
 library(FuzzyR)
@@ -39,9 +38,9 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 pts3 <- rbind(c(2, 2), c(3, 3))
 
-cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+cp1 <- create_component(st_multipoint(pts1), 0.3)
+cp2 <- create_component(st_multipoint(pts2), 0.6)
+cp3 <- create_component(st_multipoint(pts3), 1.0)
 
 pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 
@@ -66,7 +65,6 @@ pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
 # capturing the membership degree of a specific point in each object
 spa_eval(pregions$pgeometry[[1]], st_point(c(5, 15)))
 spa_eval(pregions$pgeometry[[2]], st_point(c(5, 15)))
-
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

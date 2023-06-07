@@ -96,17 +96,16 @@ spa_add_component <- function(pgo, components, is_valid = FALSE) {
 #' @noRd
 spa_add_internal <- function(pgo, components) {
   
-  #' search_by_md finds the index of the component of a plateau plateau object based on a given membership degree
-  #'
-  #' This function uses an interactive version of the binary search algorithm.
-  #'
-  #' @param components List of components
-  #' @param low First index of the list to start the binary search
-  #' @param high Last index of the list to end the binary search
-  #' @param m Membership degree to be located
-  #'
-  #' @return If found, returns a vector with TRUE and the index position.
-  #' If not found, returns a vector with FALSE and the first position given (low)
+  # This internal function finds the index of the component of a plateau plateau object based on a given membership degree.
+  # It uses an interactive version of the binary search algorithm.
+  # Parameters:
+  # components is a list of components
+  # low is the first index of the list to start the binary search
+  # high is the last index of the list to end the binary search
+  # m is the membership degree to be located
+  #
+  # If found, it returns a vector with TRUE and the index position.
+  # If not found, returns a vector with FALSE and the first position given (low)
   search_by_md <- function(components, low, high, m){
     while(low <= high){
       mid = floor((low + high)/2)

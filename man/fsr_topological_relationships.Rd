@@ -16,11 +16,11 @@ spa_meet(pgo1, pgo2, itype = "min", ret = "degree", ...)
 
 spa_disjoint(pgo1, pgo2, itype = "min", ret = "degree", ...)
 
-spa_equal(pgo1, pgo2, utype = "max", ret = 'degree', ...)
+spa_equal(pgo1, pgo2, utype = "max", ret = "degree", ...)
 
-spa_inside(pgo1, pgo2, utype = "max", ret = 'degree', ...)
+spa_inside(pgo1, pgo2, utype = "max", ret = "degree", ...)
 
-spa_contains(pgo1, pgo2, utype = "max", ret = 'degree', ...)
+spa_contains(pgo1, pgo2, utype = "max", ret = "degree", ...)
 }
 \arguments{
 \item{pgo1}{A \code{pgeometry} object of the type \code{PLATEAUREGION}.}

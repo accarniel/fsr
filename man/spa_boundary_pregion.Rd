@@ -31,6 +31,7 @@ Else if \code{boundary = "region"} (the default value), then the function return
 }
 \examples{
 
+\dontrun{
 library(tibble)
 library(FuzzyR)
 
@@ -49,6 +50,8 @@ pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
 pregions$pgeometry[[1]]
 pregions$pgeometry[[2]]
 
+# these functions are now deprecated, use `spa_boundary`
+
 # capturing and showing the boundary plateau line of each pgeometry object previously created
 (spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
 (spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
@@ -57,6 +60,7 @@ pregions$pgeometry[[2]]
 # capturing and showing the boundary plateau region (this is the default behavior)
 (spa_boundary_pregion(pregions$pgeometry[[1]]))
 (spa_boundary_pregion(pregions$pgeometry[[2]]))
+}
 
 }
 \references{

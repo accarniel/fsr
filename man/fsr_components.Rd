@@ -6,99 +6,80 @@
 \alias{component_from_sfg}
 \title{Creation of a component}
 \usage{
-create_component(raw_obj, md, type)
+create_component(obj, md, ...)
 
 component_from_sfg(sfg, md)
 }
 \arguments{
-\item{raw_obj}{A vector, list or matrix containing the pairs of coordinates  to create the \code{sfg} object of the component.}
+\item{obj}{A crisp spatial object in a specific format (see details below).}
 
-\item{md}{A numeric value indicating the membership degree of the component. It has to be a value in \eqn{]0, 1]}.}
+\item{md}{A numeric value indicating the membership degree of the component. It must be a value in \eqn{]0, 1]}.}
 
-\item{type}{A character value that indicates the type of the desired \code{sfg} object.
-It should be either \code{"POINT"}, \code{"LINE"}, or \code{"REGION"}.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Different parameters that are used to convert a crisp spatial object from a specific representation (see more in details below).}
 
-\item{sfg}{An \code{sfg} object. It should be either \code{POINT}, \code{MULTIPOINT}, \code{LINESTRING},
-\code{MULTILINESTRING}, \code{POLYGON} or \code{MULTIPOLYGON} type. Other types of spatial objects are not allowed.}
+\item{sfg}{An \code{sfg} object. It should be either of type \code{POINT}, \code{MULTIPOINT}, \code{LINESTRING},
+\code{MULTILINESTRING}, \code{POLYGON} or \code{MULTIPOLYGON}. Other types of spatial objects are not allowed.}
 }
 \value{
 A \code{component} object that can be added to a spatial plateau object (i.e., a \code{pgeometry} object).
 }
 \description{
-There are two functions that build a component from coordinate pairs or a
-single \code{sfg} object labeled with a membership degree. This component can be added to a spatial plateau object.
-A component consists of an \code{sfg} object and an associated membership degree.
-A component can be built in two different ways. By using the function \code{create_component}, the component is formed by
-the means of a  numeric vector, list or matrix that represents a pair of coordinates.
-By using the function \code{component_from_sfg}, the component is created from an \code{sfg}
-object.
+This function builds an object of class \code{component}.
+A component consists of a crisp spatial object (i.e., \code{sfg} object) labeled with a membership degree in \eqn{]0, 1]}.
+It is a flexible function since the crisp spatial object can be provided by using different formats.
 }
 \details{
-These functions create a \code{component} object, which is a pair of an \code{sfg} object and a membership degree in \eqn{]0, 1]}.
+The function \code{create_component} creates a \code{component} object. Internally, it is a pair of an \code{sfg} object and a membership degree in \eqn{]0, 1]}.
 
-The function \code{create_component} receives  three parameters: \code{raw_obj}, \code{md} and \code{type}. The use of \code{raw_obj} is
-similar to the parameter of the family of functions of the \code{sf} package (\code{st} family) that creates spatial objects
-from a numeric vector, matrix or list (e.g., the functions \code{st_point}, \code{st_multipoint}, etc.). The spatial data type
-(i.e., the type of the \code{sfg} object) indicated by the parameter \code{type} represents simple and complex objects.
-For instance, \code{"POINT"} may refer to simple or complex point objects (internally, we can create a POINT or MULTIPOINT object).
+For this, \code{obj} can be either:
+\itemize{
+\item an \code{sfg} object of type,
+\item a character vector containing the WKT representation of a crisp spatial object,
+\item a structure of class \code{"WKB"} with the WKB or EWKB representation of a crisp spatial object (if the EWKB representation is used, then you have to provide the additional parameter \code{EWKB = TRUE} in \code{...}),
+\item a vector, list, or matrix containing coordinate pairs to be used when creating the \code{sfg} object.
+This means that in this case it has a similar behavior to the family of functions \code{st} of the \code{sf} package (e.g., the functions \code{st_point}, \code{st_multipoint}, etc.).
+Thus, you have to provide the additional parameter \code{type} in \code{...}, which should be either \code{"POINT"}, \code{"LINE"}, or \code{"REGION"}.
+}
 
-The \code{component_from_sfg} builds a \code{component} object by using the specification of two parameters that directly represents the
-pair of an \code{sfg} object and its corresponding membership degree (i.e.,  \code{md} value).
+It is important to emphasize that the crisp spatial object must be a simple or complex point, line, or region (i.e., polygon) object.
+That is, it should be a \code{POINT}, \code{MULTIPOINT}, \code{LINESTRING}, \code{MULTILINESTRING}, \code{POLYGON} or \code{MULTIPOLYGON} object.
+If other types of crisp spatial objects are given, an error will be thrown.
+
+The function \code{component_from_sfg} is now integrated with the function \code{create_component}.
+Hence, \code{component_from_sfg} is deprecated.
 }
 \examples{
 
-# Creating two components of the type POINT
-v1 = rbind(c(1,2), c(3,4))
-v2 = rbind(c(1,4), c(2,3),c(4,4))
-
-md1 = 0.2
-md2 = 0.1
-
-comp1 <- create_component(v1, md1, type="POINT")
-comp2 <- create_component(v2, md2, type="POINT")
-
-# Creating two components of the type LINE
-
-md3 = 0.45
-md4 = 0.32
-
-v3 = rbind(c(2,2), c(3,3))
-v4 = rbind(c(1,1), c(3,2))
-
-comp3 <- create_component(v3, md3, type="LINE")
-comp4 <- create_component(v4, md4, type="LINE")
-
-# Creating two components of the type REGION
-
-p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-list_pols_1 <- list(p1,p2)
-
-p3 <- rbind(c(1,0), c(2,0), c(4,2), c(3,4), c(2,4), c(1,0))
-p4 <- rbind(c(2,2), c(2,3), c(3,4), c(2,2))
-list_pols_2 <- list(p3,p4)
-
-comp_pol1 <- create_component(list_pols_1, 0.4, "REGION")
-comp_pol2 <- create_component(list_pols_2, 0.6, "REGION")
-
-
-# Creating components with an sfg object
+# first way: providing sfg objects
 library(sf)
 
-# POINT
-md1 <- 0.2
-pts1 <- rbind(c(1, 2), c(3, 2))
-comp1 <- component_from_sfg(st_multipoint(pts1), md1) 
+pts <- rbind(c(1, 2), c(3, 2))
+comp1 <- create_component(st_multipoint(pts), 0.2) 
 
-# LINE
-md2 <- 0.1
-pts2 <- rbind(c(2, 2), c(3, 3))
-comp2 <- component_from_sfg(st_linestring(pts2), md2) 
+lpts <- rbind(c(2, 2), c(3, 3))
+comp2 <- create_component(st_linestring(lpts), 0.1) 
 
-# REGION
-md3 <- 0.4
-matrix_object = matrix(c(1,1,8,1,8,8,1,8,1,1),ncol=2, byrow=TRUE)
-pts3 = list(matrix_object)
-comp3 = component_from_sfg(st_polygon(pts3), md3)
+matrix_obj <- matrix(c(1,1,8,1,8,8,1,8,1,1), ncol = 2, byrow = TRUE)
+rpts <- list(matrix_obj)
+comp3 <- create_component(st_polygon(rpts), 0.4)
+
+# second way: providing WKT representations
+
+comp4 <- create_component("POINT(10 35)", 0.5)
+comp5 <- create_component("MULTILINESTRING((-29 -27,-36 -31,-45 -33), (-45 -33,-46 -32))", 0.9)
+comp6 <- create_component("POLYGON((75 29, 77 29, 77 29, 75 29))", 1)
+
+# third way: providing WKB representations
+
+wkb = structure(list("0x0101000020e610000000000000000000000000000000000040"), class = "WKB")
+comp7 <- create_component(wkb, 0.8, EWKB = TRUE)
+
+# fourth way: providing coordinates
+
+coords1 = rbind(c(2,2), c(3,3))
+coords2 = rbind(c(1,1), c(3,2))
+
+comp8 <- create_component(coords1, 0.45, type = "LINE")
+comp9 <- create_component(coords2, 0.32, type = "POINT")
 
 }

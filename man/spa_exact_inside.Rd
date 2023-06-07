@@ -7,9 +7,9 @@
 spa_exact_inside(pgo1, pgo2)
 }
 \arguments{
-\item{pgo1}{A \code{pgeometry} object of any type.}
+\item{pgo1}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
 
-\item{pgo2}{A \code{pgeometry} object of any type.}
+\item{pgo2}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
 }
 \value{
 A Boolean value that indicates if a \code{pgeometry} is completely and certainly inside \code{pgo2}.
@@ -33,9 +33,9 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 pts3 <- rbind(c(2, 2), c(3, 3))
 
-cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+cp1 <- create_component(st_multipoint(pts1), 0.3)
+cp2 <- create_component(st_multipoint(pts2), 0.6)
+cp3 <- create_component(st_multipoint(pts3), 1.0)
 
 # Creating two spatial plateau objects
 pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")

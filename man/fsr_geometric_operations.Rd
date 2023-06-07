@@ -8,20 +8,22 @@
 \alias{spa_common_points}
 \title{Fuzzy geometric set operations}
 \usage{
-spa_intersection(pgo1, pgo2, itype = "min")
+spa_intersection(pgo1, pgo2, itype = "min", as_pcomposition = FALSE)
 
-spa_union(pgo1, pgo2, utype = "max")
+spa_union(pgo1, pgo2, utype = "max", as_pcomposition = FALSE)
 
-spa_difference(pgo1, pgo2, dtype = "f_diff")
+spa_difference(pgo1, pgo2, dtype = "f_diff", as_pcomposition = FALSE)
 
 spa_common_points(pline1, pline2, itype = "min")
 }
 \arguments{
 \item{pgo1}{A \code{pgeometry} object of any type.}
 
-\item{pgo2}{A \code{pgeometry} object of the same type of \code{pgo1}.}
+\item{pgo2}{A \code{pgeometry} object of any type.}
 
 \item{itype}{A character value that indicates the name of a function implementing a t-norm. The default value is \code{"min"}, which is the standard operator of the intersection.}
+
+\item{as_pcomposition}{A logical value; if \code{TRUE}, it returns a spatial plateau composition object.}
 
 \item{utype}{A character value that refers to a t-conorm. The default value is \code{"max"}, which is the standard operator of the union.}
 
@@ -77,9 +79,9 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 pts3 <- rbind(c(2, 2), c(3, 3))
 
-cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-cp3 <- component_from_sfg(st_multipoint(pts3), 1)
+cp1 <- create_component(st_multipoint(pts1), 0.3)
+cp2 <- create_component(st_multipoint(pts2), 0.6)
+cp3 <- create_component(st_multipoint(pts3), 1)
 
 pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 
@@ -87,9 +89,9 @@ pts4 <- rbind(c(0, 0), c(1, 1))
 pts5 <- rbind(c(2, 3), c(1.2, 1.9), c(2, 1))
 pts6 <- rbind(c(3, 1), c(1.5, 0.5))
 
-cp4 <- component_from_sfg(st_multipoint(pts4), 0.4)
-cp5 <- component_from_sfg(st_multipoint(pts5), 1)
-cp6 <- component_from_sfg(st_multipoint(pts6), 0.7)
+cp4 <- create_component(st_multipoint(pts4), 0.4)
+cp5 <- create_component(st_multipoint(pts5), 1)
+cp6 <- create_component(st_multipoint(pts6), 0.7)
 
 pp2 <- create_pgeometry(list(cp4, cp5, cp6), "PLATEAUPOINT")
 
@@ -104,4 +106,5 @@ spa_difference(pp1, pp2)
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\href{https://ieeexplore.ieee.org/document/9177620}{Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.}
 }
