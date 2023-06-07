@@ -377,7 +377,7 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
             ch <- st_intersection(ch, base_poly)
           }
           
-          comp <- component_from_sfg(ch, level)
+          comp <- create_component(ch, level)
           pregion <- create_pgeometry(list(comp), "PLATEAUREGION")
           result_classes[[k-3]] <- spa_union(result_classes[[k-3]], pregion)
         }

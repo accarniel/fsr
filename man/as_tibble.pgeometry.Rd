@@ -50,9 +50,9 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 pts3 <- rbind(c(2, 2), c(3, 3))
 
-comp1 <- component_from_sfg(st_multipoint(pts1), md1)
-comp2 <- component_from_sfg(st_multipoint(pts2), md2)
-comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+comp1 <- create_component(st_multipoint(pts1), md1)
+comp2 <- create_component(st_multipoint(pts2), md2)
+comp3 <- create_component(st_multipoint(pts3), md3)
 
 # Creating the plateau point object as a pgeometry object with 3 components
 

@@ -329,9 +329,9 @@ spa_eval <- function(pgo, point) {
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #' 
-#' cp1 <- component_from_sfg(st_multipoint(pts1), 0.3)
-#' cp2 <- component_from_sfg(st_multipoint(pts2), 0.6)
-#' cp3 <- component_from_sfg(st_multipoint(pts3), 1.0)
+#' cp1 <- create_component(st_multipoint(pts1), 0.3)
+#' cp2 <- create_component(st_multipoint(pts2), 0.6)
+#' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
 #' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' pp
@@ -486,15 +486,15 @@ spa_core <- function(pgo) {
 #' cp2 <- create_component(st_multipoint(pts2), 0.6)
 #' cp3 <- create_component(st_multipoint(pts3), 1.0)
 #' 
-#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+#' ppoint <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 #' 
-#' pp_alpha_cut <- spa_alpha_cut(pp, 0.6)
+#' pp_alpha_cut <- spa_alpha_cut(ppoint, 0.6)
 #' pp_alpha_cut
 #' 
-#' pp_strict_alpha_cut <- spa_strict_alpha_cut(pp, 0.6)
+#' pp_strict_alpha_cut <- spa_strict_alpha_cut(ppoint, 0.6)
 #' pp_strict_alpha_cut
 #' 
-#' pp_range <- spa_range(pp, 0.4, 0.8, true, true)
+#' pp_range <- spa_range(ppoint, 0.4, 0.8)
 #' pp_range
 #' @import sf
 #' @export
@@ -510,14 +510,16 @@ spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = T
     return(sfg_obj)
   } else {
     if(type == "PLATEAUCOMPOSITION") {
-      triple <- st_sfc(spa_range(pgo@ppoint), spa_range(pgo@pline), spa_range(pgo@pregion))
+      triple <- st_sfc(spa_range(pgo@ppoint, lvalue, rvalue, lside_closed, rside_closed), 
+                       spa_range(pgo@pline, lvalue, rvalue, lside_closed, rside_closed), 
+                       spa_range(pgo@pregion, lvalue, rvalue, lside_closed, rside_closed))
       return(st_union(triple)[[1]])
     } else if(type == "PLATEAUCOLLECTION") {
-      range_list <- lapply(pgo@pgos, spa_range)
+      range_list <- lapply(pgo@pgos, spa_range, lvalue = lvalue, rvalue = rvalue, lside_closed = lside_closed, rside_closed = rside_closed)
       return(st_union(st_sfc(range_list))[[1]])
     } else{
       # filtering out elements that do not satisfy the condition
-      filtered_list <- pgo@component[lapply(pgo@component, function(x) {
+      filtered_list <- pgo@component[sapply(pgo@component, function(x) {
         md <- x@md
         if (lside_closed) {
           if (rside_closed) {
@@ -534,7 +536,8 @@ spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = T
         }
       })]
       if(length(filtered_list) > 0) {
-        return(st_union(st_sfc(filtered_list))[[1]])
+        objs <- lapply(filtered_list, attr, "obj")
+        return(st_union(st_sfc(objs))[[1]])
       } else {
         spa_core(create_empty_pgeometry(type))
       }

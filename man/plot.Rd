@@ -70,9 +70,9 @@ pts1 <- rbind(c(1, 2), c(3, 2))
 pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 pts3 <- rbind(c(2, 2), c(3, 3))
 
-comp1 <- component_from_sfg(st_multipoint(pts1), md1)
-comp2 <- component_from_sfg(st_multipoint(pts2), md2)
-comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+comp1 <- create_component(st_multipoint(pts1), md1)
+comp2 <- create_component(st_multipoint(pts2), md2)
+comp3 <- create_component(st_multipoint(pts3), md3)
 
 # Creating the plateau point object as a pgeometry object with 3 components
 
@@ -87,9 +87,9 @@ lpts1 <- rbind(c(0, 0), c(1, 1))
 lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 
-comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
-comp5 <- component_from_sfg(st_linestring(lpts2), 1)
-comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+comp4 <- create_component(st_linestring(lpts1), 0.4)
+comp5 <- create_component(st_linestring(lpts2), 1)
+comp6 <- create_component(st_linestring(lpts3), 0.7)
 
 pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
@@ -107,9 +107,9 @@ p4 <- rbind(c(3.3,0.3), c(3.8,0.3), c(3.8,0.8), c(3.3,0.8), c(3.3,0.3))[5:1,]
 pol2 <- st_polygon(list(p3,p4))
 pol3 <- st_polygon(list(rbind(c(3,3), c(4,2), c(4,3), c(3,3))))
 
-comp1 <- component_from_sfg(pol1, 0.2)
-comp2 <- component_from_sfg(pol2, 0.4)
-comp3 <- component_from_sfg(pol3, 0.7)
+comp1 <- create_component(pol1, 0.2)
+comp2 <- create_component(pol2, 0.4)
+comp3 <- create_component(pol3, 0.7)
 
 pregion <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
 fsr_plot(pregion)

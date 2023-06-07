@@ -79,34 +79,15 @@ spa_pwkt(pregion)
 
 # For a `PLATEAUCOMPOSITION` object.
 
-ppts <- rbind(c(1, 2), c(3, 2))
-pcomp <- create_component(st_multipoint(ppts), 0.2) 
-
-lpts <- rbind(c(0, 0), c(1, 1))
-lcomp <- create_component(st_linestring(lpts), 0.4)
-
-rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-pol <- st_polygon(list(rpts1, rpts2))
-rcomp <- create_component(pol, 0.2)
+pcomp <- create_component("POINT(0 0)", 0.2) 
+lcomp <- create_component("LINESTRING(1 1, 2 2)", 0.4)
+rcomp <- create_component("POLYGON((3 3, 4 4, 4 2, 3 3))", 0.2)
 
 pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
 
 spa_pwkt(pcomposition)
 
 # For a `PLATEAUCOLLECTION` object.
-
-lpts <- rbind(c(0, 0), c(1, 1))
-lcomp <- create_component(st_linestring(lpts), 0.4)
-pline <- create_pgeometry(list(lcomp), "PLATEAULINE")
-
-rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-pol <- st_polygon(list(rpts1, rpts2))
-rcomp <- create_component(pol, 0.2)
-pregion <- create_pgeometry(list(rcomp), "PLATEAUREGION")
-
-pcomposition <- create_pgeometry(list(pline, pregion), "PLATEAUCOMPOSITION")
 
 pcollection <- create_pgeometry(list(pline, pregion, pcomposition), "PLATEAUCOLLECTION")
  

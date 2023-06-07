@@ -54,7 +54,7 @@ comp3 <- create_component(st_multipoint(pts3), md3)
 
 # Creating the plateau point object as a pgeometry object with 3 components
 
-plateau_point <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 
 # Example 2 - Creating an `PLATEAULINE` object from a list of components.
 
@@ -66,48 +66,30 @@ comp4 <- create_component(st_linestring(lpts1), 0.4)
 comp5 <- create_component(st_linestring(lpts2), 1)
 comp6 <- create_component(st_linestring(lpts3), 0.7)
 
-plateau_line <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 
 # Example 3 - Creating an `PLATEAUREGION` object from a list of components.
 
 p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
 p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-pol1 <-st_polygon(list(p1,p2))
+pol1 <-st_polygon(list(p1, p2))
 
 comp1 <- create_component(pol1, 0.2)
 
-plateau_region <- create_pgeometry(list(comp1), "PLATEAUREGION")
+pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 
 # Example 4 - Creating an `PLATEAUCOMPOSITION` object from a list of components.
 
-ppts <- rbind(c(1, 2), c(3, 2))
-pcomp <- create_component(st_multipoint(ppts), 0.2) 
+pcomp <- create_component("POINT(0 0)", 0.2) 
+lcomp <- create_component("LINESTRING(1 1, 2 2)", 0.4)
+rcomp <- create_component("POLYGON((3 3, 4 4, 4 2, 3 3))", 0.2)
 
-lpts <- rbind(c(0, 0), c(1, 1))
-lcomp <- create_component(st_linestring(lpts), 0.4)
-
-rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-pol <- st_polygon(list(rpts1, rpts2))
-rcomp <- create_component(pol, 0.2)
-
-plateau_composition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
+pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
 
 # Example 5 - Creating an `PLATEAUCOLLECTION` object from a list of spatial plateau objects.
-
-lpts <- rbind(c(0, 0), c(1, 1))
-lcomp <- create_component(st_linestring(lpts), 0.4)
-plateau_line <- create_pgeometry(list(lcomp), "PLATEAULINE")
-
-rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-pol <- st_polygon(list(rpts1, rpts2))
-rcomp <- create_component(pol, 0.2)
-plateau_region <- create_pgeometry(list(rcomp), "PLATEAUREGION")
-
-plateau_composition <- create_pgeometry(list(plateau_region), "PLATEAUCOMPOSITION")
-
-plateau_collection <- create_pgeometry(list(plateau_line, plateau_composition), "PLATEAUCOLLECTION") 
+ 
+plateau_collection <- create_pgeometry(list(ppoint, pline, pregion, pcomposition), 
+                                       "PLATEAUCOLLECTION") 
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

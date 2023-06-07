@@ -119,34 +119,15 @@ is_pgeometry <- function(type) {
 #' 
 #' # For a `PLATEAUCOMPOSITION` object.
 #' 
-#' ppts <- rbind(c(1, 2), c(3, 2))
-#' pcomp <- create_component(st_multipoint(ppts), 0.2) 
-#' 
-#' lpts <- rbind(c(0, 0), c(1, 1))
-#' lcomp <- create_component(st_linestring(lpts), 0.4)
-#' 
-#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol <- st_polygon(list(rpts1, rpts2))
-#' rcomp <- create_component(pol, 0.2)
+#' pcomp <- create_component("POINT(0 0)", 0.2) 
+#' lcomp <- create_component("LINESTRING(1 1, 2 2)", 0.4)
+#' rcomp <- create_component("POLYGON((3 3, 4 4, 4 2, 3 3))", 0.2)
 #' 
 #' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
 #' 
 #' spa_pwkt(pcomposition)
 #' 
 #' # For a `PLATEAUCOLLECTION` object.
-#' 
-#' lpts <- rbind(c(0, 0), c(1, 1))
-#' lcomp <- create_component(st_linestring(lpts), 0.4)
-#' pline <- create_pgeometry(list(lcomp), "PLATEAULINE")
-#' 
-#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol <- st_polygon(list(rpts1, rpts2))
-#' rcomp <- create_component(pol, 0.2)
-#' pregion <- create_pgeometry(list(rcomp), "PLATEAUREGION")
-#' 
-#' pcomposition <- create_pgeometry(list(pline, pregion), "PLATEAUCOMPOSITION")
 #' 
 #' pcollection <- create_pgeometry(list(pline, pregion, pcomposition), "PLATEAUCOLLECTION")
 #'  
@@ -264,9 +245,9 @@ tibble::as_tibble
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #'
-#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
-#' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
-#' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+#' comp1 <- create_component(st_multipoint(pts1), md1)
+#' comp2 <- create_component(st_multipoint(pts2), md2)
+#' comp3 <- create_component(st_multipoint(pts3), md3)
 #' 
 #' # Creating the plateau point object as a pgeometry object with 3 components
 #' 
@@ -367,9 +348,9 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
 #' pts3 <- rbind(c(2, 2), c(3, 3))
 #'
-#' comp1 <- component_from_sfg(st_multipoint(pts1), md1)
-#' comp2 <- component_from_sfg(st_multipoint(pts2), md2)
-#' comp3 <- component_from_sfg(st_multipoint(pts3), md3)
+#' comp1 <- create_component(st_multipoint(pts1), md1)
+#' comp2 <- create_component(st_multipoint(pts2), md2)
+#' comp3 <- create_component(st_multipoint(pts3), md3)
 #' 
 #' # Creating the plateau point object as a pgeometry object with 3 components
 #' 
@@ -384,9 +365,9 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
 #' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
 #'
-#' comp4 <- component_from_sfg(st_linestring(lpts1), 0.4)
-#' comp5 <- component_from_sfg(st_linestring(lpts2), 1)
-#' comp6 <- component_from_sfg(st_linestring(lpts3), 0.7)
+#' comp4 <- create_component(st_linestring(lpts1), 0.4)
+#' comp5 <- create_component(st_linestring(lpts2), 1)
+#' comp6 <- create_component(st_linestring(lpts3), 0.7)
 #'
 #' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #'
@@ -404,9 +385,9 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' pol2 <- st_polygon(list(p3,p4))
 #' pol3 <- st_polygon(list(rbind(c(3,3), c(4,2), c(4,3), c(3,3))))
 #' 
-#' comp1 <- component_from_sfg(pol1, 0.2)
-#' comp2 <- component_from_sfg(pol2, 0.4)
-#' comp3 <- component_from_sfg(pol3, 0.7)
+#' comp1 <- create_component(pol1, 0.2)
+#' comp2 <- create_component(pol2, 0.4)
+#' comp3 <- create_component(pol3, 0.7)
 #' 
 #' pregion <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
 #' fsr_plot(pregion)
@@ -803,7 +784,7 @@ create_empty_pgeometry <- function(type) {
 #' 
 #' # Creating the plateau point object as a pgeometry object with 3 components
 #' 
-#' plateau_point <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
 #' 
 #' # Example 2 - Creating an `PLATEAULINE` object from a list of components.
 #' 
@@ -815,54 +796,38 @@ create_empty_pgeometry <- function(type) {
 #' comp5 <- create_component(st_linestring(lpts2), 1)
 #' comp6 <- create_component(st_linestring(lpts3), 0.7)
 #'
-#' plateau_line <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+#' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
 #' 
 #' # Example 3 - Creating an `PLATEAUREGION` object from a list of components.
 #' 
 #' p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
 #' p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol1 <-st_polygon(list(p1,p2))
+#' pol1 <-st_polygon(list(p1, p2))
 #' 
 #' comp1 <- create_component(pol1, 0.2)
 #' 
-#' plateau_region <- create_pgeometry(list(comp1), "PLATEAUREGION")
+#' pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
 #' 
 #' # Example 4 - Creating an `PLATEAUCOMPOSITION` object from a list of components.
 #' 
-#' ppts <- rbind(c(1, 2), c(3, 2))
-#' pcomp <- create_component(st_multipoint(ppts), 0.2) 
+#' pcomp <- create_component("POINT(0 0)", 0.2) 
+#' lcomp <- create_component("LINESTRING(1 1, 2 2)", 0.4)
+#' rcomp <- create_component("POLYGON((3 3, 4 4, 4 2, 3 3))", 0.2)
 #' 
-#' lpts <- rbind(c(0, 0), c(1, 1))
-#' lcomp <- create_component(st_linestring(lpts), 0.4)
-#' 
-#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol <- st_polygon(list(rpts1, rpts2))
-#' rcomp <- create_component(pol, 0.2)
-#' 
-#' plateau_composition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
+#' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
 #' 
 #' # Example 5 - Creating an `PLATEAUCOLLECTION` object from a list of spatial plateau objects.
-#' 
-#' lpts <- rbind(c(0, 0), c(1, 1))
-#' lcomp <- create_component(st_linestring(lpts), 0.4)
-#' plateau_line <- create_pgeometry(list(lcomp), "PLATEAULINE")
-#' 
-#' rpts1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-#' rpts2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol <- st_polygon(list(rpts1, rpts2))
-#' rcomp <- create_component(pol, 0.2)
-#' plateau_region <- create_pgeometry(list(rcomp), "PLATEAUREGION")
-#' 
-#' plateau_composition <- create_pgeometry(list(plateau_region), "PLATEAUCOMPOSITION")
-#' 
-#' plateau_collection <- create_pgeometry(list(plateau_line, plateau_composition), "PLATEAUCOLLECTION") 
+#'  
+#' plateau_collection <- create_pgeometry(list(ppoint, pline, pregion, pcomposition), 
+#'                                        "PLATEAUCOLLECTION") 
 #' @import sf dplyr
 #' @export
 create_pgeometry <- function(x, type, is_valid = TRUE) {
   # some helper functions to check the type of x
   is_list_pgos <- function(x) {
-    types <- lapply(x, spa_get_type)
+    # we don't use spa_get_type here because it throws an error if an invalid object is found
+    types <- lapply(x, function(pgo){paste0("PLATEAU", 
+                                            substr(toupper(is(pgo)[1]), 2, nchar(toupper(is(pgo)[1]))))})
     all(unlist(lapply(types, is_pgeometry)))
   }
   
@@ -967,7 +932,9 @@ create_pgeometry <- function(x, type, is_valid = TRUE) {
               stop("To create a PLATEAUPOINT, PLATEAULINE or PLATEAUREGION object you must pass a list of components or a list with only one spatial plateau object.", call. = FALSE)
             }
           } else if (type == "PLATEAUCOMPOSITION") {
-            types <- lapply(x, spa_get_type)
+            # we don't use spa_get_type here because it throws an error if an invalid object is found
+            types <- lapply(x, function(pgo){paste0("PLATEAU", 
+                                                    substr(toupper(is(pgo)[1]), 2, nchar(toupper(is(pgo)[1]))))})
             # Checking for spatial plateau objects of the same type in the list
             if(anyDuplicated(types)) {
               stop("To create a PLATEAUCOMPOSITION object, you must provide a list of components or a list with different types of spatial plateau objects.", call. = FALSE)

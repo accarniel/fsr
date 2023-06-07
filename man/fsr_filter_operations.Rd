@@ -54,15 +54,15 @@ cp1 <- create_component(st_multipoint(pts1), 0.3)
 cp2 <- create_component(st_multipoint(pts2), 0.6)
 cp3 <- create_component(st_multipoint(pts3), 1.0)
 
-pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+ppoint <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
 
-pp_alpha_cut <- spa_alpha_cut(pp, 0.6)
+pp_alpha_cut <- spa_alpha_cut(ppoint, 0.6)
 pp_alpha_cut
 
-pp_strict_alpha_cut <- spa_strict_alpha_cut(pp, 0.6)
+pp_strict_alpha_cut <- spa_strict_alpha_cut(ppoint, 0.6)
 pp_strict_alpha_cut
 
-pp_range <- spa_range(pp, 0.4, 0.8, true, true)
+pp_range <- spa_range(ppoint, 0.4, 0.8)
 pp_range
 }
 \references{
