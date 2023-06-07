@@ -318,8 +318,8 @@ as.data.frame.pgeometry <- function(x, ...) {
 #'
 #' @usage
 #' 
-#' fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, 
-#'            low = "white", high = "black", crs = NA, ...)
+#' fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", 
+#'          crs = NA, clip = FALSE, line_lwd = 1, region_lwd = 1, ...)
 #'
 #' @param pgo A `pgeometry` object of any type.
 #' @param base_poly An `sfg` object of the type `POLYGON` or `MULTIPOLYGON`. It can also be an `sfc` object with only one element of the type `POLYGON` or `MULTIPOLYGON`.

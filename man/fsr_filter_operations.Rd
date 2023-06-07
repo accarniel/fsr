@@ -16,7 +16,15 @@ spa_strict_alpha_cut(pgo, alpha)
 \arguments{
 \item{pgo}{A \code{pgeometry} object of any type.}
 
-\item{alpha}{A numeric value. For \code{spa_alpha_cut}, it must be in $\link{0, 1}$. For \code{spa_strict_alpha_cut}, it must be in $]0, 1]$.}
+\item{lvalue}{A numeric value denoting the left side of an interval in [0, 1].}
+
+\item{rvalue}{A numeric value denoting the right side of an interval in [0, 1].}
+
+\item{lside_closed}{A Boolean value indicating whether the left side is closed or not. The default value is \code{TRUE}.}
+
+\item{rside_closed}{A Boolean value indicating whether the right side is closed or not. The default value is \code{TRUE}.}
+
+\item{alpha}{A numeric value. For \code{spa_alpha_cut}, it must be in [0, 1]. For \code{spa_strict_alpha_cut}, it must be in ]0, 1].}
 }
 \value{
 An \code{sfg} object that represents the geometric union of the components extracted after applying the specific filter condition.

@@ -449,6 +449,10 @@ spa_core <- function(pgo) {
 #' spa_range(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = TRUE)
 #'
 #' @param pgo A `pgeometry` object of any type.
+#' @param lvalue A numeric value denoting the left side of an interval in \[0, 1\].
+#' @param rvalue A numeric value denoting the right side of an interval in \[0, 1\].
+#' @param lside_closed A Boolean value indicating whether the left side is closed or not. The default value is `TRUE`.
+#' @param rside_closed A Boolean value indicating whether the right side is closed or not. The default value is `TRUE`.
 #'
 #' @name fsr_filter_operations
 #'
@@ -544,7 +548,7 @@ spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = T
 #' 
 #' spa_alpha_cut(pgo, alpha) 
 #' 
-#' @param alpha A numeric value. For `spa_alpha_cut`, it must be in $[0, 1]$. For `spa_strict_alpha_cut`, it must be in $]0, 1]$.
+#' @param alpha A numeric value. For `spa_alpha_cut`, it must be in \[0, 1\]. For `spa_strict_alpha_cut`, it must be in \]0, 1\].
 #' 
 #' @import sf
 #' @export
