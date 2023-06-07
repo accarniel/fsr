@@ -457,11 +457,11 @@ spa_core <- function(pgo) {
 #' Given a spatial plateau object as input, these operations return a crisp spatial object formed by the geometric parts of the components of the input that satisfy a filter 
 #' condition based on their membership degrees. The filter condition of each operations is detailed as follows:
 #' 
-#' - `spa_alpha_cut` selects all components that have membership degrees greater than or equal to a given value in $[0, 1]$ indicated by the parameter `alpha`. 
-#' - `spa_strict_alpha_cut` picks a subset of components that have membership values greater than the parameter `alpha` (a value in $]0, 1]$). 
+#' - `spa_alpha_cut` selects all components that have membership degrees greater than or equal to a given value in \[0, 1\] indicated by the parameter `alpha`. 
+#' - `spa_strict_alpha_cut` picks a subset of components that have membership values greater than the parameter `alpha` (a value in \]0, 1\]). 
 #' - `spa_range` generalizes these two operations and allows one to pick all components that have membership degrees belonging to a given open or closed interval. 
 #' The parameters `lside_closed` and `rside_closed`, respectively, determine whether the left and right side (parameters `lvalue` and `rvalue`) of the interval is open (`false`) or closed (`true`). 
-#' For example, to represent the right open interval $[0.5, 0.8[$, the following parameter values should be given: `lvalue = 0.5, rvalue = 0.8, lside_closed = TRUE, rside_closed = FALSE`.
+#' For example, to represent the right open interval \[0.5, 0.8\[, the following parameter values should be given: `lvalue = 0.5, rvalue = 0.8, lside_closed = TRUE, rside_closed = FALSE`.
 #'
 #' @return
 #'

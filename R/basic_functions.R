@@ -324,9 +324,12 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' @param pgo A `pgeometry` object of any type.
 #' @param base_poly An `sfg` object of the type `POLYGON` or `MULTIPOLYGON`. It can also be an `sfc` object with only one element of the type `POLYGON` or `MULTIPOLYGON`.
 #' @param add_base_poly A Boolean value that indicates whether `base_poly` will added to the visualization.
-#' @param low A character value that indicates the color for the lower `md`s limit value (0). Default is `"white"`.
-#' @param high A character value that indicates the color for the higher `md`s limit value (1). Default is `"black"`.
+#' @param low A character value that indicates the color for the lowest membership degree (i.e., 0). Default is `"white"`.
+#' @param high A character value that indicates the color for the highest membership degree (i.e., 1). Default is `"black"`.
 #' @param crs A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is `NA`.
+#' @param clip A Boolean value that indicates whether the boundaries of the components should be clipped by the `sfg` object `base_poly` (if it is not `null`).
+#' @param line_lwd A numeric value that specifies the line width of linear components.
+#' @param region_lwd A numeric value that specifies the line width of the boundaries of polygonal components.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Optional parameters. They can be the same as the parameters of `geom_sf` function.
 #'
 #' @name plot
@@ -341,7 +344,7 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' to visualizations produced by the `ggplot` package.
 #' 
 #' It is possible to clip the geometric format of the components by using the parameter `base_poly`. The boundaries of this object
-#' can also be included in the visualization if the parameter `add_base_poly` is TRUE.
+#' can also be included in the visualization if the parameter `add_base_poly` is `TRUE`.
 #' 
 #' @return
 #' 

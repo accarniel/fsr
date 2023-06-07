@@ -18,11 +18,17 @@ fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE,
 
 \item{add_base_poly}{A Boolean value that indicates whether \code{base_poly} will added to the visualization.}
 
-\item{low}{A character value that indicates the color for the lower \code{md}s limit value (0). Default is \code{"white"}.}
+\item{low}{A character value that indicates the color for the lowest membership degree (i.e., 0). Default is \code{"white"}.}
 
-\item{high}{A character value that indicates the color for the higher \code{md}s limit value (1). Default is \code{"black"}.}
+\item{high}{A character value that indicates the color for the highest membership degree (i.e., 1). Default is \code{"black"}.}
 
 \item{crs}{A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is \code{NA}.}
+
+\item{clip}{A Boolean value that indicates whether the boundaries of the components should be clipped by the \code{sfg} object \code{base_poly} (if it is not \code{null}).}
+
+\item{line_lwd}{A numeric value that specifies the line width of linear components.}
+
+\item{region_lwd}{A numeric value that specifies the line width of the boundaries of polygonal components.}
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Optional parameters. They can be the same as the parameters of \code{geom_sf} function.}
 
@@ -45,7 +51,7 @@ default colors are "white" and "black", respectively. Other colors can be given 
 to visualizations produced by the \code{ggplot} package.
 
 It is possible to clip the geometric format of the components by using the parameter \code{base_poly}. The boundaries of this object
-can also be included in the visualization if the parameter \code{add_base_poly} is TRUE.
+can also be included in the visualization if the parameter \code{add_base_poly} is \code{TRUE}.
 }
 \examples{
 
