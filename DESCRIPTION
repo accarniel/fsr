@@ -16,11 +16,10 @@ Imports: rlang (>= 0.4.11),
          FuzzyR (>= 2.3.0), 
          dplyr (>= 1.0.6),
          ggplot2 (>= 3.3.5),
-	 stringr (>= 1.4.0),
-	 tibble (>= 3.0.1),
+	       stringr (>= 1.4.0),
+	       tibble (>= 3.0.1),
          pso (>= 1.0.3),
          e1071 (>= 1.7.3),
-         utils (>= 3.6.3),
          lwgeom (>= 0.2.6)
 Description: Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
     It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 

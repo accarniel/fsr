@@ -648,7 +648,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
 #' }
 #' 
-#' @import utils dplyr
+#' @import dplyr
 #' @importFrom rlang .data
 #' @export
 fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
@@ -670,9 +670,10 @@ fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
                          target <- params$what
                          target_mf <- NULL
                          if(is.null(target) || target == "max"){
-                           target_mf <- tail(fsi$cs[[1]]$mfs, n=1)[[1]]
+                           last_index <- length(fsi$cs[[1]]$mfs)
+                           target_mf <- fsi$cs[[1]]$mfs[[last_index]]
                          } else if (target == "min") {
-                           target_mf <- head(fsi$cs[[1]]$mfs, n=1)[[1]]
+                           target_mf <- fsi$cs[[1]]$mfs[[1]]
                          } else {
                            stop("Invalid value for the what parameter.", call. = FALSE)
                          }

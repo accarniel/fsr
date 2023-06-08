@@ -410,7 +410,7 @@ get_counter_ctype <- function(pgo){
 #' 
 #' spa_core(pp2)
 #'
-#' @import sf utils
+#' @import sf
 #' @export
 spa_core <- function(pgo) {
   type <- spa_get_type(pgo)
@@ -429,10 +429,10 @@ spa_core <- function(pgo) {
     } else if(type == "PLATEAUCOLLECTION") {
       core_list <- lapply(pgo@pgos, spa_core)
       return(st_union(st_sfc(core_list))[[1]])
-    } else{
-      last_comp <- tail(pgo@component, 1)
-      if(last_comp[[1]]@md == 1) {
-        return(last_comp[[1]]@obj)
+    } else {
+      last_comp <- pgo@component[[length(pgo@component)]]
+      if(last_comp@md == 1) {
+        return(last_comp@obj)
       } else {
         spa_core(create_empty_pgeometry(type))
       }
@@ -641,7 +641,7 @@ spa_strict_alpha_cut <- function(pgo, alpha) {
 #' (spa_boundary_pregion(pregions$pgeometry[[2]]))
 #' }
 #'
-#' @import methods utils sf
+#' @import methods sf
 #' @export
 spa_boundary_pregion <- function(pregion, bound_part = "region") {
   .Deprecated("spa_boundary")
@@ -653,7 +653,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
   
   if(bound_part == "line") {
     bpl <- create_empty_pgeometry("PLATEAULINE")
-    last_comp <- tail(pregion@component, 1)
+    last_comp <- pregion@component[[length(pregion@component)]]
     if(last_comp[[1]]@md == 1) {
       boundary_component <- st_boundary(last_comp[[1]]@obj)
       comp_line <- new("component", obj = boundary_component, md=1)
@@ -661,11 +661,11 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
     }
     return(bpl)
   } else if(bound_part == "region") {
-    last_comp <- tail(pregion@component, 1)
+    last_comp <- pregion@component[[length(pregion@component)]]
     n_comps <- spa_ncomp(pregion)
     if(last_comp[[1]]@md == 1 && n_comps > 1) {
       bpr <- create_empty_pgeometry("PLATEAUREGION")
-      bpr <- spa_add_component(bpr, head(pregion@component, n=n_comps-1))
+      bpr <- spa_add_component(bpr, pregion@component[1:n_comps-1])
     } else {
       ret <- new("pregion", component = pregion@component, supp = pregion@supp)
       return(ret)
@@ -727,7 +727,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
 #' (spa_boundary(pregions$pgeometry[[1]])) 
 #' (spa_boundary(pregions$pgeometry[[2]]))
 #'
-#' @import methods utils sf
+#' @import methods sf
 #' @export
 spa_boundary <- function(pgo) {
   if(fsr_is_empty(pgo)) {
@@ -743,18 +743,18 @@ spa_boundary <- function(pgo) {
     }
     
     comps <- list()
-    last_comp <- tail(pgo@component, 1)
-    if(last_comp[[1]]@md == 1) {
+    last_comp <- pgo@component[[length(pgo@component)]]
+    if(last_comp@md == 1) {
       # point or multipoint sf object (if pgo is a plateau line)
       # linestring or multilinestring sf object (if pgo is a plateau region)
-      boundary_component <- st_boundary(last_comp[[1]]@obj)
+      boundary_component <- st_boundary(last_comp@obj)
       comp <- new("component", obj = boundary_component, md = 1)
       comps <- append(comps, comp)
       n_comps <- spa_ncomp(pgo)
       if(n_comps > 1) {
         # linestring or multilinestring sf object (if pgo is a plateau line)
         # polygon or multipolygon sf object (if pgo is a plateau region)
-        comp <- head(pgo@component, n = n_comps-1)
+        comp <- pgo@component[1:n_comps-1]
         comps <- append(comps, comp)
       }
     } else {
