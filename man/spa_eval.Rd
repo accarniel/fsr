@@ -30,7 +30,6 @@ This evaluation depends on the following basic cases:
 \examples{
 library(tibble)
 library(sf)
-library(FuzzyR)
 
 # some basic examples 
 

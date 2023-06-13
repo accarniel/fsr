@@ -22,10 +22,21 @@ The \emph{fuzzy frontier} of a fuzzy region object \code{A} collects all single 
 IMPORTANT NOTE: Fuzzy frontier is different from fuzzy boundary (see \code{spa_boundary_region}).
 }
 \examples{
-
 library(tibble)
 library(sf)
-library(FuzzyR)
+
+# defining two different types of membership functions
+trap_mf <- function(a, b, c, d) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+  }
+}
+
+trim_mf <- function(a, b, c) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+  }
+}
 
 set.seed(123)
 
@@ -35,8 +46,8 @@ tbl = tibble(x = runif(10, min= 0, max = 30),
              z = runif(10, min = 0, max = 100))
 
 classes <- c("category-1", "category-2")
-mf1 <- genmf("trapmf", c(0, 5, 20, 35))
-mf2 <- genmf("trimf", c(35, 80, 100))
+mf1 <- trap_mf(0, 5, 20, 35)
+mf2 <- trim_mf(35, 80, 100)
 
 #getting the convex hull on the points to clipping the construction of plateau region objects
 pts <- st_as_sf(tbl, coords = c(1, 2))

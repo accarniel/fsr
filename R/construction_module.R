@@ -7,22 +7,32 @@
 #'
 #' @param tbl A data.frame or tibble with the following format: (x, y, z).
 #' @param classes A character vector containing the class names.
-#' @param mfs A vector of membership functions generated from FuzzyR (function `genmf`). Each membership function `i` corresponds to the class `i`.
+#' @param mfs A vector of membership functions. Each membership function `i` corresponds to the class `i`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Unused.
 #'
 #' @return a tibble containing `n` new attributes, where `n` corresponds to `length(classes)` (and `length(mfs)`)
 #'
 #' @examples
-#' 
 #' library(rlang)
 #' library(tibble)
-#' library(FuzzyR)
 #' library(dplyr)
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' # defining two different types of membership functions
+#' trap_mf <- function(a, b, c, d) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+#'   }
+#' }
+#' 
+#' trim_mf <- function(a, b, c) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+#'   }
+#' }
+#' tbl = tibble(x = runif(10, min = 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
 #' classes <- c("cold", "hot")
-#' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
-#' hot_mf <- genmf("trimf", c(35, 50, 100))
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trim_mf(35, 50, 100)
 #' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
 #' fsp
 #' 
@@ -42,7 +52,7 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
   #adding the new columns
   for(i in 1:length(classes)) {
     result <- result %>% 
-      dplyr::mutate(!!classes[i] := as.numeric(evalmf(.data$z, mfs[[i]])))
+      dplyr::mutate(!!classes[i] := as.numeric(mfs[[i]](.data$z)))
   }
 
   result
@@ -68,7 +78,7 @@ fuzzy_set_policy <- function(tbl, classes, mfs, ...) {
 #'
 #' library(e1071)
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' tbl = tibble(x = runif(10, min = 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
 #' fcp <- fuzzy_clustering_policy(tbl, 3)
 #' fcp
 #'
@@ -132,7 +142,7 @@ fuzzy_clustering_policy <- function(tbl, k, method = "cmeans", use_coords = FALS
 #' @examples
 #'
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' tbl = tibble(x = runif(10, min = 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
 #' pts <- st_as_sf(tbl, coords = c(1, 2))
 #'
 #' voro <- voronoi_delaunay_prep(pts)
@@ -190,12 +200,23 @@ clip_op <- function(objs, base_poly) {
 #' @return a tibble in the format (class, pgeometry)
 #'
 #' @examples
-#'
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' # defining two different types of membership functions
+#' trap_mf <- function(a, b, c, d) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+#'   }
+#' }
+#' 
+#' trim_mf <- function(a, b, c) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+#'   }
+#' }
+#' tbl = tibble(x = runif(10, min = 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
 #' classes <- c("cold", "hot")
-#' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
-#' hot_mf <- genmf("trimf", c(35, 50, 100))
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trim_mf(35, 50, 100)
 #' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
 #'
 #' voronoi_diagram_policy(fsp)
@@ -254,12 +275,23 @@ voronoi_diagram_policy <- function(lp, base_poly = NULL, d_tolerance = 0, ...) {
 #' FUN(x) where x is a numeric vector. Such a function should return a single numeric value.
 #'
 #' @examples
-#'
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
+#' # defining two different types of membership functions
+#' trap_mf <- function(a, b, c, d) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+#'   }
+#' }
+#' 
+#' trim_mf <- function(a, b, c) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+#'   }
+#' }
+#' tbl = tibble(x = runif(10, min = 0, max = 30), y = runif(10, min = 0, max = 50), z = runif(10, min = 0, max = 100))
 #' classes <- c("cold", "hot")
-#' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
-#' hot_mf <- genmf("trimf", c(35, 50, 100))
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trim_mf(35, 50, 100)
 #' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
 #'
 #' delaunay_triangulation_policy(fsp)
@@ -328,19 +360,27 @@ delaunay_triangulation_policy <- function(lp, tnorm = "min", base_poly = NULL, d
 #' @return a tibble in the format (class, pgeometry)
 #'
 #' @examples
-#'
 #' library(tibble)
-#' library(FuzzyR)
 #' library(sf)
 #' library(dplyr)
-#' 
 #' set.seed(7)
-#' tbl = tibble(x = runif(20, min= 0, max = 30), 
+#' # defining two different types of membership functions
+#' trap_mf <- function(a, b, c, d) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+#'   }
+#' }
+#' 
+#' trim_mf <- function(a, b, c) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+#'   }
+#' }
+#' tbl = tibble(x = runif(20, min = 0, max = 30), 
 #'   y = runif(20, min = 0, max = 50), 
-#'   z = runif(20, min = 0, max = 100))
-#' classes <- c("cold", "hot")
-#' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
-#' hot_mf <- genmf("trimf", c(35, 50, 100))
+#'   z = runif(20, min = 0, max = 100))#' classes <- c("cold", "hot")
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trim_mf(35, 50, 100)
 #' fsp <- fuzzy_set_policy(tbl, classes, mfs = c(cold_mf, hot_mf))
 #'
 #' chp <- convex_hull_policy(fsp, seq(0.1, 1, by = 0.1), 0.05)
@@ -415,7 +455,7 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
 #'
 #' `"fsp"` stands for _fuzzy set policy_ and requires two parameters that should be informed in `...`:
 #' - `classes`: A character vector containing the name of classes
-#' - `mfs`: A vector of membership functions generated by the function `genmf` of `FuzzyR` package. Each membership function _i_ represents the class _i_, where _i_ in `length(classes)`
+#' - `mfs`: A vector of membership functions. Each membership function _i_ represents the class _i_, where _i_ in `length(classes)`. For instance, membership functions can be created by using the function `genmf` of the package FuzzyR (see the provided examples for more information on how to build membership functions).
 #'
 #' `"fcp"` stands for _fuzzy clustering policy_ and requires the `e1071` package. Its possible parameters, informed in `...`, are:
 #' - `k`: A numeric value that refers to the number of groups to be created
@@ -458,17 +498,28 @@ convex_hull_policy <- function(lp, M = seq(0.05, 1, by = 0.05), d = 0.05, base_p
 #' [Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.](https://ieeexplore.ieee.org/document/8858878/)
 #'
 #' @examples
-#'
 #' library(tibble)
-#' library(FuzzyR)
+#' 
+#' # defining two different types of membership functions
+#' trap_mf <- function(a, b, c, d) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+#'   }
+#' }
+#' 
+#' trim_mf <- function(a, b, c) {
+#'   function(x) {
+#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+#'   }
+#' }
 #' 
 #' set.seed(7)
-#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#' tbl = tibble(x = runif(10, min = 0, max = 30), 
 #'              y = runif(10, min = 0, max = 50), 
 #'              z = runif(10, min = 0, max = 100))
 #' classes <- c("cold", "hot")
-#' cold_mf <- genmf("trapmf", c(0, 10, 20, 35))
-#' hot_mf <- genmf("trimf", c(35, 50, 100))
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trim_mf(35, 50, 100)
 #' 
 #' spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf))
 #'

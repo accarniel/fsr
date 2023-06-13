@@ -85,10 +85,8 @@ Note that the parameter \code{lval} only accept a character value belonging to t
 }
 }
 \examples{
-
 library(tibble)
 library(sf)
-library(FuzzyR)
 
 set.seed(456)
 

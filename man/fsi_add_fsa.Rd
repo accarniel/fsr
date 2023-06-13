@@ -26,15 +26,25 @@ The fuzzy spatial antecedent added by the \code{fsi_add_fsa} function is compose
 The format of the \code{tbl} parameter is the same as the output of the function \code{spa_creator}, allowing the user to directly provides plateau region objects as input when designing FSI models.
 }
 \examples{
-
-library(FuzzyR)
 library(tibble)
+
+trap_mf <- function(a, b, c, d) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+  }
+}
+
+trim_mf <- function(a, b, c) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+  }
+}
 
 # Create spatial plateau objects for the linguistic variable accomodation_price
 lvals_accom_price <- c("cut-rate", "affordable", "expensive")
-cut_rate_mf <- genmf("trapmf", c(0, 0, 10, 48))
-affordable_mf <- genmf("trapmf", c(10, 48, 80, 115))
-expensive_mf <- genmf("trapmf", c(80, 115, 10000, 10000))
+cut_rate_mf <- trap_mf(0, 0, 10, 48)
+affordable_mf <- trap_mf(10, 48, 80, 115)
+expensive_mf <- trap_mf(80, 115, 10000, 10000)
 
 # Example of dataset
 accom_price <- tibble(
@@ -48,7 +58,7 @@ accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price,
                          
 # Create the fsi_model:
 fsi <- fsi_create("To visit or not to visit, that is the question", 
-                  default_conseq = genmf("trimf", c(10, 30, 60)))
+                  default_conseq = trim_mf(10, 30, 60))
 
 # Add the fuzzy spatial antecedent to the fsi_model:
 fsi <- fsi_add_fsa(fsi, "accommodation price", accom_price_layer)

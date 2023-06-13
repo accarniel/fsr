@@ -69,3 +69,12 @@ get_pgos_from_pcollection <- function(pcol) {
   }
   pgos
 }
+
+#' Generates a trapezoidal membership function
+#' 
+#' @noRd
+trap_mf <- function(a, b, c, d, h = 1) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), h, (d - x)/(d - c), na.rm = TRUE), 0)
+  }
+}

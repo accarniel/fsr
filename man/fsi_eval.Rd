@@ -32,9 +32,9 @@ The user can modify the default behavior by using one of the following two ways:
 }
 }
 \examples{
-
 library(sf)
-# Creating the FSI model from an example implemented with the visitation function:
+
+# Creating the FSI model from an example
 fsi <- visitation()
 
 # Creating a vector of fuzzy rules; 

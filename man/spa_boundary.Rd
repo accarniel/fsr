@@ -28,7 +28,19 @@ the boundary plateau line and the boundary plateau region (i.e., returns a \code
 }
 \examples{
 library(tibble)
-library(FuzzyR)
+
+# defining two different types of membership functions
+trap_mf <- function(a, b, c, d) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+  }
+}
+
+trim_mf <- function(a, b, c) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+  }
+}
 
 set.seed(123)
 
@@ -38,8 +50,8 @@ tbl = tibble(x = runif(10, min= 0, max = 30),
              z = runif(10, min = 0, max = 100))
 
 classes <- c("category-1", "category-2")
-mf1 <- genmf("trapmf", c(0, 5, 20, 35))
-mf2 <- genmf("trimf", c(20, 80, 100))
+mf1 <- trap_mf(0, 5, 20, 35)
+mf2 <- trim_mf(20, 80, 100)
 
 pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
 pregions$pgeometry[[1]]

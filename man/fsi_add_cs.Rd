@@ -13,7 +13,7 @@ fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
 
 \item{lvals}{A character vector that represents linguistic values of the linguistic variable of the consequent.}
 
-\item{mfs}{A vector of functions created by the \code{genmf} of the FuzzyR package.}
+\item{mfs}{A vector of membership functions. For instance, membership functions can be created by using the function \code{genmf} of the package FuzzyR.}
 
 \item{bounds}{A numeric vector that represents the lower and upper bounds of the consequent domain.}
 }
@@ -31,20 +31,30 @@ For instance, the first value of \code{lvals} is the linguistic value for the fi
 In \code{bounds}, the lower and upper values correspond to the first and second parameter, respectively.
 }
 \examples{
+# defining two different types of membership functions
+trap_mf <- function(a, b, c, d) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
+  }
+}
 
-library(FuzzyR)
+trim_mf <- function(a, b, c) {
+  function(x) {
+    pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
+  }
+}
 
 # Create the fsi_model:
 fsi <- fsi_create("To visit or not to visit, that is the question", 
-                   default_conseq = genmf("trimf", c(10, 30, 60)))
+                   default_conseq = trim_mf(10, 30, 60))
 
 # Create the vector with the linguistic values of the linguistic variable "visiting experience":
 lvals_visiting_exp <- c("awful", "average", "great")
 
 # Define the membership function for each linguistic value:
-awful_mf <- genmf("trimf", c(0, 0, 20))
-average_mf <- genmf("trimf", c(10, 30, 60))
-great_mf <- genmf("trapmf", c(40, 80, 100, 100))
+awful_mf <- trim_mf(0, 0, 20)
+average_mf <- trim_mf(10, 30, 60)
+great_mf <- trap_mf(40, 80, 100, 100)
 
 # Add the consequent to the FSI model:
 fsi <- fsi_add_cs(fsi, "visiting experience", lvals_visiting_exp,
