@@ -3,13 +3,13 @@
 \docType{class}
 \name{pcomposition-class}
 \alias{pcomposition-class}
-\title{An S4 Class for representing a plateau composition (subclass of \code{pgeometry})}
+\title{An S4 Class for representing plateau compositions (subclass of \code{pgeometry})}
 \description{
-An S4 Class for representing a plateau composition (subclass of \code{pgeometry})
+An S4 Class for representing plateau compositions (subclass of \code{pgeometry})
 }
 \details{
 A \code{pcomposition} object is composed of a \code{ppoint} object, \code{pline} object, \code{pregion} object and inherits
-all attributes of the class \code{pgeometry} (i.e., the support).
+the attribute \code{supp} from the class \code{pgeometry} (i.e., the support).
 }
 \section{Slots}{
 

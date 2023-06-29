@@ -3,13 +3,13 @@
 \docType{class}
 \name{pcollection-class}
 \alias{pcollection-class}
-\title{An S4 Class for representing a plateau collection (subclass of \code{pgeometry})}
+\title{An S4 Class for representing plateau collections (subclass of \code{pgeometry})}
 \description{
-An S4 Class for representing a plateau collection (subclass of \code{pgeometry})
+An S4 Class for representing plateau collections (subclass of \code{pgeometry})
 }
 \details{
 A \code{pcollection} object is composed of a list of spatial plateau objects and inherits
-all attributes of the class \code{pgeometry} (i.e., the support).
+the attribute \code{supp} from the class \code{pgeometry} (i.e., the support).
 }
 \section{Slots}{
 

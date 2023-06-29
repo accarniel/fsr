@@ -3,13 +3,13 @@
 \docType{class}
 \name{pregion-class}
 \alias{pregion-class}
-\title{An S4 Class for representing a plateau region (subclass of \code{pgeometry})}
+\title{An S4 Class for representing plateau regions (subclass of \code{pgeometry})}
 \description{
-An S4 Class for representing a plateau region (subclass of \code{pgeometry})
+An S4 Class for representing plateau regions (subclass of \code{pgeometry})
 }
 \details{
 A \code{pregion} object is composed of a list of \code{component} objects and inherits
-all attributes of the class \code{pgeometry} (i.e., the support).
+the attribute \code{supp} from the class \code{pgeometry} (i.e., the support).
 }
 \section{Slots}{
 

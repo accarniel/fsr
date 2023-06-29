@@ -3,12 +3,12 @@
 \docType{class}
 \name{pgeometry-class}
 \alias{pgeometry-class}
-\title{An S4 Class for representing a spatial plateau object}
+\title{An S4 Class for representing spatial plateau data types}
 \description{
-An S4 Class for representing a spatial plateau object
+An S4 Class for representing spatial plateau data types
 }
 \details{
-A \code{pgeometry} object is composed of an \code{sfg} object that represents the union
+It is a superclass for representing spatial plateau data types. A \code{pgeometry} object stores an \code{sfg} object that represents the union
 of all crisp spatial objects of its components (i.e., the support).
 }
 \section{Slots}{

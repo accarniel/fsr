@@ -31,13 +31,13 @@ setValidity("component", function(object){
   }
 })
 
-#' An S4 Class for representing a spatial plateau object
+#' An S4 Class for representing spatial plateau data types
 #'
 #' @slot supp An `sfg` object that stores the union of all spatial objects of the components of the spatial plateau object.
 #' 
 #' @details 
 #' 
-#' A `pgeometry` object is composed of an `sfg` object that represents the union 
+#' It is a superclass for representing spatial plateau data types. A `pgeometry` object stores an `sfg` object that represents the union 
 #' of all crisp spatial objects of its components (i.e., the support).
 #' 
 #' @references
@@ -100,7 +100,7 @@ check_validity <- function(object) {
   }
 }
 
-#' An S4 Class for representing a plateau point (subclass of `pgeometry`)
+#' An S4 Class for representing plateau points (subclass of `pgeometry`)
 #'
 #' @slot supp It is inherited from `pgeometry`.
 #' @slot component A list of components.
@@ -108,7 +108,7 @@ check_validity <- function(object) {
 #' @details 
 #' 
 #' A `ppoint` object is composed of a list of `component` objects and inherits 
-#' all attributes of the class `pgeometry` (i.e., the support).
+#' the attribute `supp` from the class `pgeometry` (i.e., the support).
 #' 
 #' @references
 #'
@@ -127,7 +127,7 @@ setValidity("ppoint", function(object){
   check_validity(object)
 })
 
-#' An S4 Class for representing a plateau line (subclass of `pgeometry`)
+#' An S4 Class for representing plateau lines (subclass of `pgeometry`)
 #'
 #' @slot supp It is inherited from `pgeometry`.
 #' @slot component A list of components.
@@ -135,7 +135,7 @@ setValidity("ppoint", function(object){
 #' @details 
 #' 
 #' A `pline` object is composed of a list of `component` objects and inherits 
-#' all attributes of the class `pgeometry` (i.e., the support).
+#' the attribute `supp` from the class `pgeometry` (i.e., the support).
 #' 
 #' @references
 #'
@@ -154,7 +154,7 @@ setValidity("pline", function(object){
   check_validity(object)
 })
 
-#' An S4 Class for representing a plateau region (subclass of `pgeometry`)
+#' An S4 Class for representing plateau regions (subclass of `pgeometry`)
 #'
 #' @slot supp It is inherited from `pgeometry`.
 #' @slot component A list of components.
@@ -162,7 +162,7 @@ setValidity("pline", function(object){
 #' @details 
 #' 
 #' A `pregion` object is composed of a list of `component` objects and inherits 
-#' all attributes of the class `pgeometry` (i.e., the support).
+#' the attribute `supp` from the class `pgeometry` (i.e., the support).
 #' 
 #' @references
 #'
@@ -181,7 +181,7 @@ setValidity("pregion", function(object){
   check_validity(object)
 })
 
-#' An S4 Class for representing a plateau composition (subclass of `pgeometry`)
+#' An S4 Class for representing plateau compositions (subclass of `pgeometry`)
 #'
 #' @slot supp It is inherited from `pgeometry`.
 #' @slot ppoint A plateau point object.
@@ -191,7 +191,7 @@ setValidity("pregion", function(object){
 #' @details 
 #' 
 #' A `pcomposition` object is composed of a `ppoint` object, `pline` object, `pregion` object and inherits 
-#' all attributes of the class `pgeometry` (i.e., the support).
+#' the attribute `supp` from the class `pgeometry` (i.e., the support).
 #' 
 #' @references
 #'
@@ -237,7 +237,7 @@ setValidity("pcomposition", function(object) {
   }
 })
 
-#' An S4 Class for representing a plateau collection (subclass of `pgeometry`)
+#' An S4 Class for representing plateau collections (subclass of `pgeometry`)
 #'
 #' @slot supp It is inherited from `pgeometry`.
 #' @slot pgos A list of spatial plateau objects.
@@ -245,7 +245,7 @@ setValidity("pcomposition", function(object) {
 #' @details 
 #' 
 #' A `pcollection` object is composed of a list of spatial plateau objects and inherits 
-#' all attributes of the class `pgeometry` (i.e., the support).
+#' the attribute `supp` from the class `pgeometry` (i.e., the support).
 #' 
 #' @references
 #'
