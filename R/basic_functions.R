@@ -1,6 +1,6 @@
-#' @title Getting the type of a spatial plateau object
+#' @title Get the type of a spatial plateau object
 #'
-#' @description This function gets the type of a spatial plateau object.
+#' @description `spa_get_type()` returns the type of a spatial plateau object.
 #' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, `"PLATEAUREGION"`, `"PLATEAUCOMPOSITION"`, or `"PLATEAUCOLLECTION"`.
 #'
 #' @usage
@@ -11,23 +11,29 @@
 #'
 #' @details
 #' 
-#' The `spa_get_type` function gets the type of a spatial plateau object given as input.
-#' For instance, if the `pgo` is a object of the class `ppoint` (subclass of `pgeometry`), the return will be "PLATEAUPOINT".
+#' The `spa_get_type()` function yields the type of a spatial plateau object given as input.
+#' For instance, if the `pgo` is a object of the class `ppoint` (subclass of `pgeometry`), it returns `"PLATEAUPOINT"`.
 #' 
 #' @return
 #' 
 #' The type of a spatial plateau object as a character object (i.e., a string).
 #' 
 #' @examples
-#' library(sf)
-#' 
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pcomp1 <- create_component(st_multipoint(pts1), 0.4)
-#' pcomp2 <- create_component(st_multipoint(pts2), 0.3)
+#' pcomp1 <- create_component("MULTIPOINT(1 2, 3 2)", 0.4)
+#' pcomp2 <- create_component("POINT(2 1)", 0.3)
 #' ppoint <- create_pgeometry(list(pcomp1, pcomp2), "PLATEAUPOINT")
 #' 
 #' spa_get_type(ppoint) 
+#' 
+#' lcomp1 <- create_component("LINESTRING(1 2, 3 3, 3 4)", 1)
+#' lcomp2 <- create_component("LINESTRING(0 0, 5 5)", 0.5)
+#' pline <- create_pgeometry(list(lcomp1, lcomp2), "PLATEAULINE")
+#' 
+#' spa_get_type(pline)
+#' 
+#' pcomposition <- create_pgeometry(list(ppoint, pline), "PLATEAUCOMPOSITION")
+#' 
+#' spa_get_type(pcomposition)
 #' @export
 spa_get_type <- function(pgo) {
   type <- toupper(is(pgo)[1])
@@ -51,9 +57,9 @@ is_pgeometry <- function(type) {
   }
 }
 
-#' @title The PWKT of a spatial plateau object
+#' @title Return PWKT representation of a spatial plateau object
 #'
-#' @description This function gives the Plateau Well-Known Text (PWKT) representation of a `pgeometry` object. 
+#' @description These functions give the Plateau Well-Known Text (PWKT) representation of a `pgeometry` object. 
 #'
 #' @usage
 #'
@@ -65,78 +71,65 @@ is_pgeometry <- function(type) {
 #'
 #' @details
 #'
-#' It returns the textual representation for a `pgeometry` object, 
+#' These functions return the textual representation of a `pgeometry` object, 
 #' which combines the Well-Known Text (WKT) representation for crisp vector geometry
-#' objects and the formal definitions of the spatial plateau data types.
+#' objects and the formal definitions of spatial plateau data types.
 #' (i.e. `PLATEAUPOINT`, `PLATEAULINE`, `PLATEAUREGION`, `PLATEAUCOMPOSITION`, and `PLATEAUCOLLECTION`).
 #'
 #' @return
 #'
-#' A character value with the textual representation of a given `pgeometry` object.
+#' A character object (i.e., string) with the textual representation of a given `pgeometry` object.
 #'
 #' @references
-#'
-#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
-#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
+#' 
+#' The formal definition of PWKT is given in:
+#' 
+#' - [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Underlying concepts and formal definitions of spatial plateau data types are explained in detail in:
+#' 
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' - [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
 #'
 #' @examples
-#' library(sf)
-#'
-#' # For a `PLATEAUPOINT` object.
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- create_component(st_multipoint(pts1), 0.2) 
-#' comp2 <- create_component(st_point(c(1, 5)), 0.8)  
+#' pcomp1 <- create_component("MULTIPOINT(1 2, 3 2)", 0.4)
+#' pcomp2 <- create_component("POINT(2 1)", 0.3)
+#' ppoint <- create_pgeometry(list(pcomp1, pcomp2), "PLATEAUPOINT")
 #' 
-#' ppoint <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
+#' # using spa_pwkt()
+#' spa_pwkt(ppoint) 
+#' # using show() to display the content of ppoint
+#' ppoint
+#' # using format with width = 30 (default value)
+#' format(ppoint)
 #' 
-#' spa_pwkt(ppoint)
-#' 
-#' # For a `PLATEAULINE` object.
-#' 
-#' lpts1 <- rbind(c(0, 0), c(1, 1))
-#' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
-#'
-#' comp4 <- create_component(st_linestring(lpts1), 0.4)
-#' comp5 <- create_component(st_linestring(lpts2), 1)
-#' comp6 <- create_component(st_linestring(lpts3), 0.7)
-#'
-#' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
+#' lcomp1 <- create_component("LINESTRING(1 2, 3 3, 3 4)", 1)
+#' lcomp2 <- create_component("LINESTRING(0 0, 5 5)", 0.5)
+#' pline <- create_pgeometry(list(lcomp1, lcomp2), "PLATEAULINE")
 #' 
 #' spa_pwkt(pline)
-#'
-#' # For a `PLATEAUREGION` object.
 #' 
-#' p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-#' p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol1 <-st_polygon(list(p1, p2))
-#' 
-#' comp1 <- create_component(pol1, 0.2)
-#' 
-#' pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
+#' rcomp1 <- create_component("POLYGON((40 40, 20 48, 48 35, 40 40))", 0.8)
+#' rcomp2 <- create_component("POLYGON((10 0, 40 18, 10 20, 5 18, 10 0))", 0.2)
+#' pregion <- create_pgeometry(list(rcomp1, rcomp2), "PLATEAUREGION")
 #' 
 #' spa_pwkt(pregion)
 #' 
-#' # For a `PLATEAUCOMPOSITION` object.
-#' 
-#' pcomp <- create_component("POINT(0 0)", 0.2) 
-#' lcomp <- create_component("LINESTRING(1 1, 2 2)", 0.4)
-#' rcomp <- create_component("POLYGON((3 3, 4 4, 4 2, 3 3))", 0.2)
-#' 
-#' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
+#' pcomposition <- create_pgeometry(list(ppoint, pline, pregion), "PLATEAUCOMPOSITION")
 #' 
 #' spa_pwkt(pcomposition)
 #' 
-#' # For a `PLATEAUCOLLECTION` object.
+#' pcomp3 <- create_component("POINT(10 15)", 0.3)
+#' ppoint2 <- create_pgeometry(list(pcomp3), "PLATEAUPOINT")
 #' 
-#' pcollection <- create_pgeometry(list(pline, pregion, pcomposition), "PLATEAUCOLLECTION")
-#'  
-#' spa_pwkt(pcollection)  
+#' pcollection <- create_pgeometry(list(pcomposition, ppoint2), "PLATEAUCOLLECTION")
+#' 
+#' spa_pwkt(pcollection)
 #' @export
 spa_pwkt <- function(pgo) {
   type <- spa_get_type(pgo)
   
-  if(fsr_is_empty(pgo)) {
+  if(spa_is_empty(pgo)) {
     return(paste0(type, " EMPTY"))
   }
   
@@ -201,9 +194,9 @@ setMethod("as.character", "pgeometry", function(x, ...) {
 #' @export
 tibble::as_tibble
 
-#' @title Converting a `pgeometry` object into tabular data
+#' @title Convert a `pgeometry` object into tabular data (`data.frame` or `tibble`)
 #'
-#' @description We can convert a `pgeometry` object into tabular data, such as a `tibble` or `data.frame` object, 
+#' @description These functions convert a `pgeometry` object into a tabular format, such as a `tibble` or `data.frame` object, 
 #' where the components of the `pgeometry` object compose the rows of the table.
 #'
 #' @method as_tibble pgeometry
@@ -213,51 +206,33 @@ tibble::as_tibble
 #'
 #' @details
 #' 
-#' This function is an interface for the S3 generic `as_tibble`. 
-#' Here, it turns a `pgeometry` object into a tibble, which is a data frame with class `tbl_df`.
+#' These functions are S3 methods for `pgeometry`. 
+#' The `as_tibble()` function converts a `pgeometry` object into a `tibble`, which is a data frame with class `tbl_df`.
 #' This allows us to get the internal components of the `pgeometry` object 
 #' (i.e., spatial features objects and membership degrees) as a data frame with
-#' two separate columns - called `md` (_membership degree_) and `geometry` (an `sfc` object). 
-#' 
-#' For each component of the `pgeometry` object, `as_tibble` gets the `md` and `geometry` 
-#' values and allocates them into a row of the new created tibble, in separated columns.
+#' two separate columns: (i) `geometry` (an `sfc` object) and (ii) `md` (_membership degree_). 
 #' Therefore, each row of this tibble represents a component of the original `pgeometry` object. 
 #' 
-#' It is also possible to call the S3 method `as.data.frame` to convert a `pgeometry` object into tabular data.
+#' It is also possible to call the S3 method `as.data.frame()` to convert a `pgeometry` object into a `data.frame` object.
 #' 
 #' @return
 #' 
-#' A tibble object of size `n x 2` where `n` is the number of components of 
-#' the `pgeometry` object and two columns in the format `(md, geometry)`.
+#' A tabular object (`data.frame` or `tibble`) with the number of rows corresponding to the number of components of 
+#' the `pgeometry` object given as input and two columns in the format `(geometry, md)`.
 #' 
 #' @examples
-#' 
-#' library(sf)
-#' 
-#' # Creating components for our plateau point object
-#' v1 <- rbind(c(1,2), c(3,4))
-#' v2 <- rbind(c(1,4), c(2,3),c(4,4))
-#'
-#' md1 <- 0.2
-#' md2 <- 0.1
-#' md3 <- 0.4
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
-#'
-#' comp1 <- create_component(st_multipoint(pts1), md1)
-#' comp2 <- create_component(st_multipoint(pts2), md2)
-#' comp3 <- create_component(st_multipoint(pts3), md3)
-#' 
-#' # Creating the plateau point object as a pgeometry object with 3 components
-#' 
-#' plateau_point <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' pcomp1 <- create_component("MULTIPOINT(1 2, 3 2)", 0.4)
+#' pcomp2 <- create_component("POINT(2 1)", 0.3)
+#' pcomp3 <- create_component("MULTIPOINT(5 1, 0 0)", 1)
+#' ppoint <- create_pgeometry(list(pcomp1, pcomp2, pcomp3), "PLATEAUPOINT")
 #' 
 #' # Converting the pgeometry object into a tibble object
-#' plateau_point_tibble <- as_tibble(plateau_point)
+#' ppoint_tibble <- as_tibble(ppoint)
+#' ppoint_tibble
 #' 
-#' plateau_point_tibble
-#' 
+#' # Converting it into data.frame
+#' ppoint_df <- as.data.frame(ppoint)
+#' ppoint_df
 #' @import sf tibble
 #' @export
 as_tibble.pgeometry <- function(x, ...) {
@@ -293,9 +268,9 @@ as.data.frame.pgeometry <- function(x, ...) {
     as.data.frame(as_tibble(x))
 }
 
-#' @title Visualization of `pgeometry` objects
+#' @title Graphically visualize `pgeometry` objects
 #'
-#' @description This function plots a `pgeometry` object.
+#' @description The `fsr_plot()` function (and the S4 method `plot()`) plots a `pgeometry` object.
 #'
 #' @usage
 #' 
@@ -308,91 +283,93 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' @param low A character value that indicates the color for the lowest membership degree (i.e., 0). Default is `"white"`.
 #' @param high A character value that indicates the color for the highest membership degree (i.e., 1). Default is `"black"`.
 #' @param crs A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is `NA`.
-#' @param clip A Boolean value that indicates whether the boundaries of the components should be clipped by the `sfg` object `base_poly` (if it is not `null`).
+#' @param clip A Boolean value that indicates whether the boundaries of the components must be clipped by the `sfg` object `base_poly` (if it is not `null`).
 #' @param line_lwd A numeric value that specifies the line width of linear components.
 #' @param region_lwd A numeric value that specifies the line width of the boundaries of polygonal components.
-#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Optional parameters. They can be the same as the parameters of `geom_sf` function.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Optional parameters. They can be the same as the parameters of `geom_sf()` function from `ggplot2`.
 #'
 #' @name plot
 #'
 #' @details
 #' 
-#' The `fsr_plot` uses a `ggplot` method to construct the plot. It receives a `pgeometry` object (if it is empty, an empty graphics
+#' The `fsr_plot()` function uses a `ggplot2` package to built the resulting plot. It receives a `pgeometry` object as input (if it is empty, an empty graphics
 #'  in obtained). 
 #' 
 #' The `low` and `high` parameters are the colors for the minimum and maximum limits of the membership degrees. The 
-#' default colors are "white" and "black", respectively. Other colors can be given in the same way that colors are informed
-#' to visualizations produced by the `ggplot` package.
+#' default colors are `"white"` and `"black"`, respectively. Other colors can be given in the same way that colors are informed
+#' to visualizations produced by the `ggplot2` package.
 #' 
 #' It is possible to clip the geometric format of the components by using the parameter `base_poly`. The boundaries of this object
 #' can also be included in the visualization if the parameter `add_base_poly` is `TRUE`.
+#' 
+#' Since the returned value is a ggplot object, it can be further be customized (see examples below).
 #' 
 #' @return
 #' 
 #' A `ggplot` object.
 #' 
-#' @examples
+#' @references
 #' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' @examples
 #' library(sf)
 #' 
-#' ### Example 1
+#' pts <- rbind(c(0, 2), c(4, 2))
+#' # Point components
+#' pcp1 <- create_component(st_multipoint(pts), 0.3)
+#' pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' # Line components
+#' lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+#' lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+#' lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+#' lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+#' # Polygon components
+#' rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+#' rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
+#' # Creating spatial plateau objects
+#' pp <- create_pgeometry(list(pcp1, pcp2, pcp3), "PLATEAUPOINT")
+#' pl <- create_pgeometry(list(lcp1, lcp3, lcp4), "PLATEAULINE")
+#' pr <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+#' pcm <- create_pgeometry(list(pcp1, pcp2, lcp1, lcp2, lcp3, rcp2), "PLATEAUCOMPOSITION")
+#' pcl <- create_pgeometry(list(pp, pr, pcm), "PLATEAUCOLLECTION")
 #' 
-#' # Creating components for the plateau point object
-#' v1 <- rbind(c(1,2), c(3,4))
-#' v2 <- rbind(c(1,4), c(2,3),c(4,4))
-#'
-#' md1 <- 0.2
-#' md2 <- 0.1
-#' md3 <- 0.4
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
-#'
-#' comp1 <- create_component(st_multipoint(pts1), md1)
-#' comp2 <- create_component(st_multipoint(pts2), md2)
-#' comp3 <- create_component(st_multipoint(pts3), md3)
+#' # Displaying their textual representations
+#' pp
+#' pl
+#' pr
+#' pcm
+#' pcl
 #' 
-#' # Creating the plateau point object as a pgeometry object with 3 components
+#' # Plotting them
+#' plot(pp)
+#' plot(pl)
+#' plot(pr)
+#' plot(pcm)
+#' plot(pcl)
 #' 
-#' ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' # Custom colors
+#' fsr_plot(pr, low = "green", high = "blue")
 #' 
-#' fsr_plot(ppoint) # with default colors
-#' fsr_plot(ppoint, low="blue",high = "red") # with custom limit colors
+#' # Changing the line width of line components
+#' fsr_plot(pl, line_lwd = 2)
 #' 
-#'# Example 2 - PLATEAULINE PLOT
+#' # Changing the line width of boundary lines of region components
+#' fsr_plot(pr, region_lwd = 2)
 #' 
-#' lpts1 <- rbind(c(0, 0), c(1, 1))
-#' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
-#'
-#' comp4 <- create_component(st_linestring(lpts1), 0.4)
-#' comp5 <- create_component(st_linestring(lpts2), 1)
-#' comp6 <- create_component(st_linestring(lpts3), 0.7)
-#'
-#' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
-#'
-#' fsr_plot(pline) # Default values
-#' fsr_plot(pline, low="green", high="blue") # Custom colors ...
-#'
-#'
-#'# Example 3 - PLATEAUREGION PLOT
-#'
-#' p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-#' p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-#' pol1 <-st_polygon(list(p1,p2))
-#' p3 <- rbind(c(3,0), c(4,0), c(4,1), c(3,1), c(3,0))
-#' p4 <- rbind(c(3.3,0.3), c(3.8,0.3), c(3.8,0.8), c(3.3,0.8), c(3.3,0.3))[5:1,]
-#' pol2 <- st_polygon(list(p3,p4))
-#' pol3 <- st_polygon(list(rbind(c(3,3), c(4,2), c(4,3), c(3,3))))
+#' # Changing the line width of boundary lines of region components and its color
+#' fsr_plot(pr, region_lwd = 2, color = "blue")
 #' 
-#' comp1 <- create_component(pol1, 0.2)
-#' comp2 <- create_component(pol2, 0.4)
-#' comp3 <- create_component(pol3, 0.7)
+#' # You can customize the whole visualization using ggplot
+#' library(ggplot2)
 #' 
-#' pregion <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
-#' fsr_plot(pregion)
-#' fsr_plot(pregion, low = "blue", high = "red")
-#' 
+#' fsr_plot(pp, size = 5) +   
+#'   theme(legend.position = "none") +
+#'   theme(text=element_text(size=20, family = "serif", color = "black"),
+#'         axis.text=element_text(color="black")) +
+#'   scale_x_continuous(breaks = c(0, 1, 2, 3, 4)) +
+#'   scale_y_continuous(breaks = c(0, 1, 2, 3, 4))
 #' @import sf ggplot2
 #' @importFrom rlang .data
 #' @export
@@ -433,9 +410,9 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
   
   if(!is.null(base_poly) && add_base_poly){
     plot <- ggplot() + geom_sf(data = st_as_sf(st_sfc(base_poly)), 
-                               color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent") + 
-      theme_classic()
-    if(fsr_is_empty(pgo)){
+                               color = high, size = 0.5, aes(geometry = .data$x), fill = "transparent")
+    if(spa_is_empty(pgo)){
+      plot <- plot + theme_classic()
       return(plot)
     }
   }
@@ -444,47 +421,38 @@ fsr_plot <- function(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white",
   lines <- subset(pgo_tibble, sapply(pgo_tibble$geometry, st_is, c("MULTILINESTRING", "LINESTRING")))
   regions <- subset(pgo_tibble, sapply(pgo_tibble$geometry, st_is, c("MULTIPOLYGON", "POLYGON")))
   
-  if(nrow(regions) != 0){
-    if(!is.null(plot)){
+  if(nrow(regions) != 0) {
+    if(!is.null(plot)) {
       # lwd = 0 ; color = NA in order to remove the border of the components in the plot
-      plot <- plot + geom_sf(data = st_as_sf(regions), aes(fill = .data$md, color = .data$md, geometry = .data$geometry), lwd = line_lwd, ...) + 
-        scale_fill_gradient(name = "", limits = c(0, 1), low = low, high = high) +
-        theme_classic()
-    } else{
-      plot <- ggplot() + geom_sf(data = st_as_sf(regions), aes(fill = .data$md, color = .data$md, geometry = .data$geometry), lwd = line_lwd, ...) +
-        scale_fill_gradient(name = "", limits = c(0, 1), low = low, high = high) +
-        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
-        theme_classic()
+      plot <- plot + geom_sf(data = st_as_sf(regions), aes(fill = .data$md, color = .data$md, geometry = .data$geometry), lwd = region_lwd, ...)
+    } else {
+      plot <- ggplot() + geom_sf(data = st_as_sf(regions), aes(fill = .data$md, color = .data$md, geometry = .data$geometry), lwd = region_lwd, ...)
     }
   }
   
   if(nrow(lines) != 0) {
     if(!is.null(plot)) {
-      plot <- plot + geom_sf(data = st_as_sf(lines), aes(color = .data$md, geometry = .data$geometry), lwd = region_lwd, lineend = "round", ...) +
-        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
-        theme_classic()
+      plot <- plot + geom_sf(data = st_as_sf(lines), aes(color = .data$md, geometry = .data$geometry), lwd = line_lwd, lineend = "round", ...) 
     } else {
-      plot <- ggplot() + geom_sf(data = st_as_sf(lines), aes(color = .data$md, geometry = .data$geometry), lwd = region_lwd, lineend = "round", ...) +
-        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
-        theme_classic()
+      plot <- ggplot() + geom_sf(data = st_as_sf(lines), aes(color = .data$md, geometry = .data$geometry), lwd = line_lwd, lineend = "round", ...)
     }
   }
   
   if(nrow(points) != 0) {
-    if(!is.null(plot)){
+    if(!is.null(plot)) {
       plot <- plot + geom_sf(data = st_as_sf(points), aes(color = .data$md, geometry = .data$geometry), ...)
-      if(nrow(lines) == 0) {
-        plot <- plot + scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) + 
-          theme_classic()
-      }
     } else {
-      plot <- ggplot() + geom_sf(data = st_as_sf(points), aes(color = .data$md, geometry = .data$geometry), ...) +
-        scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) +
-        theme_classic()
+      plot <- ggplot() + geom_sf(data = st_as_sf(points), aes(color = .data$md, geometry = .data$geometry), ...) 
     }
   }
   
-  plot
+  # deciding how to put scale_*_gradient
+  if(nrow(regions) != 0) {
+    plot <- plot + scale_fill_gradient(name = "", limits = c(0, 1), low = low, high = high)
+  }
+  
+  plot + scale_colour_gradient(name = "", limits = c(0, 1), low = low, high = high) + 
+    theme_classic()
 }
 
 #' @name plot
@@ -500,10 +468,10 @@ setMethod("plot", signature(x = "pgeometry", y = "missing"), function(x, y, ...)
   fsr_plot(x, ...)
 })
 
-#' @title Creation of a component
+#' @title Create a component
 #'
-#' @description This function builds an object of class `component`. 
-#' A component consists of a crisp spatial object (i.e., `sfg` object) labeled with a membership degree in \eqn{]0, 1]}.
+#' @description `create_component()` builds an object of class `component`. 
+#' A component consists of a crisp spatial object (`sfg` object) labeled with a membership degree in \]0, 1\].
 #' It is a flexible function since the crisp spatial object can be provided by using different formats.
 #'
 #' @usage
@@ -511,36 +479,38 @@ setMethod("plot", signature(x = "pgeometry", y = "missing"), function(x, y, ...)
 #' create_component(obj, md, ...)
 #'
 #' @param obj A crisp spatial object in a specific format (see details below). 
-#' @param md A numeric value indicating the membership degree of the component. It must be a value in \eqn{]0, 1]}.
+#' @param md A numeric value indicating the membership degree of the component. It must be a value in \]0, 1\].
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> Different parameters that are used to convert a crisp spatial object from a specific representation (see more in details below).
 #'
 #' @name fsr_components
 #' 
 #' @details
 #'
-#' The function `create_component` creates a `component` object. Internally, it is a pair of an `sfg` object and a membership degree in \eqn{]0, 1]}.
+#' The `create_component()` function creates a `component` object. Internally, it is a pair of an `sfg` object and a membership degree in \]0, 1\].
 #'
-#' For this, `obj` can be either:
-#' - an `sfg` object of type, 
-#' - a character vector containing the WKT representation of a crisp spatial object, 
-#' - a structure of class `"WKB"` with the WKB or EWKB representation of a crisp spatial object (if the EWKB representation is used, then you have to provide the additional parameter `EWKB = TRUE` in `...`),
+#' `obj` can be either (see restrictions regarding its data type below):
+#' - an `sfg` object.
+#' - a character vector containing the WKT representation of a crisp spatial object.
+#' - a structure of class `"WKB"` with the WKB or EWKB representation of a crisp spatial object. If the EWKB representation is used, then you have to provide the additional parameter `EWKB = TRUE` in `...`.
 #' - a vector, list, or matrix containing coordinate pairs to be used when creating the `sfg` object. 
-#' This means that in this case it has a similar behavior to the family of functions `st` of the `sf` package (e.g., the functions `st_point`, `st_multipoint`, etc.). 
+#' This means that it has a similar behavior to the family of functions `st` of the `sf` package (e.g., `st_point()`, `st_multipoint()`, etc.). 
 #' Thus, you have to provide the additional parameter `type` in `...`, which should be either `"POINT"`, `"LINE"`, or `"REGION"`.  
 #'
 #' It is important to emphasize that the crisp spatial object must be a simple or complex point, line, or region (i.e., polygon) object. 
 #' That is, it should be a `POINT`, `MULTIPOINT`, `LINESTRING`, `MULTILINESTRING`, `POLYGON` or `MULTIPOLYGON` object.
 #' If other types of crisp spatial objects are given, an error will be thrown.
 #'
-#' The function `component_from_sfg` is now integrated with the function `create_component`. 
-#' Hence, `component_from_sfg` is deprecated.
+#' The `component_from_sfg()` function is deprecated.
 #' 
 #' @return
 #'
 #' A `component` object that can be added to a spatial plateau object (i.e., a `pgeometry` object).
 #'
+#' @references
+#' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
 #' @examples
-#'
 #' # first way: providing sfg objects
 #' library(sf)
 #' 
@@ -555,24 +525,20 @@ setMethod("plot", signature(x = "pgeometry", y = "missing"), function(x, y, ...)
 #' comp3 <- create_component(st_polygon(rpts), 0.4)
 #' 
 #' # second way: providing WKT representations
-#' 
 #' comp4 <- create_component("POINT(10 35)", 0.5)
-#' comp5 <- create_component("MULTILINESTRING((-29 -27,-36 -31,-45 -33), (-45 -33,-46 -32))", 0.9)
+#' comp5 <- create_component("MULTILINESTRING((-29 -27, -36 -31, -45 -33), (-45 -33, -46 -32))", 0.9)
 #' comp6 <- create_component("POLYGON((75 29, 77 29, 77 29, 75 29))", 1)
 #' 
 #' # third way: providing WKB representations
-#' 
 #' wkb = structure(list("0x0101000020e610000000000000000000000000000000000040"), class = "WKB")
 #' comp7 <- create_component(wkb, 0.8, EWKB = TRUE)
 #' 
-#' # fourth way: providing coordinates
-#'
+#' # fourth way: providing coordinate pairs
 #' coords1 = rbind(c(2,2), c(3,3))
 #' coords2 = rbind(c(1,1), c(3,2))
 #'
 #' comp8 <- create_component(coords1, 0.45, type = "LINE")
 #' comp9 <- create_component(coords2, 0.32, type = "POINT")
-#' 
 #' @import sf methods
 #' @export
 create_component <- function(obj, md, ...) {
@@ -662,41 +628,46 @@ component_from_sfg <- function(sfg, md) {
   }
 }
 
-#' @title Creation of an empty `pgeometry` object
+#' @title Create an empty `pgeometry` object
 #'
-#' @description This function builds an empty `pgeometry` object of a specific type.
+#' @description `create_empty_pgeometry()` builds an empty `pgeometry` object of a specific type.
 #'
 #' @usage
 #'
 #' create_empty_pgeometry(type)
 #'
-#' @param type A character value indicating the data type of the `pgeometry` object.
+#' @param type A character value indicating the spatial plateau data type of the `pgeometry` object.
 #' It can be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, `"PLATEAUREGION"`, `"PLATEAUCOMPOSITION"` or `"PLATEAUCOLLECTION"`.
 #'
 #' @details
 #'
-#' The `create_empty_pgeometry` creates a new `pgeometry` object with no components. To add new components to this object, you
-#' should use `spa_add_component`. The components added to this object must be of same type of the empty pgeometry object.
+#' The `create_empty_pgeometry()` function creates a new `pgeometry` object with no components. To add new components to this object, you
+#' should use `spa_add_component()`. The components added to this object must be compatible with the type of the empty `pgeometry` object.
 #'
 #' @return
 #'
-#' A `pgeometry` object.
+#' An empty `pgeometry` object.
 #'
 #' @examples
 #' # Creating an empty plateau point object
 #' empty_plateau_point <- create_empty_pgeometry("PLATEAUPOINT")
+#' empty_plateau_point
 #'
 #' # Creating an empty plateau line object
 #' empty_plateau_line <- create_empty_pgeometry("PLATEAULINE")
+#' empty_plateau_line
 #'
 #' # Creating an empty plateau region object
 #' empty_plateau_region <- create_empty_pgeometry("PLATEAUREGION")
+#' empty_plateau_region
 #' 
 #' # Creating an empty plateau composition object
 #' empty_plateau_composition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+#' empty_plateau_composition
 #' 
 #' # Creating an empty plateau collection object
 #' empty_plateau_collection <- create_empty_pgeometry("PLATEAUCOLLECTION")
+#' empty_plateau_collection
 #' @import sf methods
 #' @export
 create_empty_pgeometry <- function(type) {
@@ -727,26 +698,26 @@ create_empty_pgeometry <- function(type) {
   }
 }
 
-#' @title Creation of a `pgeometry` object with components
+#' @title Create a `pgeometry` object with components
 #'
-#' @description This function creates a `pgeometry` object from a `data.frame`/`tibble`, a list of components, or a list of spatial plateau objects.
+#' @description `create_pgeometry()` creates a `pgeometry` object from a `data.frame` or `tibble` object, a list of components, or a list of spatial plateau objects.
 #'
 #' @usage
 #' 
 #' create_pgeometry(x, type, is_valid = TRUE)
 #'
-#' @param x A list of `component` objects, a list of `pgeometry` objects or a `data.frame`/`tibble`. For `PLATEAUPOINT`, `PLATEAULINE` and `PLATEAUREGION`, the type of each component must be the same for all components.
+#' @param x A list of `component` objects, a list of `pgeometry` objects or a `data.frame`/`tibble` object. For `PLATEAUPOINT`, `PLATEAULINE` and `PLATEAUREGION`, the type of each component must be the same for all components.
 #' @param type A character value that indicates the type of the desired `pgeometry` object. 
 #' It should be either `"PLATEAUPOINT"`, `"PLATEAULINE"`, `"PLATEAUREGION"`, `"PLATEAUCOMPOSITION"`, or `"PLATEAUCOLLECTION"`. 
 #' It must be compatible with the components given in `x` parameter.
-#' @param is_valid A Boolean value to check if the user wants to validate the created spatial plateau object at the end. If `is_valid = TRUE`, it calls `validObject` method.
+#' @param is_valid A Boolean value to check whether the user wants to validate the created spatial plateau object at the end. If `is_valid = TRUE`, it calls `validObject()` method.
 #'
 #' @details
 #' 
-#' The function `create_pgeometry` creates a `pgeometry` object. 
-#' This object is built by using either a list of `component` objects, a list of `pgeometry` objects or a `data.frame` (or `tibble`). 
-#' If a `data.frame` is given, it must have two columns: the first one is a `sfc` object 
-#' and second one indicates the membership degree of each respective object of the `sfc` column.
+#' `create_pgeometry()` is a flexible function that creates a `pgeometry` object by using the values given in `x`. 
+#' This object is built by using either a list of `component` objects, a list of `pgeometry` objects or a `data.frame` (or `tibble`) object. 
+#' If a `data.frame` or `tibble` object is given as input, its columns must have the following format: (i) first column is an `sfc` object, and
+#' (ii) the second columns consists of the membership degree of each respective object of the `sfc` column.
 #' 
 #' By default, this function checks if the resulting spatial plateau object is valid. 
 #' That is, it checks whether all constraints defined by the Spatial Plateau Algebra are satisfied. 
@@ -759,67 +730,49 @@ create_empty_pgeometry <- function(type) {
 #' A `pgeometry` object.
 #' 
 #' @references
+#' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Underlying concepts and formal definitions of spatial plateau data types are explained in detail in:
+#' 
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' - [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
 #'
-#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
-#' [Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.](https://ieeexplore.ieee.org/document/9177620)
-#'  
 #' @examples
 #' library(sf)
-#' # Example 1 - Creating an `PLATEAUPOINT` object from a list of components.
 #' 
-#' # Creating components for the plateau point object
-#' v1 <- rbind(c(1,2), c(3,4))
-#' v2 <- rbind(c(1,4), c(2,3),c(4,4))
-#'
-#' md1 <- 0.2
-#' md2 <- 0.1
-#' md3 <- 0.4
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
-#'
-#' comp1 <- create_component(st_multipoint(pts1), md1)
-#' comp2 <- create_component(st_multipoint(pts2), md2)
-#' comp3 <- create_component(st_multipoint(pts3), md3)
+#' # Creating some components
+#' pts <- rbind(c(0, 2), c(4, 2))
+#' # Point components
+#' pcp1 <- create_component(st_multipoint(pts), 0.3)
+#' pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' # Line components
+#' lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+#' lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+#' lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+#' lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+#' # Polygon components
+#' rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+#' rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
 #' 
-#' # Creating the plateau point object as a pgeometry object with 3 components
+#' # Creating spatial plateau objects from lists of components
+#' pp <- create_pgeometry(list(pcp1, pcp2, pcp3), "PLATEAUPOINT")
+#' pl <- create_pgeometry(list(lcp1, lcp3, lcp4), "PLATEAULINE")
+#' pr <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+#' pcm <- create_pgeometry(list(pcp1, pcp2, lcp1, lcp2, lcp3, rcp2), "PLATEAUCOMPOSITION")
 #' 
-#' ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+#' # Creating a spatial plateau objects from a list of spatial plateau objects
+#' pcl <- create_pgeometry(list(pp, pr, pcm), "PLATEAUCOLLECTION")
 #' 
-#' # Example 2 - Creating an `PLATEAULINE` object from a list of components.
+#' # Converting pp into a tibble
+#' pp
+#' tibble_pp <- as_tibble(pp)
+#' tibble_pp
 #' 
-#' lpts1 <- rbind(c(0, 0), c(1, 1))
-#' lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
-#'
-#' comp4 <- create_component(st_linestring(lpts1), 0.4)
-#' comp5 <- create_component(st_linestring(lpts2), 1)
-#' comp6 <- create_component(st_linestring(lpts3), 0.7)
-#'
-#' pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
-#' 
-#' # Example 3 - Creating an `PLATEAUREGION` object from a list of components.
-#' 
-#' p1 <- rbind(c(0, 0), c(1, 0), c(3, 2), c(2, 4), c(1, 4), c(0, 0))
-#' p2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))
-#' pol1 <-st_polygon(list(p1, p2))
-#' 
-#' comp1 <- create_component(pol1, 0.2)
-#' 
-#' pregion <- create_pgeometry(list(comp1), "PLATEAUREGION")
-#' 
-#' # Example 4 - Creating an `PLATEAUCOMPOSITION` object from a list of components.
-#' 
-#' pcomp <- create_component("POINT(0 0)", 0.2) 
-#' lcomp <- create_component("LINESTRING(1 1, 2 2)", 0.4)
-#' rcomp <- create_component("POLYGON((3 3, 4 4, 4 2, 3 3))", 0.2)
-#' 
-#' pcomposition <- create_pgeometry(list(pcomp, lcomp, rcomp), "PLATEAUCOMPOSITION")
-#' 
-#' # Example 5 - Creating an `PLATEAUCOLLECTION` object from a list of spatial plateau objects.
-#'  
-#' plateau_collection <- create_pgeometry(list(ppoint, pline, pregion, pcomposition), 
-#'                                        "PLATEAUCOLLECTION") 
+#' # Creating a spatial plateau point from the previous tibble
+#' equivalent_pp <- create_pgeometry(tibble_pp, "PLATEAUPOINT")
+#' equivalent_pp
 #' @import sf dplyr
 #' @export
 create_pgeometry <- function(x, type, is_valid = TRUE) {
@@ -1027,48 +980,39 @@ create_pgeometry <- function(x, type, is_valid = TRUE) {
   }
 }
 
-#' @title Checking whether a `pgeometry` object is empty
+#' @title Check if a `pgeometry` object is empty
 #'
-#' @description This function checks whether a `pgeometry` object is empty (i.e., if it does not contain components).
+#' @description `spa_is_empty()` checks whether a given `pgeometry` object is empty (i.e., if it does not contain components).
 #'
 #' @usage
 #' 
-#' fsr_is_empty(pgo)
+#' spa_is_empty(pgo)
 #'
 #' @param pgo A `pgeometry` object.
 #'
 #' @details
 #' 
-#' It checks if a pgeometry object has any component or not. If the number of components of a `pgeometry` object is equal to 0, then 
-#' it returns  `TRUE`. Otherwise, it returns `FALSE`. 
+#' The `spa_is_empty()` function checks if a pgeometry object has any component or not. If the number of components of a `pgeometry` object is equal to 0, then 
+#' it returns `TRUE`. Otherwise, it returns `FALSE`. 
 #' 
 #' @return
 #' 
 #' A Boolean value that indicates if a `pgeometry` is empty.
 #' 
 #' @examples
-#' # Creating an empty pgeometry object 
+#' # Creating an empty plateau line object 
 #' pgo1 <- create_empty_pgeometry("PLATEAULINE")
 #' 
 #' # Checking if it is empty
-#' fsr_is_empty(pgo1)
+#' spa_is_empty(pgo1)
 #' 
-#' # Creating a component to populate the pgeometry object
-#' 
-#' library(sf)
-#' md <- 0.4
-#' pts <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' 
-#' comp <- create_component(st_multipoint(pts), md)
-#' 
-#' # Adding the component to the pgeometry object
+#' # Adding a component to it and checking if it still empty
+#' comp <- create_component("LINESTRING(1 1, 2 2, 2 3)", 0.5)
 #' pgo1 <- spa_add_component(pgo1, comp)
-#' 
-#' # Checking if it is still empty
-#' fsr_is_empty(pgo1)  
+#' spa_is_empty(pgo1)  
 #' @import sf
 #' @export
-fsr_is_empty <- function(pgo) {
+spa_is_empty <- function(pgo) {
   if(st_is_empty(pgo@supp)) {
     type <- spa_get_type(pgo)
     if(type == "PLATEAUCOLLECTION") {
@@ -1078,7 +1022,7 @@ fsr_is_empty <- function(pgo) {
         FALSE
       }
     } else if(type == "PLATEAUCOMPOSITION") {
-      if(fsr_is_empty(pgo@ppoint) && fsr_is_empty(pgo@pline) && fsr_is_empty(pgo@pregion)) {
+      if(spa_is_empty(pgo@ppoint) && spa_is_empty(pgo@pline) && spa_is_empty(pgo@pregion)) {
         TRUE
       } else {
         FALSE
@@ -1094,4 +1038,3 @@ fsr_is_empty <- function(pgo) {
     FALSE
   }
 }
-

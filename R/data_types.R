@@ -55,7 +55,7 @@ setClass("pgeometry",
 #' @import methods sf
 #' @noRd
 check_validity <- function(object) {
-  if(!fsr_is_empty(object)) {
+  if(!spa_is_empty(object)) {
     degrees <- sapply(object@component, attr, "md")
     if(anyDuplicated(degrees)) {
       "The membership degrees of the components must be unique (i.e., duplicated degrees are not allowed)."
@@ -209,7 +209,7 @@ setClass("pcomposition",
 )
 
 setValidity("pcomposition", function(object) {
-  if(!fsr_is_empty(object)) {
+  if(!spa_is_empty(object)) {
     if(validObject(object@ppoint) && validObject(object@pline) && validObject(object@pregion)) {
       disjunction <- st_disjoint(st_sfc(object@ppoint@supp, object@pline@supp, object@pregion@supp), sparse = FALSE)
       adjacency <- st_touches(st_sfc(object@ppoint@supp, object@pline@supp, object@pregion@supp), sparse = FALSE)
@@ -261,7 +261,7 @@ setClass("pcollection",
 )
 
 setValidity("pcollection", function(object) {
-  if(!fsr_is_empty(object)){
+  if(!spa_is_empty(object)){
     if(all(sapply(object@pgos, validObject))) {
       obj_sf <- list()
       for(pgo in 1:length(object@pgos)){

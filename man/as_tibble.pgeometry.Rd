@@ -3,7 +3,7 @@
 \name{as_tibble.pgeometry}
 \alias{as_tibble.pgeometry}
 \alias{as.data.frame.pgeometry}
-\title{Converting a \code{pgeometry} object into tabular data}
+\title{Convert a \code{pgeometry} object into tabular data (\code{data.frame} or \code{tibble})}
 \usage{
 \method{as_tibble}{pgeometry}(x, ...)
 
@@ -15,52 +15,34 @@
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Unused.}
 }
 \value{
-A tibble object of size \verb{n x 2} where \code{n} is the number of components of
-the \code{pgeometry} object and two columns in the format \verb{(md, geometry)}.
+A tabular object (\code{data.frame} or \code{tibble}) with the number of rows corresponding to the number of components of
+the \code{pgeometry} object given as input and two columns in the format \verb{(geometry, md)}.
 }
 \description{
-We can convert a \code{pgeometry} object into tabular data, such as a \code{tibble} or \code{data.frame} object,
+These functions convert a \code{pgeometry} object into a tabular format, such as a \code{tibble} or \code{data.frame} object,
 where the components of the \code{pgeometry} object compose the rows of the table.
 }
 \details{
-This function is an interface for the S3 generic \code{as_tibble}.
-Here, it turns a \code{pgeometry} object into a tibble, which is a data frame with class \code{tbl_df}.
+These functions are S3 methods for \code{pgeometry}.
+The \code{as_tibble()} function converts a \code{pgeometry} object into a \code{tibble}, which is a data frame with class \code{tbl_df}.
 This allows us to get the internal components of the \code{pgeometry} object
 (i.e., spatial features objects and membership degrees) as a data frame with
-two separate columns - called \code{md} (\emph{membership degree}) and \code{geometry} (an \code{sfc} object).
-
-For each component of the \code{pgeometry} object, \code{as_tibble} gets the \code{md} and \code{geometry}
-values and allocates them into a row of the new created tibble, in separated columns.
+two separate columns: (i) \code{geometry} (an \code{sfc} object) and (ii) \code{md} (\emph{membership degree}).
 Therefore, each row of this tibble represents a component of the original \code{pgeometry} object.
 
-It is also possible to call the S3 method \code{as.data.frame} to convert a \code{pgeometry} object into tabular data.
+It is also possible to call the S3 method \code{as.data.frame()} to convert a \code{pgeometry} object into a \code{data.frame} object.
 }
 \examples{
-
-library(sf)
-
-# Creating components for our plateau point object
-v1 <- rbind(c(1,2), c(3,4))
-v2 <- rbind(c(1,4), c(2,3),c(4,4))
-
-md1 <- 0.2
-md2 <- 0.1
-md3 <- 0.4
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
-
-comp1 <- create_component(st_multipoint(pts1), md1)
-comp2 <- create_component(st_multipoint(pts2), md2)
-comp3 <- create_component(st_multipoint(pts3), md3)
-
-# Creating the plateau point object as a pgeometry object with 3 components
-
-plateau_point <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+pcomp1 <- create_component("MULTIPOINT(1 2, 3 2)", 0.4)
+pcomp2 <- create_component("POINT(2 1)", 0.3)
+pcomp3 <- create_component("MULTIPOINT(5 1, 0 0)", 1)
+ppoint <- create_pgeometry(list(pcomp1, pcomp2, pcomp3), "PLATEAUPOINT")
 
 # Converting the pgeometry object into a tibble object
-plateau_point_tibble <- as_tibble(plateau_point)
+ppoint_tibble <- as_tibble(ppoint)
+ppoint_tibble
 
-plateau_point_tibble
-
+# Converting it into data.frame
+ppoint_df <- as.data.frame(ppoint)
+ppoint_df
 }

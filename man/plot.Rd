@@ -4,7 +4,7 @@
 \alias{plot}
 \alias{fsr_plot}
 \alias{plot,pgeometry,missing-method}
-\title{Visualization of \code{pgeometry} objects}
+\title{Graphically visualize \code{pgeometry} objects}
 \usage{
 fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "black", 
          crs = NA, clip = FALSE, line_lwd = 1, region_lwd = 1, ...)
@@ -24,13 +24,13 @@ fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "bla
 
 \item{crs}{A numerical value that denotes the coordinate reference system (i.e., EPSG code) of the visualization. Default is \code{NA}.}
 
-\item{clip}{A Boolean value that indicates whether the boundaries of the components should be clipped by the \code{sfg} object \code{base_poly} (if it is not \code{null}).}
+\item{clip}{A Boolean value that indicates whether the boundaries of the components must be clipped by the \code{sfg} object \code{base_poly} (if it is not \code{null}).}
 
 \item{line_lwd}{A numeric value that specifies the line width of linear components.}
 
 \item{region_lwd}{A numeric value that specifies the line width of the boundaries of polygonal components.}
 
-\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Optional parameters. They can be the same as the parameters of \code{geom_sf} function.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Optional parameters. They can be the same as the parameters of \code{geom_sf()} function from \code{ggplot2}.}
 
 \item{x}{A \code{pgeometry} object of any type.}
 
@@ -40,79 +40,80 @@ fsr_plot(pgo, base_poly = NULL, add_base_poly = TRUE, low = "white", high = "bla
 A \code{ggplot} object.
 }
 \description{
-This function plots a \code{pgeometry} object.
+The \code{fsr_plot()} function (and the S4 method \code{plot()}) plots a \code{pgeometry} object.
 }
 \details{
-The \code{fsr_plot} uses a \code{ggplot} method to construct the plot. It receives a \code{pgeometry} object (if it is empty, an empty graphics
+The \code{fsr_plot()} function uses a \code{ggplot2} package to built the resulting plot. It receives a \code{pgeometry} object as input (if it is empty, an empty graphics
 in obtained).
 
 The \code{low} and \code{high} parameters are the colors for the minimum and maximum limits of the membership degrees. The
-default colors are "white" and "black", respectively. Other colors can be given in the same way that colors are informed
-to visualizations produced by the \code{ggplot} package.
+default colors are \code{"white"} and \code{"black"}, respectively. Other colors can be given in the same way that colors are informed
+to visualizations produced by the \code{ggplot2} package.
 
 It is possible to clip the geometric format of the components by using the parameter \code{base_poly}. The boundaries of this object
 can also be included in the visualization if the parameter \code{add_base_poly} is \code{TRUE}.
+
+Since the returned value is a ggplot object, it can be further be customized (see examples below).
 }
 \examples{
-
 library(sf)
 
-### Example 1
+pts <- rbind(c(0, 2), c(4, 2))
+# Point components
+pcp1 <- create_component(st_multipoint(pts), 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+# Line components
+lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+# Polygon components
+rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
+# Creating spatial plateau objects
+pp <- create_pgeometry(list(pcp1, pcp2, pcp3), "PLATEAUPOINT")
+pl <- create_pgeometry(list(lcp1, lcp3, lcp4), "PLATEAULINE")
+pr <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+pcm <- create_pgeometry(list(pcp1, pcp2, lcp1, lcp2, lcp3, rcp2), "PLATEAUCOMPOSITION")
+pcl <- create_pgeometry(list(pp, pr, pcm), "PLATEAUCOLLECTION")
 
-# Creating components for the plateau point object
-v1 <- rbind(c(1,2), c(3,4))
-v2 <- rbind(c(1,4), c(2,3),c(4,4))
+# Displaying their textual representations
+pp
+pl
+pr
+pcm
+pcl
 
-md1 <- 0.2
-md2 <- 0.1
-md3 <- 0.4
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+# Plotting them
+plot(pp)
+plot(pl)
+plot(pr)
+plot(pcm)
+plot(pcl)
 
-comp1 <- create_component(st_multipoint(pts1), md1)
-comp2 <- create_component(st_multipoint(pts2), md2)
-comp3 <- create_component(st_multipoint(pts3), md3)
+# Custom colors
+fsr_plot(pr, low = "green", high = "blue")
 
-# Creating the plateau point object as a pgeometry object with 3 components
+# Changing the line width of line components
+fsr_plot(pl, line_lwd = 2)
 
-ppoint <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUPOINT")
+# Changing the line width of boundary lines of region components
+fsr_plot(pr, region_lwd = 2)
 
-fsr_plot(ppoint) # with default colors
-fsr_plot(ppoint, low="blue",high = "red") # with custom limit colors
+# Changing the line width of boundary lines of region components and its color
+fsr_plot(pr, region_lwd = 2, color = "blue")
 
-# Example 2 - PLATEAULINE PLOT
+# You can customize the whole visualization using ggplot
+library(ggplot2)
 
-lpts1 <- rbind(c(0, 0), c(1, 1))
-lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
-
-comp4 <- create_component(st_linestring(lpts1), 0.4)
-comp5 <- create_component(st_linestring(lpts2), 1)
-comp6 <- create_component(st_linestring(lpts3), 0.7)
-
-pline <- create_pgeometry(list(comp4, comp5, comp6), "PLATEAULINE")
-
-fsr_plot(pline) # Default values
-fsr_plot(pline, low="green", high="blue") # Custom colors ...
-
-
-# Example 3 - PLATEAUREGION PLOT
-
-p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-pol1 <-st_polygon(list(p1,p2))
-p3 <- rbind(c(3,0), c(4,0), c(4,1), c(3,1), c(3,0))
-p4 <- rbind(c(3.3,0.3), c(3.8,0.3), c(3.8,0.8), c(3.3,0.8), c(3.3,0.3))[5:1,]
-pol2 <- st_polygon(list(p3,p4))
-pol3 <- st_polygon(list(rbind(c(3,3), c(4,2), c(4,3), c(3,3))))
-
-comp1 <- create_component(pol1, 0.2)
-comp2 <- create_component(pol2, 0.4)
-comp3 <- create_component(pol3, 0.7)
-
-pregion <- create_pgeometry(list(comp1, comp2, comp3), "PLATEAUREGION")
-fsr_plot(pregion)
-fsr_plot(pregion, low = "blue", high = "red")
-
+fsr_plot(pp, size = 5) +   
+  theme(legend.position = "none") +
+  theme(text=element_text(size=20, family = "serif", color = "black"),
+        axis.text=element_text(color="black")) +
+  scale_x_continuous(breaks = c(0, 1, 2, 3, 4)) +
+  scale_y_continuous(breaks = c(0, 1, 2, 3, 4))
+}
+\references{
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
 }

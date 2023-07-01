@@ -152,7 +152,7 @@ spa_add_internal <- function(pgo, components) {
     }
     
     # 2. if the pgo is empty and the component is not empty and has a membership greater than 0
-    if(fsr_is_empty(spobj) && !(is.null(c) || st_is_empty(c)) && m > 0) {
+    if(spa_is_empty(spobj) && !(is.null(c) || st_is_empty(c)) && m > 0) {
       spobj@component[[1]] <- component
       spobj@supp <- c 
     } else if(!is.null(c) && length(spobj@component) >= 1) {
@@ -413,7 +413,7 @@ get_counter_ctype <- function(pgo){
 #' @export
 spa_core <- function(pgo) {
   type <- spa_get_type(pgo)
-  if(fsr_is_empty(pgo)) {
+  if(spa_is_empty(pgo)) {
     sf_type <- get_counter_ctype(pgo)
     sfg_obj <- switch(sf_type,
                       POINT = st_point(),
@@ -499,7 +499,7 @@ spa_core <- function(pgo) {
 #' @export
 spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = TRUE) {
   type <- spa_get_type(pgo)
-  if(fsr_is_empty(pgo)) {
+  if(spa_is_empty(pgo)) {
     sf_type <- get_counter_ctype(pgo)
     sfg_obj <- switch(sf_type,
                       POINT = st_point(),
@@ -753,7 +753,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
 #' @import methods sf
 #' @export
 spa_boundary <- function(pgo) {
-  if(fsr_is_empty(pgo)) {
+  if(spa_is_empty(pgo)) {
     return(create_empty_pgeometry("PLATEAUCOMPOSITION"))
   }
   
@@ -866,7 +866,7 @@ spa_contour <- function(pregion) {
     stop("pregion must be a PLATEAUREGION type.", call. = FALSE)
   }
   
-  if(fsr_is_empty(pregion)) {
+  if(spa_is_empty(pregion)) {
     return(create_empty_pgeometry("PLATEAULINE"))
   }
   

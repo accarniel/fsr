@@ -52,7 +52,7 @@
 #' @import methods
 #' @export
 spa_flatten <- function(pcol) {
-  if(fsr_is_empty(pcol)) {
+  if(spa_is_empty(pcol)) {
     return(pcol)
   }
   
@@ -66,19 +66,19 @@ spa_flatten <- function(pcol) {
   
   ppoint <- create_empty_pgeometry("PLATEAUPOINT")
   if(length(ppoints)) {
-    ppoint <- internal_union_list(ppoints[!sapply(ppoints, fsr_is_empty)], "PLATEAUPOINT")
+    ppoint <- internal_union_list(ppoints[!sapply(ppoints, spa_is_empty)], "PLATEAUPOINT")
   }
   pline <- create_empty_pgeometry("PLATEAULINE")
   if(length(plines)) {
-    pline <- internal_union_list(plines[!sapply(plines, fsr_is_empty)], "PLATEAULINE")
+    pline <- internal_union_list(plines[!sapply(plines, spa_is_empty)], "PLATEAULINE")
   }
   pregion <- create_empty_pgeometry("PLATEAUREGION")
   if(length(pregions)) {
-    pregion <- internal_union_list(pregions[!sapply(pregions, fsr_is_empty)], "PLATEAUREGION")
+    pregion <- internal_union_list(pregions[!sapply(pregions, spa_is_empty)], "PLATEAUREGION")
   }
   pcomposition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
   if(length(pcompositions)) {
-    pcomposition <- internal_union_list(pcompositions[!sapply(pcompositions, fsr_is_empty)], "PLATEAUCOMPOSITION")
+    pcomposition <- internal_union_list(pcompositions[!sapply(pcompositions, spa_is_empty)], "PLATEAUCOMPOSITION")
   }
   
   pgos <- c(ppoint, pline, pregion, pcomposition)
@@ -97,7 +97,7 @@ internal_union_list <- function(pgos, type) {
     result <- pgos[[1]]
     for(pgo in pgos[2:length(pgos)]){
       result <- spa_union(result, pgo, utype = "max", as_pcomposition = FALSE)
-      if(fsr_is_empty(result)){
+      if(spa_is_empty(result)){
         result <- create_empty_pgeometry(type)
       }
     }
@@ -317,13 +317,13 @@ create_result_set_op <- function(comps, as_pcomposition, type) {
 heterogeneous_geom_comp <- function(pgo1, pgo2, sigma, beta, as_pcomposition) {
   # helper function that tries to simplify the structure of a spatial plateau object (e.g., if a composition has only one sub-object, and it will be simplified to such sub-object)
   simplify <- function(pgo) {
-    if(fsr_is_empty(pgo)) {
+    if(spa_is_empty(pgo)) {
       return(pgo)
     }
     type <- spa_get_type(pgo)
     if(type == "PLATEAUCOMPOSITION") {
       triple <- c(pgo@ppoint, pgo@pline, pgo@pregion)
-      mask_empty_objs <- sapply(triple, fsr_is_empty)
+      mask_empty_objs <- sapply(triple, spa_is_empty)
       n_empty_objs <- sum(mask_empty_objs)
       if(n_empty_objs == 2) {
         if(!mask_empty_objs[1]) {
@@ -337,7 +337,7 @@ heterogeneous_geom_comp <- function(pgo1, pgo2, sigma, beta, as_pcomposition) {
         pgo
       }
     }else if(type == "PLATEAUCOLLECTION") {
-      mask_empty_objs <- sapply(pgo@pgos, fsr_is_empty)
+      mask_empty_objs <- sapply(pgo@pgos, spa_is_empty)
       n_non_empty_objs <- length(pgo@pgos) - sum(mask_empty_objs)
       if(n_non_empty_objs == 1) {
         pgo@pgos[!mask_empty_objs][[1]]
@@ -403,15 +403,15 @@ combination_matrix <- function(pgo1, pgo2, sigma, beta, as_pcomposition = TRUE) 
 #' @noRd
 agg_combination_matrix <- function(cm, as_pcomposition = FALSE) {
   ppoints <- lapply(cm, attr, "ppoint")
-  presult <- internal_union_list(ppoints[!sapply(ppoints, fsr_is_empty)], "PLATEAUPOINT")
+  presult <- internal_union_list(ppoints[!sapply(ppoints, spa_is_empty)], "PLATEAUPOINT")
   
   plines <- lapply(cm, attr, "pline")
-  lresult <- internal_union_list(plines[!sapply(plines, fsr_is_empty)], "PLATEAULINE")
+  lresult <- internal_union_list(plines[!sapply(plines, spa_is_empty)], "PLATEAULINE")
   
   pregions <- lapply(cm, attr, "pregion")
-  rresult <- internal_union_list(pregions[!sapply(pregions, fsr_is_empty)], "PLATEAUREGION")
+  rresult <- internal_union_list(pregions[!sapply(pregions, spa_is_empty)], "PLATEAUREGION")
   
-  mask_empty_objs <- sapply(c(presult, lresult, rresult), fsr_is_empty)
+  mask_empty_objs <- sapply(c(presult, lresult, rresult), spa_is_empty)
   n_empty_objs <- sum(mask_empty_objs)
   if(n_empty_objs == 2 && !as_pcomposition) {
     non_empty_objs <- c(presult, lresult, rresult)[!mask_empty_objs][[1]]

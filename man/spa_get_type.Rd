@@ -2,7 +2,7 @@
 % Please edit documentation in R/basic_functions.R
 \name{spa_get_type}
 \alias{spa_get_type}
-\title{Getting the type of a spatial plateau object}
+\title{Get the type of a spatial plateau object}
 \usage{
 spa_get_type(pgo)
 }
@@ -13,21 +13,27 @@ spa_get_type(pgo)
 The type of a spatial plateau object as a character object (i.e., a string).
 }
 \description{
-This function gets the type of a spatial plateau object.
+\code{spa_get_type()} returns the type of a spatial plateau object.
 It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"}, \code{"PLATEAUREGION"}, \code{"PLATEAUCOMPOSITION"}, or \code{"PLATEAUCOLLECTION"}.
 }
 \details{
-The \code{spa_get_type} function gets the type of a spatial plateau object given as input.
-For instance, if the \code{pgo} is a object of the class \code{ppoint} (subclass of \code{pgeometry}), the return will be "PLATEAUPOINT".
+The \code{spa_get_type()} function yields the type of a spatial plateau object given as input.
+For instance, if the \code{pgo} is a object of the class \code{ppoint} (subclass of \code{pgeometry}), it returns \code{"PLATEAUPOINT"}.
 }
 \examples{
-library(sf)
-
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pcomp1 <- create_component(st_multipoint(pts1), 0.4)
-pcomp2 <- create_component(st_multipoint(pts2), 0.3)
+pcomp1 <- create_component("MULTIPOINT(1 2, 3 2)", 0.4)
+pcomp2 <- create_component("POINT(2 1)", 0.3)
 ppoint <- create_pgeometry(list(pcomp1, pcomp2), "PLATEAUPOINT")
 
 spa_get_type(ppoint) 
+
+lcomp1 <- create_component("LINESTRING(1 2, 3 3, 3 4)", 1)
+lcomp2 <- create_component("LINESTRING(0 0, 5 5)", 0.5)
+pline <- create_pgeometry(list(lcomp1, lcomp2), "PLATEAULINE")
+
+spa_get_type(pline)
+
+pcomposition <- create_pgeometry(list(ppoint, pline), "PLATEAUCOMPOSITION")
+
+spa_get_type(pcomposition)
 }

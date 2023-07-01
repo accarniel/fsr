@@ -4,7 +4,7 @@
 \alias{fsr_components}
 \alias{create_component}
 \alias{component_from_sfg}
-\title{Creation of a component}
+\title{Create a component}
 \usage{
 create_component(obj, md, ...)
 
@@ -13,7 +13,7 @@ component_from_sfg(sfg, md)
 \arguments{
 \item{obj}{A crisp spatial object in a specific format (see details below).}
 
-\item{md}{A numeric value indicating the membership degree of the component. It must be a value in \eqn{]0, 1]}.}
+\item{md}{A numeric value indicating the membership degree of the component. It must be a value in ]0, 1].}
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Different parameters that are used to convert a crisp spatial object from a specific representation (see more in details below).}
 
@@ -24,20 +24,20 @@ component_from_sfg(sfg, md)
 A \code{component} object that can be added to a spatial plateau object (i.e., a \code{pgeometry} object).
 }
 \description{
-This function builds an object of class \code{component}.
-A component consists of a crisp spatial object (i.e., \code{sfg} object) labeled with a membership degree in \eqn{]0, 1]}.
+\code{create_component()} builds an object of class \code{component}.
+A component consists of a crisp spatial object (\code{sfg} object) labeled with a membership degree in ]0, 1].
 It is a flexible function since the crisp spatial object can be provided by using different formats.
 }
 \details{
-The function \code{create_component} creates a \code{component} object. Internally, it is a pair of an \code{sfg} object and a membership degree in \eqn{]0, 1]}.
+The \code{create_component()} function creates a \code{component} object. Internally, it is a pair of an \code{sfg} object and a membership degree in ]0, 1].
 
-For this, \code{obj} can be either:
+\code{obj} can be either (see restrictions regarding its data type below):
 \itemize{
-\item an \code{sfg} object of type,
-\item a character vector containing the WKT representation of a crisp spatial object,
-\item a structure of class \code{"WKB"} with the WKB or EWKB representation of a crisp spatial object (if the EWKB representation is used, then you have to provide the additional parameter \code{EWKB = TRUE} in \code{...}),
+\item an \code{sfg} object.
+\item a character vector containing the WKT representation of a crisp spatial object.
+\item a structure of class \code{"WKB"} with the WKB or EWKB representation of a crisp spatial object. If the EWKB representation is used, then you have to provide the additional parameter \code{EWKB = TRUE} in \code{...}.
 \item a vector, list, or matrix containing coordinate pairs to be used when creating the \code{sfg} object.
-This means that in this case it has a similar behavior to the family of functions \code{st} of the \code{sf} package (e.g., the functions \code{st_point}, \code{st_multipoint}, etc.).
+This means that it has a similar behavior to the family of functions \code{st} of the \code{sf} package (e.g., \code{st_point()}, \code{st_multipoint()}, etc.).
 Thus, you have to provide the additional parameter \code{type} in \code{...}, which should be either \code{"POINT"}, \code{"LINE"}, or \code{"REGION"}.
 }
 
@@ -45,11 +45,9 @@ It is important to emphasize that the crisp spatial object must be a simple or c
 That is, it should be a \code{POINT}, \code{MULTIPOINT}, \code{LINESTRING}, \code{MULTILINESTRING}, \code{POLYGON} or \code{MULTIPOLYGON} object.
 If other types of crisp spatial objects are given, an error will be thrown.
 
-The function \code{component_from_sfg} is now integrated with the function \code{create_component}.
-Hence, \code{component_from_sfg} is deprecated.
+The \code{component_from_sfg()} function is deprecated.
 }
 \examples{
-
 # first way: providing sfg objects
 library(sf)
 
@@ -64,22 +62,21 @@ rpts <- list(matrix_obj)
 comp3 <- create_component(st_polygon(rpts), 0.4)
 
 # second way: providing WKT representations
-
 comp4 <- create_component("POINT(10 35)", 0.5)
-comp5 <- create_component("MULTILINESTRING((-29 -27,-36 -31,-45 -33), (-45 -33,-46 -32))", 0.9)
+comp5 <- create_component("MULTILINESTRING((-29 -27, -36 -31, -45 -33), (-45 -33, -46 -32))", 0.9)
 comp6 <- create_component("POLYGON((75 29, 77 29, 77 29, 75 29))", 1)
 
 # third way: providing WKB representations
-
 wkb = structure(list("0x0101000020e610000000000000000000000000000000000040"), class = "WKB")
 comp7 <- create_component(wkb, 0.8, EWKB = TRUE)
 
-# fourth way: providing coordinates
-
+# fourth way: providing coordinate pairs
 coords1 = rbind(c(2,2), c(3,3))
 coords2 = rbind(c(1,1), c(3,2))
 
 comp8 <- create_component(coords1, 0.45, type = "LINE")
 comp9 <- create_component(coords2, 0.32, type = "POINT")
-
+}
+\references{
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
 }

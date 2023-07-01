@@ -2,37 +2,42 @@
 % Please edit documentation in R/basic_functions.R
 \name{create_empty_pgeometry}
 \alias{create_empty_pgeometry}
-\title{Creation of an empty \code{pgeometry} object}
+\title{Create an empty \code{pgeometry} object}
 \usage{
 create_empty_pgeometry(type)
 }
 \arguments{
-\item{type}{A character value indicating the data type of the \code{pgeometry} object.
+\item{type}{A character value indicating the spatial plateau data type of the \code{pgeometry} object.
 It can be either \code{"PLATEAUPOINT"}, \code{"PLATEAULINE"}, \code{"PLATEAUREGION"}, \code{"PLATEAUCOMPOSITION"} or \code{"PLATEAUCOLLECTION"}.}
 }
 \value{
-A \code{pgeometry} object.
+An empty \code{pgeometry} object.
 }
 \description{
-This function builds an empty \code{pgeometry} object of a specific type.
+\code{create_empty_pgeometry()} builds an empty \code{pgeometry} object of a specific type.
 }
 \details{
-The \code{create_empty_pgeometry} creates a new \code{pgeometry} object with no components. To add new components to this object, you
-should use \code{spa_add_component}. The components added to this object must be of same type of the empty pgeometry object.
+The \code{create_empty_pgeometry()} function creates a new \code{pgeometry} object with no components. To add new components to this object, you
+should use \code{spa_add_component()}. The components added to this object must be compatible with the type of the empty \code{pgeometry} object.
 }
 \examples{
 # Creating an empty plateau point object
 empty_plateau_point <- create_empty_pgeometry("PLATEAUPOINT")
+empty_plateau_point
 
 # Creating an empty plateau line object
 empty_plateau_line <- create_empty_pgeometry("PLATEAULINE")
+empty_plateau_line
 
 # Creating an empty plateau region object
 empty_plateau_region <- create_empty_pgeometry("PLATEAUREGION")
+empty_plateau_region
 
 # Creating an empty plateau composition object
 empty_plateau_composition <- create_empty_pgeometry("PLATEAUCOMPOSITION")
+empty_plateau_composition
 
 # Creating an empty plateau collection object
 empty_plateau_collection <- create_empty_pgeometry("PLATEAUCOLLECTION")
+empty_plateau_collection
 }

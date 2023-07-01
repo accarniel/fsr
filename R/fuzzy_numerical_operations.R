@@ -88,7 +88,7 @@
 #' @export
 spa_avg_degree <- function(pgo) {
   type <- spa_get_type(pgo)
-  if(!fsr_is_empty(pgo)) {
+  if(!spa_is_empty(pgo)) {
     if(type %in% c("PLATEAUPOINT", "PLATEAULINE", "PLATEAUREGION")) {
       mean(sapply(pgo@component, attr, "md"))
     } else if(type == "PLATEAUCOMPOSITION") {
@@ -115,7 +115,7 @@ spa_ncomp <- function(pgo) {
   } else if(type == "PLATEAUCOMPOSITION") {
     spa_ncomp(pgo@ppoint) + spa_ncomp(pgo@pline) + spa_ncomp(pgo@pregion)
   } else if(type == "PLATEAUCOLLECTION") {
-    if(!fsr_is_empty(pgo)) {
+    if(!spa_is_empty(pgo)) {
       sum(sapply(pgo@pgos, spa_ncomp))
     } else {
       0
@@ -138,7 +138,7 @@ spa_area <- function(pgo) {
   if(type %in% c("PLATEAUPOINT", "PLATEAULINE")) {
     warning(paste("A", type, "object does not have an area."), call. = FALSE)
     0
-  } else if(!fsr_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
+  } else if(!spa_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
     if(type == "PLATEAUREGION") {
       area_comp <- function(comp) {
         md_comp <- comp@md
@@ -174,7 +174,7 @@ spa_perimeter <- function(pgo) {
   if(type %in% c("PLATEAUPOINT", "PLATEAULINE")) {
     warning(paste("A", type, "object does not have a perimeter."), call. = FALSE)
     0
-  } else if(!fsr_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
+  } else if(!spa_is_empty(pgo) && type %in% c("PLATEAUREGION", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
     if(type == "PLATEAUREGION") {
       perimeter_comp <- function(comp) {
         md_comp <- comp@md
@@ -212,7 +212,7 @@ spa_length <- function(pgo) {
   if(type %in% c("PLATEAUPOINT", "PLATEAUREGION")) {
     warning(paste("A", type, "object does not have a length."), call. = FALSE)
     0
-  } else if(!fsr_is_empty(pgo) && type %in% c("PLATEAULINE", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
+  } else if(!spa_is_empty(pgo) && type %in% c("PLATEAULINE", "PLATEAUCOMPOSITION", "PLATEAUCOLLECTION")) {
     if(type == "PLATEAULINE") {
       length_comp <- function(comp){
         md_comp = comp@md

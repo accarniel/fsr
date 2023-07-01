@@ -51,7 +51,7 @@ spa_exact_equal <- function(pgo1, pgo2) {
   }
   
   # Same type and both empty
-  if(type1 == type2 && all(sapply(c(pgo1, pgo2), fsr_is_empty))) {
+  if(type1 == type2 && all(sapply(c(pgo1, pgo2), spa_is_empty))) {
     return(TRUE)
   }
   
