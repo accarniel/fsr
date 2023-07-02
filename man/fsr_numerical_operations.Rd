@@ -7,7 +7,7 @@
 \alias{spa_area}
 \alias{spa_perimeter}
 \alias{spa_length}
-\title{Fuzzy numerical operations}
+\title{Compute fuzzy numerical operations}
 \usage{
 spa_avg_degree(pgo)
 
@@ -26,8 +26,8 @@ spa_length(pgo)
 A numerical value.
 }
 \description{
-Fuzzy numerical operations are given as a family of functions that implements spatial plateau numerical operations.
-These functions extract metric properties from spatial plateau objects,
+Fuzzy numerical operations are implemented by spatial plateau numerical operations, which
+extract geometric measurements from spatial plateau objects,
 such as the area of a plateau region object and the length of a plateau line object.
 }
 \details{
@@ -35,68 +35,75 @@ These functions calculate numerical properties from spatial plateau objects (i.e
 Some of them are \emph{type-independent}. This means that the parameter can be a \code{pgeometry} object of any type.
 The type-independent functions are:
 \itemize{
-\item \code{spa_avg_degree} calculates the average membership degree of a spatial plateau object.
-\item \code{spa_ncomp} returns the number of components of a spatial plateau object.
+\item \code{spa_avg_degree()} calculates the average membership degree of a spatial plateau object.
+\item \code{spa_ncomp()} returns the number of components of a spatial plateau object.
 }
 
 The remaining functions are \emph{type-dependent}. This means that the parameter have to be of a specific type.
 The type-dependent functions are:
 \itemize{
-\item \code{spa_area} computes the area of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
-\item \code{spa_perimeter} computes the perimeter of a plateau region, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAUREGION}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
-\item \code{spa_length} computes the length of a plateau line, plateau composition, or plateau collection. Thus, its parameter has to be a \code{PLATEAULINE}, \code{PLATEAUCOMPOSITION}, or \code{PLATEAUCOLLECTION} object.
+\item \code{spa_area()} computes the area of a plateau region, plateau composition, or plateau collection object.
+\item \code{spa_perimeter()} computes the perimeter of a plateau region, plateau composition, or plateau collection.
+\item \code{spa_length()} computes the length of a plateau line, plateau composition, or plateau collection object.
 }
+
+For the aforementioned functions, if the input has the incorrect data type, it throws a warning message and returns 0.
 }
 \examples{
-library(sf)
-library(tibble)
+# Point components
+pcp1 <- create_component("POINT(0 0)", 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
+# Line components
+lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+lcp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+# Polygon components
+rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-comp1 <- create_component(st_multipoint(pts1), 0.2) 
-comp2 <- create_component(st_point(c(1, 5)), 0.8)  
+# Creating spatial plateau objects
+ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+pline <- create_pgeometry(list(lcp1, lcp2, lcp3), "PLATEAULINE")
+pregion <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+pcomp <- create_pgeometry(list(pcp6, pcp7, lcp4, lcp5), "PLATEAUCOMPOSITION")
+pcol <- create_pgeometry(list(ppoint, pline, pregion, pcomp), "PLATEAUCOLLECTION")
 
-pp <- create_pgeometry(list(comp1, comp2), "PLATEAUPOINT")
+spa_avg_degree(ppoint)
+spa_avg_degree(pline)
+spa_avg_degree(pregion)
+spa_avg_degree(pcomp)
+spa_avg_degree(pcol)
 
-# calculating the average degree and number of components of pp
+spa_ncomp(ppoint)
+spa_ncomp(pline)
+spa_ncomp(pregion)
+spa_ncomp(pcomp)
+spa_ncomp(pcol)
 
-spa_avg_degree(pp)
-spa_ncomp(pp)
+spa_area(pregion)
+spa_area(pcomp)
+spa_area(pcol)
 
-# calculating the area and perimeter
-
-set.seed(345)
-
-# some random points to create plateau region objects by using the function spa_creator
-tbl = tibble(x = runif(10, min= 0, max = 20), 
-             y = runif(10, min = 0, max = 30), 
-             z = runif(10, min = 0, max = 100))
-
-#getting the convex hull on the points to clip the construction of plateau region objects
-pts <- st_as_sf(tbl, coords = c(1, 2))
-ch <- st_convex_hull(do.call(c, st_geometry(pts)))
-
-pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
-
-spa_area(pregions$pgeometry[[1]])
-spa_area(pregions$pgeometry[[2]])
-
-spa_perimeter(pregions$pgeometry[[1]])
-spa_perimeter(pregions$pgeometry[[2]])
-
-# calculating the length of a plateau line object
-
-lpts1 <- rbind(c(0, 0), c(1, 1))
-lpts2 <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-lpts3 <- rbind(c(2, 1), c(1.5, 0.5))
-
-cp1 <- create_component(st_linestring(lpts1), 0.4)
-cp2 <- create_component(st_linestring(lpts2), 1)
-cp3 <- create_component(st_linestring(lpts3), 0.7)
-
-pline <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAULINE")
+spa_perimeter(pregion)
+spa_perimeter(pcomp)
+spa_perimeter(pcol)
 
 spa_length(pline)
+spa_length(pcomp)
+spa_length(pcol)
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Underlying concepts and formal definitions of some spatial plateau numerical operations are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+}
 }

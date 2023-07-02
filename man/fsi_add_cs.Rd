@@ -2,18 +2,18 @@
 % Please edit documentation in R/fsi_module.R
 \name{fsi_add_cs}
 \alias{fsi_add_cs}
-\title{Adding the consequent to an FSI model}
+\title{Add the consequent to an FSI model}
 \usage{
 fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
 }
 \arguments{
-\item{fsi}{The FSI model instantiated with the \code{fsi_create} function.}
+\item{fsi}{The FSI model instantiated with the \code{fsi_create()} function.}
 
 \item{lvar}{A character value that represents a linguistic variable of the consequent.}
 
-\item{lvals}{A character vector that represents linguistic values of the linguistic variable of the consequent.}
+\item{lvals}{A character vector that contains linguistic values of the linguistic variable of the consequent.}
 
-\item{mfs}{A vector of membership functions. For instance, membership functions can be created by using the function \code{genmf} of the package FuzzyR.}
+\item{mfs}{A vector of membership functions (see examples below).}
 
 \item{bounds}{A numeric vector that represents the lower and upper bounds of the consequent domain.}
 }
@@ -21,17 +21,17 @@ fsi_add_cs(fsi, lvar, lvals, mfs, bounds)
 An FSI model populated with a consequent.
 }
 \description{
-This function adds the consequent to a fuzzy spatial inference (FSI) model. It consists of a set of membership functions labeled with linguistic values.
+\code{fsi_add_cs()} adds the consequent to a fuzzy spatial inference (FSI) model. It consists of a set of membership functions labeled with linguistic values.
 }
 \details{
-Each linguistic value defined at the \code{lvals} parameter has a membership function defined at the \code{mfs} parameter.
-\code{lvals} is a character vector containing the names of linguistic values and \code{mfs} is vector containing its corresponding membership functions.
-Thus, the vectors defined for these two parameters must have the same length.
-For instance, the first value of \code{lvals} is the linguistic value for the first membership function in \code{mfs}.
+The \code{fsi_add_cs()} function adds the consequent to an FSI model.
+Each linguistic value defined in \code{lvals} has a corresponding membership function defined in \code{mfs}.
+Thus, these two parameters must have the same length.
+For instance, the first value of \code{lvals} defines the linguistic value of the first membership function in \code{mfs}.
 In \code{bounds}, the lower and upper values correspond to the first and second parameter, respectively.
 }
 \examples{
-# defining two different types of membership functions
+# Defining two different types of membership functions
 trap_mf <- function(a, b, c, d) {
   function(x) {
     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
@@ -44,20 +44,27 @@ trim_mf <- function(a, b, c) {
   }
 }
 
-# Create the fsi_model:
+# Creating the FSI model
 fsi <- fsi_create("To visit or not to visit, that is the question", 
                    default_conseq = trim_mf(10, 30, 60))
 
-# Create the vector with the linguistic values of the linguistic variable "visiting experience":
+# Creating the vector with the linguistic values of the linguistic variable "visiting experience"
 lvals_visiting_exp <- c("awful", "average", "great")
 
-# Define the membership function for each linguistic value:
+# Defining the membership function for each linguistic value
 awful_mf <- trim_mf(0, 0, 20)
 average_mf <- trim_mf(10, 30, 60)
 great_mf <- trap_mf(40, 80, 100, 100)
 
-# Add the consequent to the FSI model:
+# Adding the consequent to the FSI model
 fsi <- fsi_add_cs(fsi, "visiting experience", lvals_visiting_exp,
                   c(awful_mf, average_mf, great_mf), c(0, 100))
+}
+\references{
+\href{https://doi.org/10.1145/3474717.3484255}{Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.}
 
+Underlying concepts and formal definitions of FSI models are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
+}
 }

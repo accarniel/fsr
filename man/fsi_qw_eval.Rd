@@ -2,78 +2,113 @@
 % Please edit documentation in R/fsi_module.R
 \name{fsi_qw_eval}
 \alias{fsi_qw_eval}
-\title{Evaluating a query window inference}
+\title{Evaluate region inference methods}
 \usage{
 fsi_qw_eval(fsi, qw, approach = "discretization", ...)
 }
 \arguments{
-\item{fsi}{An FSI model built with the \code{fsi_create} function that is populated by the following functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
+\item{fsi}{An FSI model built with the \code{fsi_create()} function and populated by the functions \code{fsi_add_fsa()}, \code{fsi_add_cs()}, and \code{fsi_add_rules()}.}
 
-\item{qw}{An \code{sfg} object storing the query window that is supposed to be used as input for the inference. It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).}
+\item{qw}{An \code{sfg} object representing the search object (e.g., a query window). It has to be an axis-aligned rectangle represented by a simple polygon object of 5 points (since the last coordinate pair closes the external ring of the rectangle).}
 
-\item{approach}{Defines which approach is employed to perform the query window inference: \verb{“discretization”} or \verb{“pso”}. Default value is `"discretization"``}
+\item{approach}{Defines which approach is employed to perform the region inference: \code{"discretization"} or \code{"pso"}. Default value is \code{"discretization"}.}
 
 \item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Different set of parameters required depending on the chosen approach (see more in details below).}
 }
 \value{
-A tibble in the format \verb{(points, inferred_values)}, where \code{points} is an \code{sfc} object (i.e., a list of \code{sfg} objects of geometry type POINT) and \code{inferred_values} are inferred values in the domain of the consequent of the FSI model.
+A tibble in the format \verb{(points, inferred_values)}, where \code{points} is an \code{sfc} object and \code{inferred_values} are inferred values in the domain of the consequent of the FSI model.
 }
 \description{
-This function implements two approaches for evaluating the query window inference on a fuzzy spatial inference (FSI) model.
-Given a query window (i.e., a rectangular object), it returns a set of inferred points inside this window
-that satisfy a specific condition (e.g., target linguistic value, or maximum/minimum inferred values).
+\code{fsi_qw_eval()} implements two methods for evaluating region inference (RI) queries: (i) Linguistic value-based RI query, and (ii) Optimal RI query.
+The objective of these queries is to capture all points that intersect a search object (e.g., a query window) and
+whose inferred values fulfill some specific user requirements (e.g., the points with the maximum or minimum inferred values).
 }
 \details{
-For the \emph{discretization} approach, two additional parameters are needed and they have to be informed by using the three-dots parameter \code{...}:
+The \code{fsi_qw_eval()} function evaluates two types of RI queries:
 \itemize{
-\item \code{target_lval}: A character value that indicates the target linguistic value from the linguistic variable of the consequent.
-\item \code{k}: A numeric value that defines the number of points that will be captured from the query window and evaluated by the function \code{fsi_eval}. Its square root has to an integer value.   Alternatively, you can inform the number of columns and rows of the regular grid to be performed on the query window by informing numeric values for \code{n_col} and \code{n_row}, respectively. Thus, these parameters can be given instead of the number \code{k}.
+\item \emph{Linguistic value-based RI query}, which answers the following type of question: what are the points that intersect a given search object and have inferred values that belong to a target linguistic value?
+\item \emph{Optimal RI query}, which answers the following type of question: what are the points that intersect a given search object and have the maximum (or minimum) inferred values?
 }
 
-For the \emph{pso} approach, it is necessary to set the following parameters:
+\code{fsi_qw_eval()} offers two different methods to answer these questions: (i) \emph{discretization} method, and (ii) \emph{optimization} method.
+Comparative analyses (see reference below) indicate that the discretization method should be employed to process linguistic value-based RI queries, while
+the optimization method is more adequate for processing optimal RI queries. The details below describe how to use these methods.
+
+For the \emph{discretization} method, two additional parameters are needed and must be informed by using the three-dots parameter \code{...}:
 \itemize{
-\item \code{what}: A character value that defines the user's goal, which can be either \strong{maximize} or \strong{minimize} inferred values. Thus, this parameter can be \verb{“max”} and \verb{“min”}, respectively. The default value is \verb{“max”}.
-\item \code{max_depth}: A numeric value that refers to the number of times the user wants to split the query window. The default value is equal to 2. For instance, a \code{max_depth} = 2 results in the query window split into four sub quadrants, where the particle swarm optimization (PSO) algorithm will be applied to each one as its search space.
+\item \code{target_lval}: A character value that indicates the target linguistic value from the linguistic variable of the consequent.
+\item \code{k}: A numeric value that defines the number of points that will be captured from the query window and evaluated by \code{fsi_eval()}.
+Its square root has to an integer value.
+Alternatively, you can inform the number of columns and rows of the regular grid to be created on the query window by informing numeric values for \code{n_col} and \code{n_row}, respectively.
+Thus, these parameters can be given instead of the number \code{k}.
+}
+
+The \emph{optimization} method employs the particle swarm optimization (PSO) algorithm. Thus, the parameter \code{approach = "pso"} must be set together with the following parameters:
+\itemize{
+\item \code{what}: A character value that defines the user's goal, which can be either \strong{maximize} or \strong{minimize} inferred values.
+Thus, this parameter can be either \code{"max"} or \code{"min"}. The default value is \code{"max"}.
+\item \code{max_depth}: A numeric value that refers to the number of times that the query window is divided into subquadrants.
+The default value is equal to 2. For instance, a \code{max_depth = 2} means that the query window will be split into four subquadrants, where the PSO will be applied to each one as its search space.
+}
+
 In addition, the PSO algorithm has its own set of parameters:
+\itemize{
 \item \code{maxit}: A numeric value that defines the maximum number of iterations. Default value is 50.
 \item \code{population}: A numeric value that defines the number of particles. Default value is 10.
 }
 }
 \examples{
-
 library(sf)
-# Creating the FSI model from an example implemented with the visitation function:
+
+# Creating the FSI model from an example
 fsi <- visitation()
 
-# Creating a vector of fuzzy rules; 
-## note that we make use of the linguistic variables and linguistic values previously defined:
+# Creating a vector of fuzzy rules
+## note that we make use of the linguistic variables and linguistic values previously defined
 rules <- c(
-  "IF accommodation review is reasonable AND food safety is low 
+ "IF accommodation review is reasonable AND 
+    food safety is low 
   THEN visiting experience is awful",
- "IF accommodation price is expensive AND accommodation review is reasonable 
-   THEN visiting experience is awful",
- "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
-   THEN visiting experience is average",
- "IF accommodation price is affordable AND accommodation review is excellent 
-                                                                AND food safety is high 
-   THEN visiting experience is great",
- "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
-   THEN visiting experience is great")
+ "IF accommodation price is expensive AND 
+    accommodation review is reasonable 
+  THEN visiting experience is awful",
+ "IF accommodation price is affordable AND 
+    accommodation review is good AND 
+    food safety is medium 
+  THEN visiting experience is average",
+ "IF accommodation price is affordable AND 
+    accommodation review is excellent AND 
+    food safety is high 
+  THEN visiting experience is great",
+ "IF accommodation price is cut-rate AND 
+    accommodation review is excellent AND 
+    food safety is high 
+  THEN visiting experience is great")
 
-# Adding these rules to the FSI model previously instantiated:
+# Adding these rules to the FSI model previously instantiated
 fsi <- fsi_add_rules(fsi, rules)
 
-# Defining the query window that is defined over an application domain
+# Defining the query window
 pts_qw1 <- rbind(c(-73.92, 40.68527), c(-73.75, 40.68527), 
                  c(-73.75, 40.75), c(-73.92, 40.75), c(-73.92, 40.68527))
 qw1 <- st_polygon(list(pts_qw1))
 
-# Example using the discretization approach:
-dis_res <- fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 25)
+# Recall that our running example is based on a small set of point datasets
+# This means that inferred values will likely be the same
 
-## Example using the pso approach in two levels:
 \dontrun{
-pso_res <- fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
-}
+# Example using the discretization method
+fsi_qw_eval(fsi, qw1, approach = "discretization", target_lval = "great", k = 25)
 
+# Example using the optimization method
+fsi_qw_eval(fsi, qw1, approach = "pso", max_depth = 2)
+}
+}
+\references{
+\href{https://doi.org/10.1145/3474717.3484255}{Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.}
+
+Underlying concepts and definitions on the evaluation of region inference methods are explained in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/9882658}{Carniel, A. C.; Galdino, F.; Schneider, M. Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models. In Proceedings of the 2022 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2022), pp. 1-8, 2022.}
+}
 }

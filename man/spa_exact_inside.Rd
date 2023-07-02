@@ -2,52 +2,43 @@
 % Please edit documentation in R/fuzzy_topological_relations.R
 \name{spa_exact_inside}
 \alias{spa_exact_inside}
-\title{Check exact containment}
+\title{Check two spatial plateau objects for exact containment}
 \usage{
 spa_exact_inside(pgo1, pgo2)
 }
 \arguments{
-\item{pgo1}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
+\item{pgo1}{A \code{pgeometry} object that is either a plateau point, plateau line, or plateau region object.}
 
-\item{pgo2}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
+\item{pgo2}{A \code{pgeometry} object that is either a plateau point, plateau line, or plateau region object.}
 }
 \value{
 A Boolean value that indicates if a \code{pgeometry} is completely and certainly inside \code{pgo2}.
 }
 \description{
-This function checks whether a \code{pgeometry} object is completely inside of another \code{pgeometry} object.
+\code{spa_exact_inside()} checks whether a \code{pgeometry} object is completely inside of another \code{pgeometry} object.
 }
 \details{
-It is a Boolean function that checks \emph{fuzzy containment} in the spatial plateau context.
-
+\code{spa_exact_inside()} is a Boolean function that checks \emph{fuzzy containment} in the spatial plateau context.
 This Boolean function checks whether the components of \code{pgo1} are contained in the components of \code{pgo2}
-by considering their membership degrees and geographic positions. That is, it is follows the classical definition of fuzzy containment of the fuzzy set theory.
+by considering their membership degrees and geographic positions. That is, it follows the classical definition of fuzzy containment of the fuzzy set theory.
 
 In other words, this function checks if the (standard) intersection of \code{pgo1} and \code{pgo2} is exactly equal to \code{pgo1}. The other of operands affects the result.
 }
 \examples{
+pcp1 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp2 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp3 <- create_component("POINT(2 2)", 0.2)
+pcp4 <- create_component("MULTIPOINT((1 1), (3 3))", 0.7)
 
-library(sf)
+ppoint1 <- create_pgeometry(list(pcp1, pcp2), "PLATEAUPOINT")
+ppoint2 <- create_pgeometry(list(pcp3, pcp4), "PLATEAUPOINT")
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+# is ppoint2 completely and certainly inside ppoint1?
+spa_exact_inside(ppoint2, ppoint1)
 
-cp1 <- create_component(st_multipoint(pts1), 0.3)
-cp2 <- create_component(st_multipoint(pts2), 0.6)
-cp3 <- create_component(st_multipoint(pts3), 1.0)
-
-# Creating two spatial plateau objects
-pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
-
-# The other of operands after the result
-# pp1 is not inside pp2 since it has one point that is not included in pp2
-spa_exact_inside(pp1, pp2)
-
-# on the other hand, pp2 is inside pp1
-spa_exact_inside(pp2, pp1)
-
+# The order of operands after the result
+# ppoint1 is not inside ppoint2 since it has different points
+spa_exact_inside(ppoint1, ppoint2)
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

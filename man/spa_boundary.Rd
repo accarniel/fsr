@@ -2,32 +2,33 @@
 % Please edit documentation in R/general_operations.R
 \name{spa_boundary}
 \alias{spa_boundary}
-\title{Capturing the fuzzy boundary of a spatial plateau object}
+\title{Capture the fuzzy boundary of a spatial plateau object}
 \usage{
 spa_boundary(pgo)
 }
 \arguments{
-\item{pgo}{A \code{pgeometry} object of type \code{PLATEAUPOINT}, \code{PLATEAULINE}, or \code{PLATEAUREGION}.}
+\item{pgo}{A \code{pgeometry} object of type \code{ppoint}, \code{pline}, or \code{pregion}.}
 }
 \value{
-A \code{pcomposition} object that represents a fuzzy boundary of \code{pgeometry} object given as input.
+A \code{pcomposition} object that represents a fuzzy boundary of the \code{pgeometry} object given as input.
 }
 \description{
-This function yields the fuzzy boundary of a plateau region object.
+\code{spa_boundary()} yields the fuzzy boundary of a homogeneous spatial plateau object.
 }
 \details{
-It employs the definition of \emph{fuzzy boundary} of a fuzzy region object in the context of spatial plateau algebra (as defined in the references).
-The \emph{fuzzy boundary} of a fuzzy region object \code{A} has a heterogeneous nature since it consists of two parts:
+The \code{spa_boundary()} function employs the definition of \emph{fuzzy boundary} in the context of Spatial Plateau Algebra.
+The \emph{fuzzy boundary} of a fuzzy spatial object has a heterogeneous nature. For instance, the fuzzy boundary of a plateau region object consists of two parts:
 \itemize{
-\item a fuzzy line object that corresponds to the boundary of the core of \code{A}.
-\item a fuzzy region object that comprises all points of \code{A} with a membership degree greater than 0 and less than 1.
+\item a plateau line object that corresponds to the boundary of the core of \code{A}.
+\item a plateau region object that comprises all points of \code{A} with a membership degree greater than 0 and less than 1.
 }
 
-This means that the function \code{spa_boundary} can yield these two parts of the fuzzy boundary of a plateau region object (the argument \code{pgeometry}):
-the boundary plateau line and the boundary plateau region (i.e., returns a \code{pgeometry} object of the type \code{PLATEAUCOMPOSITION} with these two plateau objects).
+This means that \code{spa_boundary()} returns a \code{pcomposition} object.
 }
 \examples{
 library(tibble)
+library(sf)
+library(ggplot2)
 
 # defining two different types of membership functions
 trap_mf <- function(a, b, c, d) {
@@ -36,33 +37,37 @@ trap_mf <- function(a, b, c, d) {
   }
 }
 
-trim_mf <- function(a, b, c) {
-  function(x) {
-    pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
-  }
+set.seed(7)
+tbl = tibble(x = runif(20, min = 0, max = 30), 
+             y = runif(20, min = 0, max = 50), 
+             z = runif(20, min = 0, max = 100))
+classes <- c("cold", "hot")
+cold_mf <- trap_mf(0, 10, 20, 35)
+hot_mf <- trap_mf(20, 50, 100, 100)
+
+# Getting the convex hull on the points to clip plateau region objects during their constructions
+pts <- st_as_sf(tbl, coords = c(1, 2))
+ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+
+# Using the standard fuzzification policy based on fuzzy sets
+pregions <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+\dontrun{
+pregions
+plot(pregions$pgeometry[[1]]) + ggtitle("Cold")
+plot(pregions$pgeometry[[2]]) + ggtitle("Hot")
 }
-
-set.seed(123)
-
-# some random points to create pgeometry objects by using the function spa_creator
-tbl = tibble(x = runif(10, min= 0, max = 30), 
-             y = runif(10, min = 0, max = 50), 
-             z = runif(10, min = 0, max = 100))
-
-classes <- c("category-1", "category-2")
-mf1 <- trap_mf(0, 5, 20, 35)
-mf2 <- trim_mf(20, 80, 100)
-
-pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
-pregions$pgeometry[[1]]
-pregions$pgeometry[[2]]
-
 # capturing and showing the boundary of each pgeometry object previously created
-(spa_boundary(pregions$pgeometry[[1]])) 
-(spa_boundary(pregions$pgeometry[[2]]))
-
+boundary_cold <- spa_boundary(pregions$pgeometry[[1]])
+boundary_hot <- spa_boundary(pregions$pgeometry[[2]])
+\dontrun{
+plot(boundary_cold) + ggtitle("Boundary (Cold)")
+plot(boundary_hot) + ggtitle("Boundary (Hot)")
+}
 }
 \references{
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Concepts and formal definitions of fuzzy boundary are introduced in:
 \itemize{
 \item \href{https://ieeexplore.ieee.org/document/7737976}{Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.}
 \item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

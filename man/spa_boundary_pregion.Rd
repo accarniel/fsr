@@ -2,12 +2,12 @@
 % Please edit documentation in R/general_operations.R
 \name{spa_boundary_pregion}
 \alias{spa_boundary_pregion}
-\title{Capturing the fuzzy boundary of a plateau region object}
+\title{Capture the fuzzy boundary of a plateau region object}
 \usage{
 spa_boundary_pregion(pregion, bound_part = "region")
 }
 \arguments{
-\item{pregion}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pregion}{A \code{pregion} object. It throws an error if a different type is given.}
 
 \item{bound_part}{A character value that indicates the part of the fuzzy boundary to be returned. It can be \code{"region"} or \code{"line"}. See below for more details.}
 }
@@ -15,24 +15,27 @@ spa_boundary_pregion(pregion, bound_part = "region")
 A \code{pgeometry} object that represents a specific part of the fuzzy boundary of \code{pgeometry} object given as input.
 }
 \description{
-This function yields a specific part of the fuzzy boundary of a plateau region object.
+\code{spa_boundary_pregion()} yields a specific part of the fuzzy boundary of a plateau region object. This function is deprecated; use \code{spa_boundary()}.
 }
 \details{
-It employs the definition of \emph{fuzzy boundary} of a fuzzy region object in the context of spatial plateau algebra (as defined in the references).
+The \code{spa_boundary_pregion()} function employs the definition of \emph{fuzzy boundary} of a fuzzy region object in the context of Spatial Plateau Algebra.
 The \emph{fuzzy boundary} of a fuzzy region object \code{A} has a heterogeneous nature since it consists of two parts:
 \itemize{
 \item a fuzzy line object that corresponds to the boundary of the core of \code{A}.
 \item a fuzzy region object that comprises all points of \code{A} with a membership degree greater than 0 and less than 1.
 }
 
-This means that the function \code{spa_boundary_pregion} can yield one specific part of the fuzzy boundary of a plateau region object (the argument \code{pgeometry}).
-If \code{boundary = "line"}, then the function returns the boundary plateau line of \code{pgeometry} (i.e., returns a \code{pgeometry} object of the type \code{PLATEAULINE}).
-Else if \code{boundary = "region"} (the default value), then the function returns the boundary plateau region of \code{pgeometry} (i.e., returns a \code{pgeometry} object of the type \code{PLATEAUREGION}).
+This means that \code{spa_boundary_pregion()} can yield one specific part of the fuzzy boundary of a plateau region object.
+If \code{boundary = "line"}, then the function returns the boundary plateau line of \code{pregion} (i.e., returns a \code{pline} object).
+Else if \code{boundary = "region"} (the default value), then the function returns the boundary plateau region of \code{pregion} (i.e., returns a \code{pregion} object).
+
+This function is deprecated; use \code{spa_boundary()}.
 }
 \examples{
-
 \dontrun{
 library(tibble)
+library(sf)
+library(ggplot2)
 
 # defining two different types of membership functions
 trap_mf <- function(a, b, c, d) {
@@ -47,35 +50,37 @@ trim_mf <- function(a, b, c) {
   }
 }
 
-set.seed(123)
-
-# some random points to create pgeometry objects by using the function spa_creator
-tbl = tibble(x = runif(10, min= 0, max = 30), 
+set.seed(7)
+tbl = tibble(x = runif(10, min = 0, max = 30), 
              y = runif(10, min = 0, max = 50), 
              z = runif(10, min = 0, max = 100))
+classes <- c("cold", "hot")
+cold_mf <- trap_mf(0, 10, 20, 35)
+hot_mf <- trim_mf(35, 50, 100)
 
-classes <- c("category-1", "category-2")
-mf1 <- trap_mf(0, 5, 20, 35)
-mf2 <- trim_mf(20, 80, 100)
+# Getting the convex hull on the points to clip plateau region objects during their constructions
+pts <- st_as_sf(tbl, coords = c(1, 2))
+ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 
-pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
-pregions$pgeometry[[1]]
-pregions$pgeometry[[2]]
+# Using the standard fuzzification policy based on fuzzy sets
+pregions <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+plot(pregions$pgeometry[[1]]) + ggtitle("Cold")
+plot(pregions$pgeometry[[2]]) + ggtitle("Hot")
 
-# these functions are now deprecated, use `spa_boundary`
+# these functions are now deprecated, use `spa_boundary()`
 
 # capturing and showing the boundary plateau line of each pgeometry object previously created
 (spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
 (spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
-# the last boundary is empty because there is no core! 
+# this part of the boundary is empty because there is no core! 
 
 # capturing and showing the boundary plateau region (this is the default behavior)
 (spa_boundary_pregion(pregions$pgeometry[[1]]))
 (spa_boundary_pregion(pregions$pgeometry[[2]]))
 }
-
 }
 \references{
+Concepts of fuzzy boundary of plateau region objects are introduced in:
 \itemize{
 \item \href{https://ieeexplore.ieee.org/document/7737976}{Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.}
 \item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

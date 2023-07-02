@@ -24,46 +24,42 @@ spa_strict_alpha_cut(pgo, alpha)
 
 \item{rside_closed}{A Boolean value indicating whether the right side is closed or not. The default value is \code{TRUE}.}
 
-\item{alpha}{A numeric value. For \code{spa_alpha_cut}, it must be in [0, 1]. For \code{spa_strict_alpha_cut}, it must be in ]0, 1].}
+\item{alpha}{A numeric value. For \code{spa_alpha_cut()}, it must be in [0, 1]. For \code{spa_strict_alpha_cut()}, it must be in ]0, 1].}
 }
 \value{
 An \code{sfg} object that represents the geometric union of the components extracted after applying the specific filter condition.
 }
 \description{
-This function yields a crisp spatial object (as an \code{sfg} object) formed by the geometric parts of the components of the \code{pgeometry} given as input that satisfy a filter condition based on their membership degrees
+These functions yield a crisp spatial object (as an \code{sfg} object) formed by the geometric parts of the components of the \code{pgeometry} given as input that satisfy a filter condition based on their membership degrees.
 }
 \details{
-Given a spatial plateau object as input, these operations return a crisp spatial object formed by the geometric parts of the components of the input that satisfy a filter
-condition based on their membership degrees. The filter condition of each operations is detailed as follows:
+Given a spatial plateau object as input, these functions return a crisp spatial object formed by the geometric parts of the components of the input that satisfy a filter
+condition based on their membership degrees. The filter condition of each function is detailed as follows:
 \itemize{
-\item \code{spa_alpha_cut} selects all components that have membership degrees greater than or equal to a given value in [0, 1] indicated by the parameter \code{alpha}.
-\item \code{spa_strict_alpha_cut} picks a subset of components that have membership values greater than the parameter \code{alpha} (a value in ]0, 1]).
-\item \code{spa_range} generalizes these two operations and allows one to pick all components that have membership degrees belonging to a given open or closed interval.
-The parameters \code{lside_closed} and \code{rside_closed}, respectively, determine whether the left and right side (parameters \code{lvalue} and \code{rvalue}) of the interval is open (\code{false}) or closed (\code{true}).
+\item \code{spa_alpha_cut()} selects all components that have membership degrees greater than or equal to a given value in [0, 1] indicated by the parameter \code{alpha}.
+\item \code{spa_strict_alpha_cut()} picks a subset of components that have membership values greater than the parameter \code{alpha} (a value in ]0, 1]).
+\item \code{spa_range()} generalizes these two operations and allows one to pick all components that have membership degrees belonging to a given open or closed interval.
+The parameters \code{lside_closed} and \code{rside_closed}, respectively, determine whether the left and right side (parameters \code{lvalue} and \code{rvalue}) of the interval is open (\code{FALSE}) or closed (\code{TRUE}).
 For example, to represent the right open interval [0.5, 0.8[, the following parameter values should be given: \verb{lvalue = 0.5, rvalue = 0.8, lside_closed = TRUE, rside_closed = FALSE}.
 }
 }
 \examples{
-library(sf)
+pcp1 <- create_component("POINT(0 0)", 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+# Creating a plateau point object
+ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+ppoint
 
-cp1 <- create_component(st_multipoint(pts1), 0.3)
-cp2 <- create_component(st_multipoint(pts2), 0.6)
-cp3 <- create_component(st_multipoint(pts3), 1.0)
-
-ppoint <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-
-pp_alpha_cut <- spa_alpha_cut(ppoint, 0.6)
-pp_alpha_cut
-
-pp_strict_alpha_cut <- spa_strict_alpha_cut(ppoint, 0.6)
-pp_strict_alpha_cut
-
-pp_range <- spa_range(ppoint, 0.4, 0.8)
-pp_range
+# Processing the alpha-cut, strict alpha-cut, and range
+spa_alpha_cut(ppoint, 0.7)
+spa_strict_alpha_cut(ppoint, 0.7)
+spa_range(ppoint, 0.4, 0.8)
 }
 \references{
 \href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}

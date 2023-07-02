@@ -2,7 +2,7 @@
 % Please edit documentation in R/general_operations.R
 \name{spa_add_component}
 \alias{spa_add_component}
-\title{Adding components to a \code{pgeometry} object}
+\title{Add components to a \code{pgeometry} object}
 \usage{
 spa_add_component(pgo, components, is_valid = FALSE)
 }
@@ -11,54 +11,53 @@ spa_add_component(pgo, components, is_valid = FALSE)
 
 \item{components}{A \code{component} object or a list of \code{component} objects.}
 
-\item{is_valid}{A Boolean value to check if the user wants to validate the updated spatial plateau object at the end. If \code{is_valid = TRUE}, it calls \code{validObject} method.}
+\item{is_valid}{A Boolean value to check if the user wants to validate the updated spatial plateau object at the end. If \code{is_valid = TRUE}, it calls \code{validObject()} method.}
 }
 \value{
 A \code{pgeometry} object containing the \code{component} objects.
 }
 \description{
-This function adds components to a spatial plateau object (i.e., \code{pgeometry} object).
-The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
-For instance, a \code{pgeometry} object of the type \code{PLATEAUREGION} accepts only components containing polygons (e.g., \code{POLYGON} or \code{MULTIPOLYGON}).
-In the case of \code{PLATEAUCOMPOSITION} object, formed by a triple (\code{PLATEAUPOINT}, \code{PLATEAULINE} and \code{PLATEAUREGION}), any type of component is compatible to be added.
-Thus, a component of type \code{POINT}, for example, will be added to the \code{PLATEAUPOINT} in which it is composed.
-On the other hand, as a \code{PLATEAUCOLLECTION} object can have multiple spatial objects of the same type, this function is not applicable to it.
+\code{spa_add_component()} inserts components into a spatial plateau object (i.e., \code{pgeometry} object).
 }
 \details{
 This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
 The goal of this function is to insert a component or a list of components into a \code{pgeometry} object.
-This insertion is based on the membership degree of the component (e.g., created by \code{create_component}). Thus, it preserves the properties of a spatial plateau object.
-However, this function assumes that a component is compatible with the \code{pgeometry} object and its geometric format is valid (i.e., it does not overlap with existing components).
+The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
+For instance, a \code{pregion} object accepts only components containing polygons (e.g., \code{POLYGON} or \code{MULTIPOLYGON}).
+In the case of \code{pcomposition} object any type of component is compatible to be added.
+For instance, a point component is added to the plateau point sub-object of the plateau composition object.
+On the other hand, as a \code{pcollection} object can have multiple spatial objects of the same type, this function is not applicable to it.
+
+The insertion is based on the membership degree of the component. Thus, it preserves the properties of a spatial plateau object.
+However, \code{spa_add_component()} assumes that the geometric format of the component is valid (i.e., it does not overlap with existing components).
 }
 \examples{
-library(sf)
-
-# For a `PLATEAUPOINT` object.
-
-pts1 <- rbind(c(1, 2), c(3, 2))
-comp1 <- create_component(st_multipoint(pts1), 0.2) 
-comp2 <- create_component(st_point(c(1, 5)), 0.8)  
+comp1 <- create_component("MULTIPOINT(1 1, 2 2)", 0.2) 
+comp2 <- create_component("POINT(1 5)", 0.8)  
 
 # appending these components into an empty pgeometry object
-
 pp <- create_empty_pgeometry("PLATEAUPOINT")
 pp <- spa_add_component(pp, list(comp1, comp2))
 pp
 
-# For a `PLATEAUCOMPOSITION` object.
+# inserting components with existing membership degrees are merged
+comp3 <- create_component("MULTIPOINT(0 0, 4 4)", 0.2)
+pp <- spa_add_component(pp, comp3)
+pp
 
-pts <- rbind(c(1, 2), c(3, 2))
-pcp <- create_component(st_multipoint(pts), 0.3)
-pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION")
+comp4 <- create_component("MULTIPOINT(0 1, 3 4)", 1)
+pc <- create_pgeometry(list(comp4), "PLATEAUCOMPOSITION")
 pc
 
-# appending these components into a pgeometry object
-
-lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-lcp <- create_component(st_linestring(lpts), 0.4)
-pc <- spa_add_component(pc, list(lcp))
+# appending these components into pc
+comp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+comp6 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+pc <- spa_add_component(pc, list(comp5, comp6))
 pc
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+The formal definition of the \eqn{\odot}{odot} operator is described in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+}
 }

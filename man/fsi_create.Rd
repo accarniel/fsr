@@ -2,7 +2,7 @@
 % Please edit documentation in R/fsi_module.R
 \name{fsi_create}
 \alias{fsi_create}
-\title{Creation of an empty fuzzy spatial inference model}
+\title{Create an empty fuzzy spatial inference model}
 \usage{
 fsi_create(name, and_method = "min", or_method = "max",
            imp_method = "min", agg_method = "max", 
@@ -11,32 +11,33 @@ fsi_create(name, and_method = "min", or_method = "max",
 \arguments{
 \item{name}{A character value that specifies the name of the FSI model.}
 
-\item{and_method}{A character value that defines the operator name for the logical connective AND. Default value is \code{"min"}.}
+\item{and_method}{A character value that defines the operator for the logical connective AND. Default value is \code{"min"}.}
 
 \item{or_method}{A character value that defines the operator for the logical connective OR. Default value is \code{"max"}.}
 
-\item{imp_method}{A character value that defines the operator for the implication operator. Default value is \code{"min"}.}
+\item{imp_method}{A character value that defines the implication operator. Default value is \code{"min"}.}
 
-\item{agg_method}{A character value that defines the operator for the aggregation operator. Default value is \code{"max"}.}
+\item{agg_method}{A character value that defines the aggregation operator. Default value is \code{"max"}.}
 
 \item{defuzz_method}{A character value that determines the defuzzification technique. Default value is the centroid technique.}
 
 \item{default_conseq}{A function object that corresponds to a membership function of the consequent.}
 }
 \value{
-An empty named FSI model that is ready to be populated with fuzzy rules representing the antecedents and the consequent.
+An empty named FSI model that is ready to be populated with data source component (i.e., spatial plateau objects, fuzzy rules set, and fuzzy sets).
 }
 \description{
-This function builds a fuzzy spatial inference (FSI) model without elements of the data source component (i.e., spatial plateau objects, fuzzy rules set, and fuzzy sets).
+\code{fsi_create()} builds a fuzzy spatial inference (FSI) model without elements of the data source component (i.e., spatial plateau objects, fuzzy rules set, and fuzzy sets).
 }
 \details{
-The FSI model created with the function \code{fsi_create} and its default parameter values will implement a model using Mamdani's method.
+The \code{fsi_create()} function creates an empty FSI model and its default parameter values will implement a model using Mamdani's method.
+
 The possible values for the parameters \code{and_method} and \code{imp_method} are: \code{"min"}, \code{"prod"}. The name of a user-defined t-norm function can also be informed here.
 The possible value for the parameters \code{or_method} and \code{agg_method} is: \code{"max"}.  The name of a user-defined t-conorm function can also be informed here.
 The possible values for the parameter \code{defuzz_method} are \code{"centroid"} (default value), \code{"bisector"}, \code{"mom"}, \code{"som"}, and \code{"lom"}.
 The parameter \code{default_conseq} defines the default behavior of the FSI model when there is no fuzzy rule with a degree of fulfillment greater than 0 returned by the FSI model.
 
-After creating an empty FSI model, you have to call the functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules} to fulfill the FSI model.
+After creating an empty FSI model, you have to call the functions \code{fsi_add_fsa()}, \code{fsi_add_cs()}, and \code{fsi_add_rules()} to fulfill the FSI model with the needed information before performing inferences.
 }
 \examples{
 trim_mf <- function(a, b, c) {
@@ -44,7 +45,16 @@ trim_mf <- function(a, b, c) {
     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
   }
 }
+
 # Creating the FSI model
 fsi <- fsi_create("To visit or not to visit, that is the question", 
                   default_conseq = trim_mf(10, 30, 60)) 
+}
+\references{
+\href{https://doi.org/10.1145/3474717.3484255}{Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.}
+
+Underlying concepts and formal definitions of FSI models are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
+}
 }

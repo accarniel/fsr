@@ -8,7 +8,7 @@
 \alias{spa_equal}
 \alias{spa_inside}
 \alias{spa_contains}
-\title{Fuzzy topological relationships}
+\title{Compute fuzzy topological relationships}
 \usage{
 spa_overlap(pgo1, pgo2, itype = "min", ret = "degree", ...)
 
@@ -23,9 +23,9 @@ spa_inside(pgo1, pgo2, utype = "max", ret = "degree", ...)
 spa_contains(pgo1, pgo2, utype = "max", ret = "degree", ...)
 }
 \arguments{
-\item{pgo1}{A \code{pgeometry} object of the type \code{PLATEAUREGION}.}
+\item{pgo1}{A \code{pregion} object.}
 
-\item{pgo2}{A \code{pgeometry} object of the type \code{PLATEAUREGION}.}
+\item{pgo2}{A \code{pregion} object.}
 
 \item{itype}{A character value that indicates the name of a function implementing a t-norm. The default value is \code{"min"}, which is the standard operator of the intersection.}
 
@@ -39,48 +39,46 @@ spa_contains(pgo1, pgo2, utype = "max", ret = "degree", ...)
 The returning value is determined by the parameter \code{ret}, as described above.
 }
 \description{
-Fuzzy topological relationships are given as a family of functions that implements spatial plateau topological relationships.
+Fuzzy topological relationships are implemented by spatial plateau topological relationships.
 A fuzzy topological relationship expresses a particular relative position of two spatial plateau objects.
-Since the spatial objects are fuzzy, their topological relationships are also fuzzy.
-Hence, a fuzzy topological relationship determines the degree to which a relation holds for any two spatial plateau objects by a real value in the interval [0, 1].
-The key idea of these relationships is to consider point subsets resulting from the combination of spatial plateau
-set operations and spatial plateau metric operations on the spatial plateau objects for computing the resulting degree.
-The resulting degree can be also interpreted as a linguistic value.
+Such a topological relationship determines the degree to which it holds for any two spatial plateau objects by a real value in the interval [0, 1].
 }
 \details{
-These functions implement topological relationships of the spatial plateau algebra.
-They receive two \code{pgeometry} objects of the type \code{PLATEAUREGION} together with some additional parameters (as detailed below).
-The family of fuzzy topological relationships consists of the following functions:
+These functions implement the spatial plateau topological relationships between plateau region objects.
+The key idea of these relationships is to consider point subsets resulting from the combination of spatial plateau
+set operations and spatial plateau metric operations on spatial plateau objects for computing the resulting degree.
+The resulting degree can be also interpreted as a linguistic value.
+
+The spatial plateau topological relationships are implemented by the following functions:
 \itemize{
-\item \code{spa_overlap} computes the overlapping degree of two plateau region objects.
+\item \code{spa_overlap()} computes the overlapping degree of two plateau region objects.
 Since it uses the intersection operation, a t-norm operator can be given by the parameter \code{itype}. Currently, it can assume \code{"min"} (default) or \code{"prod"}.
-\item \code{spa_meet} computes the meeting degree of two plateau region objects.
+\item \code{spa_meet()} computes the meeting degree of two plateau region objects.
 Similarly to \code{spa_overlap}, a t-norm operator can be given by the parameter \code{itype}.
-\item \code{spa_disjoint} computes the disjointedness degree of two plateau region objects.
+\item \code{spa_disjoint()} computes the disjointedness degree of two plateau region objects.
 Similarly to \code{spa_overlap} and \code{spa_meet}, a t-norm operator can be given by the parameter \code{itype}.
-\item \code{spa_equal} - computes how equal are two plateau region objects.
+\item \code{spa_equal()} computes how equal are two plateau region objects.
 Since it uses the union operation, a t-conorm operator can be given by the parameter \code{utype}. Currently, it can assume \code{"max"} (default).
-\item \code{spa_inside} - computes the containment degree of \code{pgo1} in \code{pgo2}.
-Similarly to \code{spa_equal}, a t-conorm operator can be given by the parameter \code{utype}.
-\item \code{spa_contains} - it is the same of \code{spa_inside} but changing the order of the operands \code{pgo1} and \code{pgo2}.
+\item \code{spa_inside()} computes the containment degree of \code{pgo1} in \code{pgo2}.
+Similarly to \code{spa_equal()}, a t-conorm operator can be given by the parameter \code{utype}.
+\item \code{spa_contains()} changes the order of the operations \code{pgo1} ad \code{pgo2} when invoking \code{spa_inside()}.
 }
 
-The parameter \code{ret} determines the returning value of a fuzzy topological relationship. The default value is the following:
-\itemize{
-\item \code{"degree"} (default) - it indicates that the function will return a value in [0, 1] that represents the degree of truth of a given topological relationships.
-}
+The parameter \code{ret} determines the returning value of a fuzzy topological relationship.
+The default value is \code{"degree"} (default), which indicates that the function will return a value in [0, 1] that represents the degree of truth of a given topological relationship.
 
 For the remainder possible values, the functions make use of a set of linguistic values that characterize the different situations of topological relationships.
 Each linguistic value has an associated membership function defined in the domain [0, 1].
-The \code{fsr} package has a default set of linguistic values. You can use the function \code{spa_set_classification} to change this set of linguistic values.
+The \code{fsr} package has a default set of linguistic values. You can use the function \code{spa_set_classification()} to change this set of linguistic values.
 
 The remainder possible values for the parameter \code{ret} are:
 \itemize{
-\item \code{"list"} - it indicates that the function will return a named list containing how much the result of the predicate belongs to each linguistic value (i.e., it employs the membership functions of the linguistic values).
-\item \code{"bool"} - it indicates that the function will return a Boolean value indicating whether the degree returned by the topological relationship matches a given linguistic value according to an \emph{evaluation mode}.
+\item \code{ret = "list"} indicates that the function will return a named list containing the membership degree of the result of the predicate for each linguistic value (i.e., it employs the membership functions of the linguistic values).
+\item \code{ret = "bool"} indicates that the function will return a Boolean value indicating whether the degree returned by the topological relationship matches a given linguistic value according to an \emph{evaluation mode}.
 The evaluation mode and the linguistic values have to be informed by using the parameters \code{eval_mode} and \code{lval}, respectively.
 The possible values for \code{eval_mode} are: \code{"soft_eval"}, \code{"strict_eval"}, \code{"alpha_eval"}, and \code{"soft_alpha_eval"}.
-They have different behavior in how computing the Boolean value from the membership function of a linguistic value. See their documentations for more details.
+They have different behavior in how computing the Boolean value from the membership function of a linguistic value.
+See the documentation of the functions \code{soft_eval()}, \code{strict_eval()}, \code{alpha_eval()}, and \code{soft_alpha_eval()} for more details.
 Note that the parameter \code{lval} only accept a character value belonging to the set of linguistic values that characterize the different situations of topological relationships.
 }
 }
@@ -90,17 +88,21 @@ library(sf)
 
 set.seed(456)
 
-# some random points to create pgeometry objects by using the function spa_creator
+# Generating some random points to create pgeometry objects by using spa_creator()
 tbl = tibble(x = runif(10, min= 0, max = 30), 
              y = runif(10, min = 0, max = 30), 
              z = runif(10, min = 0, max = 50))
 
-#getting the convex hull on the points to clipping the construction of plateau region objects
+# Getting the convex hull on the points to clip plateau region objects during their constructions
 pts <- st_as_sf(tbl, coords = c(1, 2))
 ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 
 pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 
+plot(pregions$pgeometry[[1]])
+plot(pregions$pgeometry[[2]])
+
+\dontrun{ 
 # Showing the different types of returning values
 spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]])
 spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
@@ -108,15 +110,19 @@ spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "bool",
            eval_mode = "soft_eval", lval = "mostly")
 
 ## Examples for evaluating the other fuzzy topological relationships
-\dontrun{ 
 spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 }
-
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Underlying concepts and formal definitions of spatial plateau topological relationships and fuzzy topological relationships are respectively introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\item \href{https://ieeexplore.ieee.org/document/7737976}{Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.}
+}
 }

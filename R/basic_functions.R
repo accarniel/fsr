@@ -302,7 +302,7 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' It is possible to clip the geometric format of the components by using the parameter `base_poly`. The boundaries of this object
 #' can also be included in the visualization if the parameter `add_base_poly` is `TRUE`.
 #' 
-#' Since the returned value is a ggplot object, it can be further be customized (see examples below).
+#' Since the returned value is a `ggplot` object, it can be further be customized (see examples below).
 #' 
 #' @return
 #' 
@@ -313,6 +313,7 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
 #' 
 #' @examples
+#' \dontrun{
 #' library(sf)
 #' 
 #' pts <- rbind(c(0, 2), c(4, 2))
@@ -370,6 +371,7 @@ as.data.frame.pgeometry <- function(x, ...) {
 #'         axis.text=element_text(color="black")) +
 #'   scale_x_continuous(breaks = c(0, 1, 2, 3, 4)) +
 #'   scale_y_continuous(breaks = c(0, 1, 2, 3, 4))
+#' }
 #' @import sf ggplot2
 #' @importFrom rlang .data
 #' @export

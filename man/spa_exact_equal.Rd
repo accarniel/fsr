@@ -2,42 +2,37 @@
 % Please edit documentation in R/fuzzy_topological_relations.R
 \name{spa_exact_equal}
 \alias{spa_exact_equal}
-\title{Check exact equality}
+\title{Check two spatial plateau objects for exact equality}
 \usage{
 spa_exact_equal(pgo1, pgo2)
 }
 \arguments{
-\item{pgo1}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
+\item{pgo1}{A \code{pgeometry} object that is either a plateau point, plateau line, or plateau region object.}
 
-\item{pgo2}{A \code{pgeometry} object of the types \code{PLATEAUPOINT}, \code{PLATEAULINE}, and \code{PLATEAUREGION}.}
+\item{pgo2}{A \code{pgeometry} object that is either a plateau point, plateau line, or plateau region object.}
 }
 \value{
 A Boolean value that indicates if two \code{pgeometry} objects are exactly equal.
 }
 \description{
-This function checks whether two spatial plateau objects are exactly equal.
+\code{spa_exact_equal()} checks whether two spatial plateau objects are exactly equal.
 }
 \details{
-It is a Boolean function that checks \emph{fuzzy equality} in the spatial plateau context. Two \code{pgeometry} objects are exactly equal if their components are equal.
+\code{spa_exact_equal()} is a Boolean function that checks \emph{fuzzy equality} in the spatial plateau context. Two \code{pgeometry} objects are exactly equal if their components are equal.
 Two components are equal if they have the same membership degree and they are (spatially) equal (i.e., their \code{sfg} objects have the same geometric format - this means that the order of the points can be different).
 }
 \examples{
-library(sf)
+pcp1 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp2 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp3 <- create_component("MULTIPOINT((10 10), (9 8), (7 7))", 1)
+pcp4 <- create_component("MULTIPOINT((0 0), (2 3))", 0.7)
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+ppoint1 <- create_pgeometry(list(pcp1, pcp2), "PLATEAUPOINT")
+ppoint2 <- create_pgeometry(list(pcp3, pcp4), "PLATEAUPOINT")
 
-cp1 <- create_component(st_multipoint(pts1), 0.3)
-cp2 <- create_component(st_multipoint(pts2), 0.6)
-cp3 <- create_component(st_multipoint(pts3), 1.0)
+spa_exact_equal(ppoint1, ppoint2)
 
-pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
-
-spa_exact_equal(pp1, pp2)
-
-spa_exact_equal(pp1, pp1)
+spa_exact_equal(ppoint1, ppoint1)
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}

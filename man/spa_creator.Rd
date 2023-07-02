@@ -2,12 +2,12 @@
 % Please edit documentation in R/construction_module.R
 \name{spa_creator}
 \alias{spa_creator}
-\title{Building \code{pgeometry} objects from a point dataset}
+\title{Build \code{pgeometry} objects from a point dataset}
 \usage{
 spa_creator(tbl, fuzz_policy = "fsp", const_policy = "voronoi", ...)
 }
 \arguments{
-\item{tbl}{A data.frame or tibble with the following format: (x, y, z).}
+\item{tbl}{A \code{data.frame} or \code{tibble} object with three columns: (\emph{x}, \emph{y}, \emph{z}).}
 
 \item{fuzz_policy}{The fuzzification policy to be employed by the algorithm. See details below.}
 
@@ -20,68 +20,70 @@ A tibble in the format \verb{(class, pgeometry)}, where \code{class} is a charac
 This means that a spatial plateau object is created for representing a specific class of the point dataset.
 }
 \description{
-This function builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
+\code{spa_creator()} builds a set of spatial plateau objects from a given point dataset assigned with domain-specific numerical values.
 }
 \details{
-It follows the two-stage construction method described in the research paper of reference.
+The \code{spa_creator()} function implements a two-stage construction method that takes as input a point dataset and produces a set of spatial plateau objects as output.
 
-The input \code{tbl} is a point dataset where each point represents the location of a phenomenon treated by the application.
+The input \code{tbl} is a point dataset (\code{data.frame} or \code{tibble} object) where each point represents the location of a phenomenon treated by the application.
 Further, each point is annotated with numerical data that describe its meaning in the application.
-Therefore, \code{tbl} must have three columns: (\emph{x}, \emph{y}, \emph{z}). The columns \emph{x}, \emph{y} are the pair of coordinates, and \emph{z} is the column containing domain-specific numeric values.
+Therefore, \code{tbl} must have three columns: (\emph{x}, \emph{y}, \emph{z}). The columns \emph{x}, \emph{y} are the coordinate pairs, and \emph{z} is the column containing domain-specific numeric values.
 
-\code{fuzz_policy} refers to the method used by the \strong{fuzzification stage}.
+The parameter \code{fuzz_policy} refers to the method used by the \strong{fuzzification stage}.
 This stage aims to assign membership degrees to each point of the dataset.
-It accepts three possible values only: \code{"fsp"} (default), or \code{"fcp"}.
+It accepts two possible values: \code{"fsp"} (default) or \code{"fcp"}.
 
 \code{"fsp"} stands for \emph{fuzzy set policy} and requires two parameters that should be informed in \code{...}:
 \itemize{
-\item \code{classes}: A character vector containing the name of classes
-\item \code{mfs}: A vector of membership functions. Each membership function \emph{i} represents the class \emph{i}, where \emph{i} in \code{length(classes)}. For instance, membership functions can be created by using the function \code{genmf} of the package FuzzyR (see the provided examples for more information on how to build membership functions).
+\item \code{classes}: A character vector containing the name of classes.
+\item \code{mfs}: A vector of membership functions. Each membership function \emph{i} represents the class \emph{i}, where \emph{i} in \code{length(classes)}. See the provided examples for more information on how to build membership functions.
 }
 
-\code{"fcp"} stands for \emph{fuzzy clustering policy} and requires the \code{e1071} package. Its possible parameters, informed in \code{...}, are:
+\code{"fcp"} stands for \emph{fuzzy clustering policy} and requires the \code{e1071} package. Its possible parameters informed in \code{...} are:
 \itemize{
-\item \code{k}: A numeric value that refers to the number of groups to be created
-\item \code{method}: A fuzzy clustering method of the package \code{e1071}, which can be either \code{"cmeans"} (default) or \code{"cshell"}
-\item \code{use_coords}: A Boolean value to indicate whether the columns (x, y) should be used in the clustering algorithm (default is \code{FALSE})
-\item \code{iter}: A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100)
+\item \code{k}: A numeric value that refers to the number of groups to be created.
+\item \code{method}: A fuzzy clustering method of the package \code{e1071}, which can be either \code{"cmeans"} (default) or \code{"cshell"}.
+\item \code{use_coords}: A Boolean value to indicate whether the columns (\emph{x}, \emph{y}) should be used in the clustering algorithm (default is \code{FALSE}).
+\item \code{iter}: A numeric indicating the number of maximum iterations of the clustering algorithm (default is 100).
 }
 
-An optional and common parameter for both fuzzification stages is the \code{"digits"}.
+An optional and common parameter for both fuzzification stages is \code{"digits"}.
 This is an integer value that indicates the number of decimal digits of the membership degrees calculated by the fuzzification stage.
 That is, it is used to \strong{round} membership degrees to the specified number of decimal places.
-Be careful with this optional parameter! If you specify a low value for \code{"digits"} some membership degrees could be rounded to 0 and thus, some components would not be created.
+Be careful with this optional parameter! If you specify a low value for \code{"digits"}, some membership degrees could be rounded to 0 and thus, some components would not be created.
 
-\code{const_policy} refers to the method used by the \strong{construction stage}.
+The parameter \code{const_policy} refers to the method used by the \strong{construction stage}.
 This stage aims to create polygons from the labeled point dataset and use them to build spatial plateau objects.
-It accepts two possible values only: either \code{"voronoi"} (default) or "\verb{delaunay"}.
+It accepts three possible values: \code{"voronoi"} (default), "\verb{delaunay"}, or \code{"convex_hull"}.
 
-\code{"voronoi"} stands for \emph{Voronoi diagram policy} and has one optional parameter that can be provided in \code{...}:
+\code{"voronoi"} stands for \emph{Voronoi diagram policy} and has two optional parameter that can be provided in \code{...}:
 \itemize{
-\item \code{base_poly}: An \code{sfg} object that will be used to clip the generated polygons (optional argument). If this parameter is not provided, the Voronoi is created by using a bounding box (standard behavior of \code{sf}).
-\item \code{d_tolerance}: It refers to the parameter \code{dTolerance} employed by the function \code{st_voronoi} of the package \code{sf}.
+\item \code{base_poly}: An \code{sfg} object that will be used to clip the generated polygons. If this parameter is not provided, the Voronoi is created by using a bounding box (standard behavior of the package \code{sf}).
+\item \code{d_tolerance}: It refers to the parameter \code{dTolerance} employed by the function \code{st_voronoi()} of the package \code{sf}.
 }
 
 \code{"delaunay"} stands for \emph{Delaunay triangulation policy}, which accepts the following parameters in \code{...}:
 \itemize{
-\item \code{base_poly}: An \code{sfg} object that will be used to clip the generated triangles (optional argument).
-\item \code{tnorm}: A t-norm used to calculate the membership degree of the triangle. It should be the name of a vector function.
-Possible values are \code{"min"} (default), and \code{"prod"}.
+\item \code{base_poly}: An \code{sfg} object that will be used to clip the generated triangles.
+\item \code{tnorm}: A t-norm used to calculate the membership degree of the triangle. It should be the name of a vectorized function.
+Possible values are \code{"min"} (default) and \code{"prod"}.
 Note that it is possible to use your own t-norms. A t-norm should has the following signature: \code{FUN(x)} where \emph{x} is a numeric vector. Such a function should return a single numeric value.
-\item \code{d_tolerance}: It refers to the parameter \code{dTolerance} employed by the function \code{st_triangulate} of the package \code{sf}.
+\item \code{d_tolerance}: It refers to the parameter \code{dTolerance} employed by the function \code{st_triangulate()} of the package \code{sf}.
 }
 
 \code{"convex_hull"} stands for \emph{Convex hull policy}, which accepts the following parameters in \code{...}:
 \itemize{
-\item \code{M}: A numeric vector containing the membership degrees that will be used to create the components. The default is defined by \code{seq(0.05, 1, by = 0.05)}.
-\item \code{d}: A numeric value representing the tolerance distance to compute the membership degree between the elements of \code{M} and the membership degrees of the points. The default is \code{0.05}.
-\item \code{base_poly}: An \code{sfg} object that will be used to clip the generated polygons (optional argument).
+\item \code{degrees}: A numeric vector containing the membership degrees that will be used to create the components. The default vector is defined by \code{seq(0.05, 1, by = 0.05)}.
+\item \code{d}: A numeric value representing the tolerance distance to compute the membership degree between the elements of \code{m} and the membership degrees of the points. The default is \code{0.05}.
+\item \code{base_poly}: An \code{sfg} object that will be used to clip the generated polygons.
 }
 }
 \examples{
 library(tibble)
-
-# defining two different types of membership functions
+library(sf)
+library(ggplot2)
+ 
+# Defining two different types of membership functions
 trap_mf <- function(a, b, c, d) {
   function(x) {
     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
@@ -102,23 +104,44 @@ classes <- c("cold", "hot")
 cold_mf <- trap_mf(0, 10, 20, 35)
 hot_mf <- trim_mf(35, 50, 100)
 
-spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf))
+# Using the standard fuzzification policy based on fuzzy sets
+res <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf))
+\dontrun{
+res  
+plot(res$pgeometry[[1]]) + ggtitle("Cold")
+plot(res$pgeometry[[2]]) + ggtitle("Hot")
 
+# Getting the convex hull on the points to clip plateau region objects during their constructions
+pts <- st_as_sf(tbl, coords = c(1, 2))
+ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+res <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+plot(res$pgeometry[[1]]) + ggtitle("Cold (with clipped boundaries)")
+plot(res$pgeometry[[2]]) + ggtitle("Hot (with clipped boundaries)")
+ 
+# Using the fuzzification policy based on fuzzy clustering
 spa_creator(tbl, fuzz_policy = "fcp", k = 4)
 
 spa_creator(tbl, fuzz_policy = "fcp", k = 4, digits = 2)
 
+# Varying the construction policy
 spa_creator(tbl, fuzz_policy = "fcp", k = 3, const_policy = "delaunay")
 
 spa_creator(tbl, fuzz_policy = "fcp", const_policy = "delaunay", k = 3, tnorm = "prod")
 
 spa_creator(tbl, fuzz_policy = "fcp", k = 2, digits = 2, 
-            M = seq(0.1, 1, by = 0.1), d = 0.05, const_policy = "convex_hull")
+            degrees = seq(0.1, 1, by = 0.1), d = 0.05, const_policy = "convex_hull")
+
+spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), const_policy = "delaunay")
             
 spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), 
             digits = 2, const_policy = "convex_hull")
-
+}
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8858878/}{Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.}
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Underlying concepts and formal definitions of the two-stage construction method is introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8858878/}{Carniel, A. C.; Schneider, M. A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets. In Proceedings of the 2019 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2019), pp. 1-6, 2019.}
+}
 }

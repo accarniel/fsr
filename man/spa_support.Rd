@@ -2,7 +2,7 @@
 % Please edit documentation in R/general_operations.R
 \name{spa_support}
 \alias{spa_support}
-\title{Capturing the support of a \code{pgeometry} object}
+\title{Get the support of a \code{pgeometry} object}
 \usage{
 spa_support(pgo)
 }
@@ -10,40 +10,41 @@ spa_support(pgo)
 \item{pgo}{A \code{pgeometry} object of any type.}
 }
 \value{
-An \code{sfg} object that represents the support of \code{pgeometry}. It can be an empty object if \code{pgeometry} is empty.
+An \code{sfg} object that represents the support of \code{pgeometry}. It can be an empty object, if \code{pgeometry} is empty.
 }
 \description{
-This function yields a crisp spatial object (as an \code{sfg} object) that corresponds to the support of a \code{pgeometry} object given as input.
+\code{spa_support()} yields a crisp spatial object (as an \code{sfg} object) that corresponds to the support of a \code{pgeometry} object given as input.
 }
 \details{
-It employs the classical definition of \emph{support} from the fuzzy set theory in the context of spatial plateau algebra.
+The \code{spa_support()} function employs the classical definition of \emph{support} from the fuzzy set theory in the context of Spatial Plateau Algebra.
 The \emph{support} only comprises the points with membership degree greater than or equal to 1.
-Hence, this operation returns the \code{sfg} object that represents the total extent of the \code{pgeometry} given as input.
-If the \code{pgeometry} object has no components, then an empty \code{sfg} object is returned (i.e., a crisp spatial object without points).
+Hence, \code{spa_support()} returns the \code{sfg} object that represents the total extent of the \code{pgeometry} given as input.
+If the \code{pgeometry} is empty, then an empty \code{sfg} object is returned.
 }
 \examples{
+pcp1 <- create_component("POINT(0 0)", 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
 
-library(sf)
+# Creating a plateau point object
+ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+ppoint
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+# Getting its support
+spa_support(ppoint)
 
-cp1 <- create_component(st_multipoint(pts1), 0.3)
-cp2 <- create_component(st_multipoint(pts2), 0.6)
-cp3 <- create_component(st_multipoint(pts3), 1.0)
-
-pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-pp
-
-pp_supp <- spa_support(pp)
-pp_supp
-
-pp_empty <- create_empty_pgeometry("PLATEAUPOINT")
-pp_empty_supp <- spa_support(pp_empty)
-pp_empty_supp
-
+# Getting the support of an empty pgeometry
+spa_support(create_empty_pgeometry("PLATEAUREGION"))
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/7737976}{Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.}
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Underlying concepts and formal definitions of Spatial Plateau Algebra are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+}
 }

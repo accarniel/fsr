@@ -2,7 +2,7 @@
 % Please edit documentation in R/general_operations.R
 \name{spa_eval}
 \alias{spa_eval}
-\title{Capturing the membership degree of a point}
+\title{Evaluate the membership degree of a point in a \code{pgeometry} object}
 \usage{
 spa_eval(pgo, point)
 }
@@ -15,11 +15,11 @@ spa_eval(pgo, point)
 A numeric value between 0 and 1 that indicates the membership degree of a point (i.e., \code{sfg} object) in a spatial plateau object (i.e., \code{pgeometry} object).
 }
 \description{
-This function evaluates the membership degree of a given point in a spatial plateau object of any type.
+\code{spa_eval()} evaluates the membership degree of a given point in a spatial plateau object of any type.
 It returns a value in [0, 1] that indicates to which extent the point belongs to the \code{pgeometry} object.
 }
 \details{
-The goal of this function is to return the membership degree of a simple point object (i.e., \code{sfg} object) in a given spatial plateau object (i.e., \code{pgeometry} object).
+The \code{spa_eval()} returns the membership degree of a simple point object (i.e., \code{sfg} object) in a given spatial plateau object (i.e., \code{pgeometry} object).
 This evaluation depends on the following basic cases:
 \itemize{
 \item if the simple point object belongs to the interior or boundary of \emph{one} component of the spatial plateau object, it returns the membership degree of that component.
@@ -28,43 +28,45 @@ This evaluation depends on the following basic cases:
 }
 }
 \examples{
-library(tibble)
 library(sf)
 
-# some basic examples 
+# Point components
+pcp1 <- create_component("POINT(0 0)", 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
+# Line components
+lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+lcp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+# Polygon components
+rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+# Creating spatial plateau objects
+ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+pline <- create_pgeometry(list(lcp1, lcp2, lcp3), "PLATEAULINE")
+pregion <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+pcomp <- create_pgeometry(list(pcp6, pcp7, lcp4, lcp5), "PLATEAUCOMPOSITION")
+pcol <- create_pgeometry(list(ppoint, pline, pregion, pcomp), "PLATEAUCOLLECTION")
 
-cp1 <- create_component(st_multipoint(pts1), 0.3)
-cp2 <- create_component(st_multipoint(pts2), 0.6)
-cp3 <- create_component(st_multipoint(pts3), 1.0)
+point <- st_point(c(0, 0))
 
-pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-
-spa_eval(pp, st_point(c(1, 2)))
-spa_eval(pp, st_point(c(1, 3)))
-
-# other examples with plateau regions
-
-set.seed(345)
-
-# some random points to create plateau region objects by using the function spa_creator
-tbl = tibble(x = runif(10, min= 0, max = 20), 
-             y = runif(10, min = 0, max = 30), 
-             z = runif(10, min = 0, max = 100))
-
-#getting the convex hull on the points to clipping the construction of plateau region objects
-pts <- st_as_sf(tbl, coords = c(1, 2))
-ch <- st_convex_hull(do.call(c, st_geometry(pts)))
-
-pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
-
-# capturing the membership degree of a specific point in each object
-spa_eval(pregions$pgeometry[[1]], st_point(c(5, 15)))
-spa_eval(pregions$pgeometry[[2]], st_point(c(5, 15)))
+spa_eval(ppoint, point)
+spa_eval(pline, point)
+spa_eval(pregion, point)
+spa_eval(pcomp, point)
+spa_eval(pcol, point)
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+Formal definitions of this function are described in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/9882658}{Carniel, A. C.; Galdino, F.; Schneider, M. Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models. In Proceedings of the 2022 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2022), pp. 1-8, 2022.}
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+}
 }

@@ -2,53 +2,73 @@
 % Please edit documentation in R/fsi_module.R
 \name{fsi_add_rules}
 \alias{fsi_add_rules}
-\title{Adding fuzzy rules to an FSI model}
+\title{Add fuzzy rules to an FSI model}
 \usage{
 fsi_add_rules(fsi, rules, weights = rep(1, length(rules)))
 }
 \arguments{
-\item{fsi}{An FSI model instantiated with the function \code{fsi_create}.}
+\item{fsi}{An FSI model instantiated with the \code{fsi_create()} function.}
 
 \item{rules}{A character vector containing the rules defined by the user. It follows a specific format, as detailed below.}
 
 \item{weights}{A numeric vector of weight values for each rule. Default values are 1.}
 }
 \value{
-An FSI model populated with fuzzy rules set.
+An FSI model populated with a fuzzy rules set.
 }
 \description{
-This function adds the fuzzy rules set to a fuzzy spatial inference (FSI) model. A fuzzy rule must contain only linguistic variables and values employed by the added antecedent parts and consequent.
+\code{fsi_add_rules()} adds the fuzzy rules set to a fuzzy spatial inference (FSI) model.
+A fuzzy rule must contain only linguistic variables and values included in the antecedent parts and consequent.
 }
 \details{
-The definition of a fuzzy rule is user-friendly since users can write it by using the \emph{linguistic variables} and \emph{linguistic values} previously defined and added to the FSI model.
-A fuzzy rule has the format \verb{IF A THEN B}, where \code{A} is called the antecedent and \code{B} the consequent of the rule such that \code{A} implies \code{B}.  Further, \code{A} and \code{B} are statements that combine fuzzy propositions by using logical connectives like \code{AND} or \code{OR}. Each fuzzy proposition has the format \verb{LVar is LVal} where \code{LVal} is a linguistic value in the scope of the linguistic variable \code{LVar}.
+The \code{fsi_add_rules()} function adds fuzzy rules to an FSI model.
+The definition of a fuzzy rule is user-friendly since users can write it by using the \emph{linguistic variables} and \emph{linguistic values} previously defined and added to the FSI model (via \code{fsi_add_fsa()} and \code{fsi_add_cs()}).
+
+A fuzzy rule has the format \verb{IF A THEN B}, where \code{A} is called the antecedent and \code{B} the consequent of the rule such that \code{A} implies \code{B}.
+Further, \code{A} and \code{B} are statements that combine fuzzy propositions by using logical connectives like \code{AND} or \code{OR}.
+Each fuzzy proposition has the format \verb{LVar is LVal} where \code{LVal} is a linguistic value in the scope of the linguistic variable \code{LVar}.
+
 To avoid possible contradictions keep in mind the following items when specifying the rules:
 \itemize{
-\item the order of the statements in the antecedent is not relevant;
-\item each linguistic variable has to appear at most one time in each fuzzy rule;
+\item the order of the statements in the antecedent is not relevant.
+\item each linguistic variable has to appear at most one time in each fuzzy rule.
+\item only one kind of logical connective (i.e., \code{AND} or \code{OR}) must be used in the statements of the antecedent.
 }
 }
 \examples{
-
-# Creating the FSI model from an example implemented with the visitation function:
+# Creating the FSI model from an example
 fsi <- visitation()
 
-# Creating a vector of fuzzy rules; 
-## note that we make use of the linguistic variables and linguistic values previously defined:
+# Creating a vector of fuzzy rules
+## note that we make use of the linguistic variables and linguistic values previously defined
 rules <- c(
-  "IF accommodation review is reasonable AND food safety is low 
+ "IF accommodation review is reasonable AND 
+    food safety is low 
   THEN visiting experience is awful",
- "IF accommodation price is expensive AND accommodation review is reasonable 
-   THEN visiting experience is awful",
- "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
-   THEN visiting experience is average",
- "IF accommodation price is affordable AND accommodation review is excellent 
-                                                                AND food safety is high 
-   THEN visiting experience is great",
- "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
-   THEN visiting experience is great")
+ "IF accommodation price is expensive AND 
+    accommodation review is reasonable 
+  THEN visiting experience is awful",
+ "IF accommodation price is affordable AND 
+    accommodation review is good AND 
+    food safety is medium 
+  THEN visiting experience is average",
+ "IF accommodation price is affordable AND 
+    accommodation review is excellent AND 
+    food safety is high 
+  THEN visiting experience is great",
+ "IF accommodation price is cut-rate AND 
+    accommodation review is excellent AND 
+    food safety is high 
+  THEN visiting experience is great")
 
-# Adding these rules to the FSI model previously instantiated:
+# Adding these rules to the FSI model previously instantiated
 fsi <- fsi_add_rules(fsi, rules)
+}
+\references{
+\href{https://doi.org/10.1145/3474717.3484255}{Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.}
 
+Underlying concepts and formal definitions of FSI models are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
+}
 }

@@ -6,7 +6,7 @@
 \alias{spa_union}
 \alias{spa_difference}
 \alias{spa_common_points}
-\title{Fuzzy geometric set operations}
+\title{Compute fuzzy geometric set operations}
 \usage{
 spa_intersection(pgo1, pgo2, itype = "min", as_pcomposition = FALSE)
 
@@ -34,77 +34,142 @@ spa_common_points(pline1, pline2, itype = "min")
 \item{pline2}{A \code{pgeometry} object of the type \code{PLATEAULINE}.}
 }
 \value{
-A \code{pgeometry} object that is the result of the geometric manipulation between two spatial plateau objects.
+A \code{pgeometry} object that is the result of a fuzzy geometric set operation.
 }
 \description{
-Fuzzy geometric set operations are given as a family of functions that implements spatial plateau set operations.
-These functions yield a spatial plateau object from a specific combination of other two spatial plateau objects,
-such as the intersection of two plateau region objects.
+The spatial plateau set operations \emph{plateau intersection}, \emph{plateau union}, and \emph{plateau difference} implement
+the respective operations \emph{fuzzy geometric intersection}, \emph{fuzzy geometric union}, and \emph{fuzzy geometric difference}.
 }
 \details{
-These functions implement geometric operations of the spatial plateau algebra.
-They receive two \code{pgeometry} objects of the \emph{same type} together with an operation as inputs and yield another \code{pgeometry} object as output. The output object has \emph{the same} type of the inputs.
+They receive two \code{pgeometry} objects of the \emph{any type} as input and yield another \code{pgeometry} object as output.
 The family of fuzzy geometric set operations consists of the following functions:
 \itemize{
-\item \code{spa_intersection} computes the geometric intersection of two spatial plateau objects.
+\item \code{spa_intersection()} computes the geometric intersection of two spatial plateau objects.
 The membership degree of common points are calculated by using a t-norm operator given by the parameter \code{itype}. Currently, it can assume \code{"min"} (default) or \code{"prod"}.
-\item \code{spa_union} computes the geometric union of two spatial plateau objects.
+\item \code{spa_union()} computes the geometric union of two spatial plateau objects.
 The membership degree of common points are calculated by using a t-conorm operator given by the parameter \code{utype}. Currently, it can assume \code{"max"} (default).
-\item \code{spa_difference} computes the geometric difference of two spatial plateau objects.
-The membership degree of common points are calculated by using a diff operator given by the parameter \code{dtype}.
-Currently, it can assume \code{"f_diff"} (default fuzzy difference), \code{"f_bound_diff"} (fuzzy bounded difference), \code{"f_symm_diff"} (fuzzy symmetric difference), and \code{"f_abs_diff"} (fuzzy absolute difference).
+\item \code{spa_difference()} computes the geometric difference of two spatial plateau objects.
+The membership degree of common points are calculated by using a difference operator given by the parameter \code{dtype}.
+Currently, it can assume \code{"f_diff"} (default fuzzy difference), \code{"f_bound_diff"} (fuzzy bounded difference), \code{"f_symm_diff"} (fuzzy symmetric difference), or \code{"f_abs_diff"} (fuzzy absolute difference).
 }
 
-Another related geometric function is:
-\itemize{
-\item \code{spa_common_points} which gets the common points of two plateau line objects by using a t-norm to compute their membership degrees.
-It is different from the other functions since it gets two plateau line objects as input and yields a plateau point object as output.
-}
-
-Other t-norms, t-conorms, and diff operators can be implemented and given as values for the \code{"itype"}, \code{"utype"}, and \code{"dtype"}, respectively.
+Other t-norms, t-conorms, and difference operators can be implemented and given as values for the parameters \code{itype}, \code{utype}, and \code{dtype}, respectively.
 For this, the following steps should be performed:
+\enumerate{
+\item Implement your function that accepts two numeric values in [0, 1] as inputs and yields another numeric value in [0, 1] as output. Recall that t-norms and t-conorms must have some specific properties according to the fuzzy set theory.
+\item Use the name of your function as the character value of the corresponding parameter \code{itype}, \code{utype}, or \code{dtype}.
+}
 
-1 - implement your function that accepts two numeric values as inputs and yields another numeric value as output. All values should be between 0 and 1. Recall that t-norms and t-conorms must have some specific properties according to the fuzzy set theory.
-2 - use the name of your function as the character value of the corresponding \code{"itype"}, \code{"utype"}, or \code{"dtype"}.
-
-An example of operator is the source code of \code{f_bound_diff}:
+An example of operator is the source code of \code{f_bound_diff()}:
 
 \code{f_bound_diff <- function(x, y) { max(0, (x - y)) }}
+
+The \code{spa_common_points()} is deprecated. In the past, it computed the common points of two plateau line objects; now, you can use \code{spa_intersection()}.
 }
 \examples{
+library(ggplot2)
 
-library(sf)
+# Point components
+pcp1 <- create_component("POINT(0 0)", 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
 
-pts1 <- rbind(c(1, 2), c(3, 2))
-pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-pts3 <- rbind(c(2, 2), c(3, 3))
+pcp4 <- create_component("MULTIPOINT((2 2), (2 4), (3 2))", 1)
+pcp5 <- create_component("MULTIPOINT((0 0), (2 3))", 0.7)
+pcp6 <- create_component("MULTIPOINT((0 1), (3 3))", 0.85)
+pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
+# Line components
+lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
 
-cp1 <- create_component(st_multipoint(pts1), 0.3)
-cp2 <- create_component(st_multipoint(pts2), 0.6)
-cp3 <- create_component(st_multipoint(pts3), 1)
+lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+lcp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+# Polygon components
+rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
 
-pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
+# Creating plateau point objects
+ppoint1 <- create_pgeometry(list(pcp1, pcp2, pcp3), "PLATEAUPOINT")
+ppoint2 <- create_pgeometry(list(pcp4, pcp5, pcp6, pcp7), "PLATEAUPOINT")
+# Creating plateau line objects
+pline1 <- create_pgeometry(list(lcp1, lcp2, lcp3), "PLATEAULINE")
+pline2 <- create_pgeometry(list(lcp4, lcp5), "PLATEAULINE")
+# Creating a plateau region objects
+pregion <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
 
-pts4 <- rbind(c(0, 0), c(1, 1))
-pts5 <- rbind(c(2, 3), c(1.2, 1.9), c(2, 1))
-pts6 <- rbind(c(3, 1), c(1.5, 0.5))
+# Defining a wrapper to combine plots side by side, for convenience
+combine_plots <- function(plot1, plot2, plot3) {
+  # setting the same range of coordinates and removing the legend of plot1 and plot2
+  plot1 <- plot1 + coord_sf(xlim = c(0, 4), ylim = c(0, 4)) + theme(legend.position = "none")
+  plot2 <- plot2 + coord_sf(xlim = c(0, 4), ylim = c(0, 4)) + theme(legend.position = "none")
+  plot3 <- plot3 + coord_sf(xlim = c(0, 4), ylim = c(0, 4))
+  ggplot() +
+    annotation_custom(ggplotGrob(plot1), xmin = 0, xmax = 0.5, ymin = 0.5, ymax = 1) +
+    annotation_custom(ggplotGrob(plot2), xmin = 0.5, xmax = 1, ymin = 0.5, ymax = 1) +
+    annotation_custom(ggplotGrob(plot3), xmin = 0, xmax = 1, ymin = 0, ymax = 0.5) +
+    coord_cartesian(xlim = c(0, 1), ylim = c(0, 1)) +
+    theme_void()
+}
 
-cp4 <- create_component(st_multipoint(pts4), 0.4)
-cp5 <- create_component(st_multipoint(pts5), 1)
-cp6 <- create_component(st_multipoint(pts6), 0.7)
+plot_ppoint1 <- plot(ppoint1) + ggtitle("Plateau point 1")
+plot_ppoint2 <- plot(ppoint2) + ggtitle("Plateau point 2")
+plot_pline1 <- plot(pline1) + ggtitle("Plateau line 1")
+plot_pline2 <- plot(pline2) + ggtitle("Plateau line 2")
+plot_pregion <- plot(pregion) + ggtitle("Plateau region")
 
-pp2 <- create_pgeometry(list(cp4, cp5, cp6), "PLATEAUPOINT")
+# Computing the intersection
+ppoints_intersec <- spa_intersection(ppoint1, ppoint2)
+plot_inter <- plot(ppoints_intersec) + ggtitle("Intersection")
+combine_plots(plot_ppoint1, plot_ppoint2, plot_inter)
 
-pp1
-pp2
+\dontrun{
+# varying the t-norm 
+ppoints_intersec <- spa_intersection(ppoint1, ppoint2, itype = "prod")
+plot_inter <- plot(ppoints_intersec) + ggtitle("Intersection (prod)")
+combine_plots(plot_ppoint1, plot_ppoint2, plot_inter)
 
-spa_intersection(pp1, pp2)
-spa_intersection(pp1, pp2, itype = "prod") #changing the t-norm
-spa_union(pp1, pp2)
-spa_difference(pp1, pp2)
+plines_intersec <- spa_intersection(pline1, pline2)
+plot_inter <- plot(plines_intersec) + ggtitle("Intersection")
+combine_plots(plot_pline1, plot_pline2, plot_inter)
 
+pregion_pline_intersec <- spa_intersection(pline1, pregion)
+plot_inter <- plot(pregion_pline_intersec) + ggtitle("Intersection")
+combine_plots(plot_pline1, plot_pregion, plot_inter)
+
+# Computing the union
+ppoints_union <- spa_union(ppoint1, ppoint2)
+plot_union <- plot(ppoints_union) + ggtitle("Union")
+combine_plots(plot_ppoint1, plot_ppoint2, plot_union)
+
+plines_union <- spa_union(pline1, pline2)
+plot_union <- plot(plines_union) + ggtitle("Union")
+combine_plots(plot_pline1, plot_pline2, plot_union)
+
+pregion_pline_union <- spa_union(pline1, pregion)
+plot_union <- plot(pregion_pline_union) + ggtitle("Union")
+combine_plots(plot_pline1, plot_pregion, plot_union)
+
+# Computing the difference
+ppoints_diff <- spa_difference(ppoint1, ppoint2)
+plot_diff <- plot(ppoints_diff) + ggtitle("Difference")
+combine_plots(plot_ppoint1, plot_ppoint2, plot_diff)
+
+plines_diff <- spa_difference(pline1, pline2)
+plot_diff <- plot(plines_diff) + ggtitle("Difference")
+combine_plots(plot_pline1, plot_pline2, plot_diff)
+
+pregion_pline_diff <- spa_difference(pline1, pregion)
+plot_diff <- plot(pregion_pline_diff) + ggtitle("Difference")
+combine_plots(plot_pline1, plot_pregion, plot_diff)
+}
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
-\href{https://ieeexplore.ieee.org/document/9177620}{Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.}
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Underlying concepts and formal definitions of spatial plateau set operations are explained in detail in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\item \href{https://ieeexplore.ieee.org/document/9177620}{Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.}
+}
 }

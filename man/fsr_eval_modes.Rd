@@ -6,7 +6,7 @@
 \alias{strict_eval}
 \alias{alpha_eval}
 \alias{soft_alpha_eval}
-\title{Evaluation modes}
+\title{Evaluate a membership degree}
 \usage{
 soft_eval(degree)
 
@@ -29,27 +29,24 @@ This family of functions implements evaluation modes
 that returns a Boolean value for a given degree in [0, 1] obtained from a membership function of a linguistic value.
 }
 \details{
-These functions yield a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
-That is, the parameter \code{degree} is a value in [0, 1] resulting from evaluation a value in a membership degree.
-Then, an evaluation mode "translate" the meaning of this degree of truth as a Boolean value.
+These functions yield a Boolean value that indicates whether the membership degree matches an expected interpretation (according to the meaning of an evaluation mode).
+That is, the parameter \code{degree} is a value in [0, 1] and an evaluation mode "translates" the meaning of this degree of truth as a Boolean value.
 
-There some different ways to make this kind of translation:
+There are some different ways to make this translation:
 \itemize{
-\item \code{soft_eval}: It returns \code{TRUE} if \code{degree} is greater than 0.
-\item \code{strict_eval}: It returns \code{TRUE} if \code{degree} is equal to 0.
-\item \code{alpha_eval}: It returns \code{TRUE} if \code{degree} is greater than or equal to another value (named \code{alpha}).
-\item \code{soft_alpha_eval}: It returns \code{TRUE} if \code{degree} is greater than another value (named \code{alpha}).
+\item \code{soft_eval()} returns \code{TRUE} if \code{degree} is greater than 0.
+\item \code{strict_eval()} returns \code{TRUE} if \code{degree} is equal to 1.
+\item \code{alpha_eval()} returns \code{TRUE} if \code{degree} is greater than or equal to another value (named \code{alpha}).
+\item \code{soft_alpha_eval()} returns \code{TRUE} if \code{degree} is greater than another value (named \code{alpha}).
 }
 
-These operators are employed to process the evaluation modes of fuzzy topological relationships that are processed as Boolean predicates.
+These operators are employed to process the evaluation modes of fuzzy topological relationships (parameter \code{eval_mode}) that are processed as Boolean predicates.
 }
 \examples{
-
-x <- c(0.1, 0.3, 0.6, 0.8)
+x <- c(0, 0.1, 0.3, 0.6, 1, 0.8)
 
 soft_eval(x)
 strict_eval(x)
 alpha_eval(x, 0.3)
 soft_alpha_eval(x, 0.3)
-
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fuzzy_topological_relations.R
 \name{spa_set_classification}
 \alias{spa_set_classification}
-\title{Setting a new classification for fuzzy topological relationships}
+\title{Set a new classification for fuzzy topological relationships}
 \usage{
 spa_set_classification(classes, mfs)
 }
@@ -15,51 +15,61 @@ spa_set_classification(classes, mfs)
 No return values, called for side effects.
 }
 \description{
-This functions configures a new set of linguistic values and their corresponding membership functions to be used by fuzzy topological relationships.
+\code{spa_set_classification()} configures a new set of linguistic values and corresponding membership functions to be used by fuzzy topological relationships.
 }
 \details{
-This function replaces the default linguistic values employed by fuzzy topological relationships.
+The \code{spa_set_classification()} function replaces the default linguistic values employed by fuzzy topological relationships.
 Each membership function \emph{i} of the parameter \code{mfs} represents the class \emph{i} of the parameter \code{classes}.
-The length of these parameters have to be same.
+The length of these parameters must to be equal.
 }
 \examples{
+\dontrun{
 library(tibble)
 library(sf)
 
 set.seed(456)
 
-# some random points to create pgeometry objects by using the function spa_creator
+# Generating some random points to create pgeometry objects by using spa_creator()
 tbl = tibble(x = runif(10, min= 0, max = 30), 
              y = runif(10, min = 0, max = 30), 
              z = runif(10, min = 0, max = 50))
 
-#getting the convex hull on the points to clipping the construction of plateau region objects
+# Getting the convex hull on the points to clip plateau region objects during their constructions
 pts <- st_as_sf(tbl, coords = c(1, 2))
 ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 
 pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 
-# Showing the default list of classes
+plot(pregions$pgeometry[[1]])
+plot(pregions$pgeometry[[2]])
+
+# Showing results for spa_overlap() by considering default list of classes
 spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 
-# Changing the default classification
-
+# Changing the default classification 
 trap_mf <- function(a, b, c, d) {
   function(x) {
     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
   }
 }
 
-classes <- c("small", "medium", "large")
-small <- trap_mf(0, 0.3, 0.4, 0.6)
-medium <- trap_mf(0.4, 0.6, 0.8, 1)
-large <- trap_mf(0.6, 0.8, 1, 1)
+classes <- c("superficially", "moderately", "completely")
+superficially <- trap_mf(0, 0.2, 0.4, 0.6)
+moderately <- trap_mf(0.4, 0.6, 0.8, 1)
+completely <- trap_mf(0.6, 0.8, 1, 1)
 
-spa_set_classification(classes, c(small, medium, large))
+spa_set_classification(classes, c(superficially, moderately, completely))
 
+# Now the fuzzy topological relationships will use the new classification
 spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-
+}
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+
+Underlying concepts and formal definitions of spatial plateau topological relationships and fuzzy topological relationships are respectively introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8491565}{Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.}
+\item \href{https://ieeexplore.ieee.org/document/7737976}{Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.}
+}
 }

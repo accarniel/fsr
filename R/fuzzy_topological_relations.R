@@ -1,17 +1,17 @@
-#' @title Check exact equality
+#' @title Check two spatial plateau objects for exact equality
 #'
-#' @description This function checks whether two spatial plateau objects are exactly equal.
+#' @description `spa_exact_equal()` checks whether two spatial plateau objects are exactly equal.
 #'
 #' @usage
 #'
 #' spa_exact_equal(pgo1, pgo2)
 #'
-#' @param pgo1 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
-#' @param pgo2 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
+#' @param pgo1 A `pgeometry` object that is either a plateau point, plateau line, or plateau region object.
+#' @param pgo2 A `pgeometry` object that is either a plateau point, plateau line, or plateau region object.
 #' 
 #' @details
 #'
-#' It is a Boolean function that checks _fuzzy equality_ in the spatial plateau context. Two `pgeometry` objects are exactly equal if their components are equal. 
+#' `spa_exact_equal()` is a Boolean function that checks _fuzzy equality_ in the spatial plateau context. Two `pgeometry` objects are exactly equal if their components are equal. 
 #' Two components are equal if they have the same membership degree and they are (spatially) equal (i.e., their `sfg` objects have the same geometric format - this means that the order of the points can be different).
 #'   
 #' @return
@@ -23,22 +23,17 @@
 #' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#' library(sf)
-#'
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' pcp1 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp2 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' pcp3 <- create_component("MULTIPOINT((10 10), (9 8), (7 7))", 1)
+#' pcp4 <- create_component("MULTIPOINT((0 0), (2 3))", 0.7)
 #' 
-#' cp1 <- create_component(st_multipoint(pts1), 0.3)
-#' cp2 <- create_component(st_multipoint(pts2), 0.6)
-#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' ppoint1 <- create_pgeometry(list(pcp1, pcp2), "PLATEAUPOINT")
+#' ppoint2 <- create_pgeometry(list(pcp3, pcp4), "PLATEAUPOINT")
 #' 
-#' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
+#' spa_exact_equal(ppoint1, ppoint2)
 #' 
-#' spa_exact_equal(pp1, pp2)
-#' 
-#' spa_exact_equal(pp1, pp1)
+#' spa_exact_equal(ppoint1, ppoint1)
 #' @import sf
 #' @export
 spa_exact_equal <- function(pgo1, pgo2) {
@@ -55,20 +50,14 @@ spa_exact_equal <- function(pgo1, pgo2) {
     return(TRUE)
   }
   
-  comp_check <- function(comp1, comp2) {
-    if(st_equals(comp1@obj, comp2@obj, sparse=FALSE)[1] && (comp1@md == comp2@md)) {
-      TRUE
-    }
-    FALSE
-  }
-  
   if((type1 != type2) ||
      (spa_ncomp(pgo1) != spa_ncomp(pgo2)) ||
      (!(st_equals(pgo1@supp, pgo2@supp, sparse=FALSE)[1]))) {
     return(FALSE)
   } else {
-    for(i in 1:spa_ncomp(pgo1)){
-      if(!(comp_check(pgo1@component[[i]], pgo2@component[[i]]))) {
+    for(i in 1:spa_ncomp(pgo1)) {
+      if(pgo1@component[[i]]@md != pgo2@component[[i]]@md || 
+         !st_equals(pgo1@component[[i]]@obj, pgo2@component[[i]]@obj, sparse=FALSE)[1]) {
         return(FALSE)
       }
     }
@@ -76,23 +65,22 @@ spa_exact_equal <- function(pgo1, pgo2) {
   TRUE
 }
 
-#' @title Check exact containment
+#' @title Check two spatial plateau objects for exact containment
 #'
-#' @description This function checks whether a `pgeometry` object is completely inside of another `pgeometry` object.
+#' @description `spa_exact_inside()` checks whether a `pgeometry` object is completely inside of another `pgeometry` object.
 #'
 #' @usage
 #'
 #' spa_exact_inside(pgo1, pgo2)
 #'
-#' @param pgo1 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
-#' @param pgo2 A `pgeometry` object of the types `PLATEAUPOINT`, `PLATEAULINE`, and `PLATEAUREGION`.
+#' @param pgo1 A `pgeometry` object that is either a plateau point, plateau line, or plateau region object.
+#' @param pgo2 A `pgeometry` object that is either a plateau point, plateau line, or plateau region object.
 #' 
 #' @details
 #'  
-#' It is a Boolean function that checks _fuzzy containment_ in the spatial plateau context. 
-#' 
+#' `spa_exact_inside()` is a Boolean function that checks _fuzzy containment_ in the spatial plateau context. 
 #' This Boolean function checks whether the components of `pgo1` are contained in the components of `pgo2` 
-#' by considering their membership degrees and geographic positions. That is, it is follows the classical definition of fuzzy containment of the fuzzy set theory.
+#' by considering their membership degrees and geographic positions. That is, it follows the classical definition of fuzzy containment of the fuzzy set theory. 
 #' 
 #' In other words, this function checks if the (standard) intersection of `pgo1` and `pgo2` is exactly equal to `pgo1`. The other of operands affects the result.
 #' 
@@ -105,28 +93,20 @@ spa_exact_equal <- function(pgo1, pgo2) {
 #' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#'
-#' library(sf)
-#'
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' pcp1 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp2 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' pcp3 <- create_component("POINT(2 2)", 0.2)
+#' pcp4 <- create_component("MULTIPOINT((1 1), (3 3))", 0.7)
 #' 
-#' cp1 <- create_component(st_multipoint(pts1), 0.3)
-#' cp2 <- create_component(st_multipoint(pts2), 0.6)
-#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' ppoint1 <- create_pgeometry(list(pcp1, pcp2), "PLATEAUPOINT")
+#' ppoint2 <- create_pgeometry(list(pcp3, pcp4), "PLATEAUPOINT")
 #' 
-#' # Creating two spatial plateau objects
-#' pp1 <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' pp2 <- create_pgeometry(list(cp2, cp1), "PLATEAUPOINT")
+#' # is ppoint2 completely and certainly inside ppoint1?
+#' spa_exact_inside(ppoint2, ppoint1)
 #' 
-#' # The other of operands after the result
-#' # pp1 is not inside pp2 since it has one point that is not included in pp2
-#' spa_exact_inside(pp1, pp2)
-#' 
-#' # on the other hand, pp2 is inside pp1
-#' spa_exact_inside(pp2, pp1)
-#'
+#' # The order of operands after the result
+#' # ppoint1 is not inside ppoint2 since it has different points
+#' spa_exact_inside(ppoint1, ppoint2)
 #' @export
 spa_exact_inside <- function(pgo1, pgo2){
   
@@ -192,22 +172,18 @@ check_spa_topological_condition <- function(pgo1, pgo2) {
   }
 }
 
-#' @title Fuzzy topological relationships
+#' @title Compute fuzzy topological relationships
 #'
-#' @description Fuzzy topological relationships are given as a family of functions that implements spatial plateau topological relationships.
-#' A fuzzy topological relationship expresses a particular relative position of two spatial plateau objects.
-#' Since the spatial objects are fuzzy, their topological relationships are also fuzzy.
-#' Hence, a fuzzy topological relationship determines the degree to which a relation holds for any two spatial plateau objects by a real value in the interval \[0, 1\].
-#' The key idea of these relationships is to consider point subsets resulting from the combination of spatial plateau
-#' set operations and spatial plateau metric operations on the spatial plateau objects for computing the resulting degree.
-#' The resulting degree can be also interpreted as a linguistic value. 
-#'
+#' @description Fuzzy topological relationships are implemented by spatial plateau topological relationships. 
+#' A fuzzy topological relationship expresses a particular relative position of two spatial plateau objects. 
+#' Such a topological relationship determines the degree to which it holds for any two spatial plateau objects by a real value in the interval \[0, 1\].
+#' 
 #' @usage
 #'
 #' spa_overlap(pgo1, pgo2, itype = "min", ret = "degree", ...)
 #'
-#' @param pgo1 A `pgeometry` object of the type `PLATEAUREGION`.
-#' @param pgo2 A `pgeometry` object of the type `PLATEAUREGION`.
+#' @param pgo1 A `pregion` object.
+#' @param pgo2 A `pregion` object.
 #' @param itype A character value that indicates the name of a function implementing a t-norm. The default value is `"min"`, which is the standard operator of the intersection.
 #' @param ret A character value that indicates the return type of the fuzzy topological relationship. The default value is `"degree"` and other possible values are `"list"` and `"bool"`.
 #' @param ... <[`dynamic-dots`][rlang::dyn-dots]> If `ret = "bool"`, two additional parameters have to be informed, as described below.
@@ -216,37 +192,40 @@ check_spa_topological_condition <- function(pgo1, pgo2) {
 #'
 #' @details
 #'
-#' These functions implement topological relationships of the spatial plateau algebra. 
-#' They receive two `pgeometry` objects of the type `PLATEAUREGION` together with some additional parameters (as detailed below).
-#' The family of fuzzy topological relationships consists of the following functions:
+#' These functions implement the spatial plateau topological relationships between plateau region objects. 
+#' The key idea of these relationships is to consider point subsets resulting from the combination of spatial plateau
+#' set operations and spatial plateau metric operations on spatial plateau objects for computing the resulting degree.
+#' The resulting degree can be also interpreted as a linguistic value. 
 #' 
-#' - `spa_overlap` computes the overlapping degree of two plateau region objects.
+#' The spatial plateau topological relationships are implemented by the following functions:
+#' 
+#' - `spa_overlap()` computes the overlapping degree of two plateau region objects.
 #' Since it uses the intersection operation, a t-norm operator can be given by the parameter `itype`. Currently, it can assume `"min"` (default) or `"prod"`.
-#' - `spa_meet` computes the meeting degree of two plateau region objects.
+#' - `spa_meet()` computes the meeting degree of two plateau region objects.
 #' Similarly to `spa_overlap`, a t-norm operator can be given by the parameter `itype`.
-#' - `spa_disjoint` computes the disjointedness degree of two plateau region objects.
+#' - `spa_disjoint()` computes the disjointedness degree of two plateau region objects.
 #' Similarly to `spa_overlap` and `spa_meet`, a t-norm operator can be given by the parameter `itype`.
-#' - `spa_equal` - computes how equal are two plateau region objects.
+#' - `spa_equal()` computes how equal are two plateau region objects.
 #' Since it uses the union operation, a t-conorm operator can be given by the parameter `utype`. Currently, it can assume `"max"` (default).
-#' - `spa_inside` - computes the containment degree of `pgo1` in `pgo2`.
-#' Similarly to `spa_equal`, a t-conorm operator can be given by the parameter `utype`.
-#' - `spa_contains` - it is the same of `spa_inside` but changing the order of the operands `pgo1` and `pgo2`.
+#' - `spa_inside()` computes the containment degree of `pgo1` in `pgo2`.
+#' Similarly to `spa_equal()`, a t-conorm operator can be given by the parameter `utype`.
+#' - `spa_contains()` changes the order of the operations `pgo1` ad `pgo2` when invoking `spa_inside()`.
 #' 
-#' The parameter `ret` determines the returning value of a fuzzy topological relationship. The default value is the following:
-#' 
-#' - `"degree"` (default) - it indicates that the function will return a value in \[0, 1\] that represents the degree of truth of a given topological relationships.
+#' The parameter `ret` determines the returning value of a fuzzy topological relationship. 
+#' The default value is `"degree"` (default), which indicates that the function will return a value in \[0, 1\] that represents the degree of truth of a given topological relationship.
 #' 
 #' For the remainder possible values, the functions make use of a set of linguistic values that characterize the different situations of topological relationships.
 #' Each linguistic value has an associated membership function defined in the domain \[0, 1\].
-#' The `fsr` package has a default set of linguistic values. You can use the function `spa_set_classification` to change this set of linguistic values.
+#' The `fsr` package has a default set of linguistic values. You can use the function `spa_set_classification()` to change this set of linguistic values.
 #' 
 #' The remainder possible values for the parameter `ret` are:
 #' 
-#' - `"list"` - it indicates that the function will return a named list containing how much the result of the predicate belongs to each linguistic value (i.e., it employs the membership functions of the linguistic values).
-#' - `"bool"` - it indicates that the function will return a Boolean value indicating whether the degree returned by the topological relationship matches a given linguistic value according to an _evaluation mode_.
+#' - `ret = "list"` indicates that the function will return a named list containing the membership degree of the result of the predicate for each linguistic value (i.e., it employs the membership functions of the linguistic values).
+#' - `ret = "bool"` indicates that the function will return a Boolean value indicating whether the degree returned by the topological relationship matches a given linguistic value according to an _evaluation mode_.
 #' The evaluation mode and the linguistic values have to be informed by using the parameters `eval_mode` and `lval`, respectively.
 #' The possible values for `eval_mode` are: `"soft_eval"`, `"strict_eval"`, `"alpha_eval"`, and `"soft_alpha_eval"`.
-#' They have different behavior in how computing the Boolean value from the membership function of a linguistic value. See their documentations for more details.
+#' They have different behavior in how computing the Boolean value from the membership function of a linguistic value. 
+#' See the documentation of the functions `soft_eval()`, `strict_eval()`, `alpha_eval()`, and `soft_alpha_eval()` for more details.
 #' Note that the parameter `lval` only accept a character value belonging to the set of linguistic values that characterize the different situations of topological relationships.
 #'   
 #' @return
@@ -254,8 +233,13 @@ check_spa_topological_condition <- function(pgo1, pgo2) {
 #' The returning value is determined by the parameter `ret`, as described above.
 #'
 #' @references
-#'
-#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Underlying concepts and formal definitions of spatial plateau topological relationships and fuzzy topological relationships are respectively introduced in:
+#' 
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' - [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
 #'
 #' @examples
 #' library(tibble)
@@ -263,32 +247,34 @@ check_spa_topological_condition <- function(pgo1, pgo2) {
 #' 
 #' set.seed(456)
 #' 
-#' # some random points to create pgeometry objects by using the function spa_creator
+#' # Generating some random points to create pgeometry objects by using spa_creator()
 #' tbl = tibble(x = runif(10, min= 0, max = 30), 
 #'              y = runif(10, min = 0, max = 30), 
 #'              z = runif(10, min = 0, max = 50))
 #' 
-#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' # Getting the convex hull on the points to clip plateau region objects during their constructions
 #' pts <- st_as_sf(tbl, coords = c(1, 2))
 #' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 #' 
 #' pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 #' 
+#' plot(pregions$pgeometry[[1]])
+#' plot(pregions$pgeometry[[2]])
+#' 
+#' \dontrun{ 
 #' # Showing the different types of returning values
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]])
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "bool", 
 #'            eval_mode = "soft_eval", lval = "mostly")
-#'
+#' 
 #' ## Examples for evaluating the other fuzzy topological relationships
-#' \dontrun{ 
 #' spa_meet(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' spa_disjoint(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' spa_equal(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' spa_inside(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' spa_contains(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' }
-#' 
 #' @import sf
 #' @export
 spa_overlap <- function(pgo1, pgo2, itype = "min", ret = "degree", ...) {
@@ -524,9 +510,9 @@ pkg_env$ftopological_mfs <- c(trap_mf(0, 0, 0.03, 0.08),
                               trap_mf(0.62, 0.69, 0.93, 0.95),
                               trap_mf(0.93, 0.95, 1, 1))
 
-#' @title Setting a new classification for fuzzy topological relationships
+#' @title Set a new classification for fuzzy topological relationships
 #'
-#' @description This functions configures a new set of linguistic values and their corresponding membership functions to be used by fuzzy topological relationships.
+#' @description `spa_set_classification()` configures a new set of linguistic values and corresponding membership functions to be used by fuzzy topological relationships.
 #'
 #' @usage
 #'
@@ -537,9 +523,9 @@ pkg_env$ftopological_mfs <- c(trap_mf(0, 0, 0.03, 0.08),
 #'
 #' @details
 #'
-#' This function replaces the default linguistic values employed by fuzzy topological relationships.
+#' The `spa_set_classification()` function replaces the default linguistic values employed by fuzzy topological relationships.
 #' Each membership function _i_ of the parameter `mfs` represents the class _i_ of the parameter `classes`.
-#' The length of these parameters have to be same.
+#' The length of these parameters must to be equal.
 #' 
 #' @return 
 #' 
@@ -547,45 +533,54 @@ pkg_env$ftopological_mfs <- c(trap_mf(0, 0, 0.03, 0.08),
 #' 
 #' @references
 #'
-#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Underlying concepts and formal definitions of spatial plateau topological relationships and fuzzy topological relationships are respectively introduced in:
+#' 
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' - [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
 #'
 #' @examples
+#' \dontrun{
 #' library(tibble)
 #' library(sf)
 #' 
 #' set.seed(456)
 #' 
-#' # some random points to create pgeometry objects by using the function spa_creator
+#' # Generating some random points to create pgeometry objects by using spa_creator()
 #' tbl = tibble(x = runif(10, min= 0, max = 30), 
 #'              y = runif(10, min = 0, max = 30), 
 #'              z = runif(10, min = 0, max = 50))
 #' 
-#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' # Getting the convex hull on the points to clip plateau region objects during their constructions
 #' pts <- st_as_sf(tbl, coords = c(1, 2))
 #' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 #' 
 #' pregions <- spa_creator(tbl, base_poly = ch, fuzz_policy = "fcp", k = 2)
 #' 
-#' # Showing the default list of classes
+#' plot(pregions$pgeometry[[1]])
+#' plot(pregions$pgeometry[[2]])
+#' 
+#' # Showing results for spa_overlap() by considering default list of classes
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #'
-#' # Changing the default classification
-#' 
+#' # Changing the default classification 
 #' trap_mf <- function(a, b, c, d) {
 #'   function(x) {
 #'     pmax(pmin((x - a)/(b - a), 1, (d - x)/(d - c), na.rm = TRUE), 0)
 #'   }
 #' }
 #' 
-#' classes <- c("small", "medium", "large")
-#' small <- trap_mf(0, 0.3, 0.4, 0.6)
-#' medium <- trap_mf(0.4, 0.6, 0.8, 1)
-#' large <- trap_mf(0.6, 0.8, 1, 1)
+#' classes <- c("superficially", "moderately", "completely")
+#' superficially <- trap_mf(0, 0.2, 0.4, 0.6)
+#' moderately <- trap_mf(0.4, 0.6, 0.8, 1)
+#' completely <- trap_mf(0.6, 0.8, 1, 1)
 #' 
-#' spa_set_classification(classes, c(small, medium, large))
+#' spa_set_classification(classes, c(superficially, moderately, completely))
 #' 
+#' # Now the fuzzy topological relationships will use the new classification
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#'
+#' }
 #' @export
 spa_set_classification <- function(classes, mfs) {
   if(!(length(classes) == length(mfs))) {
@@ -599,7 +594,7 @@ spa_set_classification <- function(classes, mfs) {
   pkg_env$ftopological_mfs <- mfs
 }
 
-#' @title Evaluation modes
+#' @title Evaluate a membership degree
 #'
 #' @description This family of functions implements evaluation modes 
 #' that returns a Boolean value for a given degree in \[0, 1\] obtained from a membership function of a linguistic value.
@@ -614,31 +609,28 @@ spa_set_classification <- function(classes, mfs) {
 #'
 #' @details
 #'
-#' These functions yield a Boolean value that express the meaning of a degree returning from an evaluation of a membership function.
-#' That is, the parameter `degree` is a value in \[0, 1\] resulting from evaluation a value in a membership degree.
-#' Then, an evaluation mode "translate" the meaning of this degree of truth as a Boolean value.
+#' These functions yield a Boolean value that indicates whether the membership degree matches an expected interpretation (according to the meaning of an evaluation mode).
+#' That is, the parameter `degree` is a value in \[0, 1\] and an evaluation mode "translates" the meaning of this degree of truth as a Boolean value.
 #' 
-#' There some different ways to make this kind of translation:
-#' - `soft_eval`: It returns `TRUE` if `degree` is greater than 0.
-#' - `strict_eval`: It returns `TRUE` if `degree` is equal to 0.
-#' - `alpha_eval`: It returns `TRUE` if `degree` is greater than or equal to another value (named `alpha`).
-#' - `soft_alpha_eval`: It returns `TRUE` if `degree` is greater than another value (named `alpha`).
+#' There are some different ways to make this translation:
+#' - `soft_eval()` returns `TRUE` if `degree` is greater than 0.
+#' - `strict_eval()` returns `TRUE` if `degree` is equal to 1.
+#' - `alpha_eval()` returns `TRUE` if `degree` is greater than or equal to another value (named `alpha`).
+#' - `soft_alpha_eval()` returns `TRUE` if `degree` is greater than another value (named `alpha`).
 #' 
-#' These operators are employed to process the evaluation modes of fuzzy topological relationships that are processed as Boolean predicates.
+#' These operators are employed to process the evaluation modes of fuzzy topological relationships (parameter `eval_mode`) that are processed as Boolean predicates.
 #' 
 #' @return
 #'
 #' A Boolean vector.
 #'
 #' @examples
-#'
-#' x <- c(0.1, 0.3, 0.6, 0.8)
+#' x <- c(0, 0.1, 0.3, 0.6, 1, 0.8)
 #' 
 #' soft_eval(x)
 #' strict_eval(x)
 #' alpha_eval(x, 0.3)
 #' soft_alpha_eval(x, 0.3)
-#'
 #' @export
 soft_eval <- function(degree){
   degree > 0

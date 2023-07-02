@@ -2,7 +2,7 @@
 % Please edit documentation in R/fuzzy_geom_set_operations.R
 \name{pcollection_to_pcomposition}
 \alias{pcollection_to_pcomposition}
-\title{Convert a spatial plateau collection into a spatial plateau composition}
+\title{Convert a plateau collection object into a plateau composition object}
 \usage{
 pcollection_to_pcomposition(pcol)
 }
@@ -10,35 +10,57 @@ pcollection_to_pcomposition(pcol)
 \item{pcol}{A \code{pcollection} object.}
 }
 \value{
-A spatial plateau composition object.
+A \code{pcomposition} object.
 }
 \description{
-This function gathers all the fuzzy spatial objects of a \code{PLATEAUCOLLECTION} and
-reorganizes them into an equivalent fuzzy spatial composition object.
+\code{pcollection_to_pcomposition()} converts a plateau collection object into an equivalent plateau composition object.
 }
 \details{
-It gives a fuzzy spatial composition object equivalent to the spatial collection object given as input
+The \code{pcollection_to_pcomposition()} function yields a \code{pcomposition} object that is equivalent to the \code{pcollection} object given as input by
 aggregating all spatial plateau objects by type.
 }
 \examples{
-library(sf)
+# Point components
+pcp1 <- create_component("POINT(0 0)", 0.3)
+pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+pcp4 <- create_component("MULTIPOINT((10 10), (9 8), (7 7))", 1)
+pcp5 <- create_component("MULTIPOINT((0 0), (2 3))", 0.7)
+pcp6 <- create_component("MULTIPOINT((0 1), (3 3))", 0.85)
+pcp7 <- create_component("MULTIPOINT((1 0), (2 3))", 0.4)
+# Line components
+lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+lcp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+# Polygon components
+rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
 
-pts <- rbind(c(1, 2), c(3, 2))
-pcp <- create_component(st_multipoint(pts), 0.3)
-
-lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-lcp <- create_component(st_linestring(lpts), 1)
-pline <- create_pgeometry(list(lcp), "PLATEAULINE")
-
-rpts1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
-rpts2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-rcp <- create_component(st_polygon(list(rpts1, rpts2)), 0.7)
-pregion <- create_pgeometry(list(rcp), "PLATEAUREGION")
-
-pcomposition <- create_pgeometry(list(pcp, rcp), "PLATEAUCOMPOSITION")
-pcollection <- create_pgeometry(list(pcomposition), "PLATEAUCOLLECTION")
-
-pcollection_to_pcomposition(pcollection)
+# Creating plateau point objects
+ppoint1 <- create_pgeometry(list(pcp1, pcp2, pcp3), "PLATEAUPOINT")
+ppoint2 <- create_pgeometry(list(pcp4, pcp5), "PLATEAUPOINT")
+ppoint3 <- create_pgeometry(list(pcp4, pcp5), "PLATEAUPOINT")
+ppoint4 <- create_pgeometry(list(pcp6, pcp7), "PLATEAUPOINT")
+# Creating plateau line objects
+pline1 <- create_pgeometry(list(lcp1, lcp3), "PLATEAULINE")
+pline2 <- create_pgeometry(list(lcp2, lcp4), "PLATEAULINE")
+pline3 <- create_pgeometry(list(lcp5), "PLATEAULINE")
+# Creating a plateau region objects
+pregion <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+# Creating a plateau composition object
+pcomposition <- create_pgeometry(list(ppoint4, pline3), "PLATEAUCOMPOSITION")
+# Creating plateau collection objects
+pcol1 <- create_pgeometry(list(ppoint1, ppoint2, ppoint3, pline1), "PLATEAUCOLLECTION")
+pcol2 <- create_pgeometry(list(pline2, pregion, pcomposition, pcol1), "PLATEAUCOLLECTION")
+pcol2
+plot(pcol2)
+\dontrun{
+converted_pcomp <- pcollection_to_pcomposition(pcol2)
+converted_pcomp
+plot(converted_pcomp)
+}
 }
 \references{
 \href{https://ieeexplore.ieee.org/document/9177620}{Carniel, A. C.; Schneider, M. Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions. In Proceedings of the 2020 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2020), pp. 1-8, 2020.}

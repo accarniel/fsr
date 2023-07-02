@@ -53,9 +53,10 @@ to visualizations produced by the \code{ggplot2} package.
 It is possible to clip the geometric format of the components by using the parameter \code{base_poly}. The boundaries of this object
 can also be included in the visualization if the parameter \code{add_base_poly} is \code{TRUE}.
 
-Since the returned value is a ggplot object, it can be further be customized (see examples below).
+Since the returned value is a \code{ggplot} object, it can be further be customized (see examples below).
 }
 \examples{
+\dontrun{
 library(sf)
 
 pts <- rbind(c(0, 2), c(4, 2))
@@ -113,6 +114,7 @@ fsr_plot(pp, size = 5) +
         axis.text=element_text(color="black")) +
   scale_x_continuous(breaks = c(0, 1, 2, 3, 4)) +
   scale_y_continuous(breaks = c(0, 1, 2, 3, 4))
+}
 }
 \references{
 \href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}

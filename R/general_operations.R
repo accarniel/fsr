@@ -1,11 +1,6 @@
-#' @title Adding components to a `pgeometry` object
+#' @title Add components to a `pgeometry` object
 #'
-#' @description This function adds components to a spatial plateau object (i.e., `pgeometry` object). 
-#' The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
-#' For instance, a `pgeometry` object of the type `PLATEAUREGION` accepts only components containing polygons (e.g., `POLYGON` or `MULTIPOLYGON`). 
-#' In the case of `PLATEAUCOMPOSITION` object, formed by a triple (`PLATEAUPOINT`, `PLATEAULINE` and `PLATEAUREGION`), any type of component is compatible to be added. 
-#' Thus, a component of type `POINT`, for example, will be added to the `PLATEAUPOINT` in which it is composed. 
-#' On the other hand, as a `PLATEAUCOLLECTION` object can have multiple spatial objects of the same type, this function is not applicable to it.
+#' @description `spa_add_component()` inserts components into a spatial plateau object (i.e., `pgeometry` object). 
 #'
 #' @usage
 #'
@@ -13,50 +8,53 @@
 #'
 #' @param pgo A `pgeometry` object of any type.
 #' @param components A `component` object or a list of `component` objects.
-#' @param is_valid A Boolean value to check if the user wants to validate the updated spatial plateau object at the end. If `is_valid = TRUE`, it calls `validObject` method.
+#' @param is_valid A Boolean value to check if the user wants to validate the updated spatial plateau object at the end. If `is_valid = TRUE`, it calls `validObject()` method.
 #'
 #' @details
 #'
-#' This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra.
+#' This function implements the \eqn{\odot}{odot} operator defined by Spatial Plateau Algebra. 
 #' The goal of this function is to insert a component or a list of components into a `pgeometry` object. 
-#' This insertion is based on the membership degree of the component (e.g., created by `create_component`). Thus, it preserves the properties of a spatial plateau object.
-#' However, this function assumes that a component is compatible with the `pgeometry` object and its geometric format is valid (i.e., it does not overlap with existing components).
+#' The crisp spatial object of the component must be compatible with the type of the plateau spatial object.
+#' For instance, a `pregion` object accepts only components containing polygons (e.g., `POLYGON` or `MULTIPOLYGON`). 
+#' In the case of `pcomposition` object any type of component is compatible to be added. 
+#' For instance, a point component is added to the plateau point sub-object of the plateau composition object.
+#' On the other hand, as a `pcollection` object can have multiple spatial objects of the same type, this function is not applicable to it.
+#' 
+#' The insertion is based on the membership degree of the component. Thus, it preserves the properties of a spatial plateau object.
+#' However, `spa_add_component()` assumes that the geometric format of the component is valid (i.e., it does not overlap with existing components).
 #'  
 #' @return
 #'
 #' A `pgeometry` object containing the `component` objects.
 #'
 #' @references
+#' 
+#' The formal definition of the \eqn{\odot}{odot} operator is described in: 
 #'
-#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#' library(sf)
-#' 
-#' # For a `PLATEAUPOINT` object.
-#'
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' comp1 <- create_component(st_multipoint(pts1), 0.2) 
-#' comp2 <- create_component(st_point(c(1, 5)), 0.8)  
+#' comp1 <- create_component("MULTIPOINT(1 1, 2 2)", 0.2) 
+#' comp2 <- create_component("POINT(1 5)", 0.8)  
 #' 
 #' # appending these components into an empty pgeometry object
-#' 
 #' pp <- create_empty_pgeometry("PLATEAUPOINT")
 #' pp <- spa_add_component(pp, list(comp1, comp2))
 #' pp
 #' 
-#' # For a `PLATEAUCOMPOSITION` object.
+#' # inserting components with existing membership degrees are merged
+#' comp3 <- create_component("MULTIPOINT(0 0, 4 4)", 0.2)
+#' pp <- spa_add_component(pp, comp3)
+#' pp
 #' 
-#' pts <- rbind(c(1, 2), c(3, 2))
-#' pcp <- create_component(st_multipoint(pts), 0.3)
-#' pc <- create_pgeometry(list(pcp), "PLATEAUCOMPOSITION")
+#' comp4 <- create_component("MULTIPOINT(0 1, 3 4)", 1)
+#' pc <- create_pgeometry(list(comp4), "PLATEAUCOMPOSITION")
 #' pc
 #' 
-#' # appending these components into a pgeometry object
-#' 
-#' lpts <- rbind(c(1, 1), c(1.2, 1.9), c(2, 1))
-#' lcp <- create_component(st_linestring(lpts), 0.4)
-#' pc <- spa_add_component(pc, list(lcp))
+#' # appending these components into pc
+#' comp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+#' comp6 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+#' pc <- spa_add_component(pc, list(comp5, comp6))
 #' pc
 #' @import  sf
 #' @export
@@ -185,9 +183,9 @@ spa_add_internal <- function(pgo, components) {
   pgo
 }
 
-#' @title Capturing the membership degree of a point
+#' @title Evaluate the membership degree of a point in a `pgeometry` object
 #'
-#' @description This function evaluates the membership degree of a given point in a spatial plateau object of any type.
+#' @description `spa_eval()` evaluates the membership degree of a given point in a spatial plateau object of any type.
 #' It returns a value in \[0, 1\] that indicates to which extent the point belongs to the `pgeometry` object.
 #'
 #' @usage
@@ -199,7 +197,7 @@ spa_add_internal <- function(pgo, components) {
 #'
 #' @details
 #'
-#' The goal of this function is to return the membership degree of a simple point object (i.e., `sfg` object) in a given spatial plateau object (i.e., `pgeometry` object).
+#' The `spa_eval()` returns the membership degree of a simple point object (i.e., `sfg` object) in a given spatial plateau object (i.e., `pgeometry` object). 
 #' This evaluation depends on the following basic cases:
 #' 
 #' - if the simple point object belongs to the interior or boundary of _one_ component of the spatial plateau object, it returns the membership degree of that component.
@@ -212,45 +210,46 @@ spa_add_internal <- function(pgo, components) {
 #'
 #' @references
 #'
-#' [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
+#' Formal definitions of this function are described in:
+#' 
+#' - [Carniel, A. C.; Galdino, F.; Schneider, M. Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models. In Proceedings of the 2022 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2022), pp. 1-8, 2022.](https://ieeexplore.ieee.org/document/9882658)
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#' library(tibble)
 #' library(sf)
 #' 
-#' # some basic examples 
+#' # Point components
+#' pcp1 <- create_component("POINT(0 0)", 0.3)
+#' pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+#' pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+#' pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+#' pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
+#' # Line components
+#' lcp1 <- create_component("LINESTRING(0 0, 1 1.5)", 0.2)
+#' lcp2 <- create_component("LINESTRING(1 3, 1 2, 2 0.5)", 0.5)
+#' lcp3 <- create_component("LINESTRING(2 1.2, 3 1.6, 4 4)", 0.7)
+#' lcp4 <- create_component("LINESTRING(1 1.5, 2 1.2)", 1.0)
+#' lcp5 <- create_component("LINESTRING(-1 1, 2 2)", 0.9)
+#' # Polygon components
+#' rcp1 <- create_component("POLYGON((0 0, 1 4, 2 2, 0 0))", 0.4)
+#' rcp2 <- create_component("POLYGON((2 0.5, 4 1, 4 0, 2 0.5))", 0.8)
 #' 
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' # Creating spatial plateau objects
+#' ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+#' pline <- create_pgeometry(list(lcp1, lcp2, lcp3), "PLATEAULINE")
+#' pregion <- create_pgeometry(list(rcp1, rcp2), "PLATEAUREGION")
+#' pcomp <- create_pgeometry(list(pcp6, pcp7, lcp4, lcp5), "PLATEAUCOMPOSITION")
+#' pcol <- create_pgeometry(list(ppoint, pline, pregion, pcomp), "PLATEAUCOLLECTION")
 #' 
-#' cp1 <- create_component(st_multipoint(pts1), 0.3)
-#' cp2 <- create_component(st_multipoint(pts2), 0.6)
-#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' point <- st_point(c(0, 0))
 #' 
-#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' 
-#' spa_eval(pp, st_point(c(1, 2)))
-#' spa_eval(pp, st_point(c(1, 3)))
-#' 
-#' # other examples with plateau regions
-#' 
-#' set.seed(345)
-#' 
-#' # some random points to create plateau region objects by using the function spa_creator
-#' tbl = tibble(x = runif(10, min= 0, max = 20), 
-#'              y = runif(10, min = 0, max = 30), 
-#'              z = runif(10, min = 0, max = 100))
-#' 
-#' #getting the convex hull on the points to clipping the construction of plateau region objects
-#' pts <- st_as_sf(tbl, coords = c(1, 2))
-#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
-#' 
-#' pregions <- spa_creator(tbl, fuzz_policy = "fcp", k = 2, base_poly = ch)
-#' 
-#' # capturing the membership degree of a specific point in each object
-#' spa_eval(pregions$pgeometry[[1]], st_point(c(5, 15)))
-#' spa_eval(pregions$pgeometry[[2]], st_point(c(5, 15)))
+#' spa_eval(ppoint, point)
+#' spa_eval(pline, point)
+#' spa_eval(pregion, point)
+#' spa_eval(pcomp, point)
+#' spa_eval(pcol, point)
 #' @import  sf
 #' @export
 spa_eval <- function(pgo, point) {
@@ -295,9 +294,9 @@ spa_eval <- function(pgo, point) {
   ret
 }
 
-#' @title Capturing the support of a `pgeometry` object
+#' @title Get the support of a `pgeometry` object
 #'
-#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the support of a `pgeometry` object given as input.
+#' @description `spa_support()` yields a crisp spatial object (as an `sfg` object) that corresponds to the support of a `pgeometry` object given as input.
 #'
 #' @usage
 #'
@@ -307,41 +306,41 @@ spa_eval <- function(pgo, point) {
 #'
 #' @details
 #'
-#' It employs the classical definition of _support_ from the fuzzy set theory in the context of spatial plateau algebra. 
+#' The `spa_support()` function employs the classical definition of _support_ from the fuzzy set theory in the context of Spatial Plateau Algebra. 
 #' The _support_ only comprises the points with membership degree greater than or equal to 1.
-#' Hence, this operation returns the `sfg` object that represents the total extent of the `pgeometry` given as input. 
-#' If the `pgeometry` object has no components, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#' Hence, `spa_support()` returns the `sfg` object that represents the total extent of the `pgeometry` given as input. 
+#' If the `pgeometry` is empty, then an empty `sfg` object is returned.
 #'
 #' @return
 #'
-#' An `sfg` object that represents the support of `pgeometry`. It can be an empty object if `pgeometry` is empty.
+#' An `sfg` object that represents the support of `pgeometry`. It can be an empty object, if `pgeometry` is empty.
 #'
 #' @references
-#'
-#' [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Underlying concepts and formal definitions of Spatial Plateau Algebra are introduced in:
+#' 
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#'
-#' library(sf)
-#'
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' pcp1 <- create_component("POINT(0 0)", 0.3)
+#' pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+#' pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+#' pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+#' pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
 #' 
-#' cp1 <- create_component(st_multipoint(pts1), 0.3)
-#' cp2 <- create_component(st_multipoint(pts2), 0.6)
-#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' # Creating a plateau point object
+#' ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+#' ppoint
 #' 
-#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' pp
+#' # Getting its support
+#' spa_support(ppoint)
 #' 
-#' pp_supp <- spa_support(pp)
-#' pp_supp
-#' 
-#' pp_empty <- create_empty_pgeometry("PLATEAUPOINT")
-#' pp_empty_supp <- spa_support(pp_empty)
-#' pp_empty_supp
-#'
+#' # Getting the support of an empty pgeometry
+#' spa_support(create_empty_pgeometry("PLATEAUREGION"))
 #' @export
 spa_support <- function(pgo){
   pgo@supp
@@ -360,9 +359,9 @@ get_counter_ctype <- function(pgo){
          PLATEAUCOLLECTION = "GEOMETRYCOLLECTION")
 }
 
-#' @title Capturing the core of a `pgeometry` object
+#' @title Get the core of a `pgeometry` object
 #'
-#' @description This function yields a crisp spatial object (as an `sfg` object) that corresponds to the core of a `pgeometry` object given as input.
+#' @description `spa_core()` yields a crisp spatial object (as an `sfg` object) that corresponds to the core of a `pgeometry` object given as input.
 #'
 #' @usage
 #'
@@ -372,43 +371,41 @@ get_counter_ctype <- function(pgo){
 #'
 #' @details
 #'
-#' It employs the classical definition of _core_ from the fuzzy set theory in the context of spatial plateau algebra. 
+#' The `spa_core()` function employs the classical definition of _core_ from the fuzzy set theory in the context of Spatial Plateau Algebra. 
 #' The _core_ only comprises the points with membership degree equal to 1.
 #' Hence, this operation returns the `sfg` object that represents the component labeled with 
-#' membership degree equal to 1 of the `pgeometry` object given as input. If the `pgeometry` object has no core, then an empty `sfg` object is returned (i.e., a crisp spatial object without points).
+#' membership degree equal to 1 of the `pgeometry` object given as input. If the `pgeometry` object has no core, then an empty `sfg` object is returned.
 #'
 #' @return
 #'
-#' An `sfg` object that represents the core of `pgo`. It can be an empty object if `pgo` does not have a component with membership degree 1.
+#' An `sfg` object that represents the core of `pgo`. It can be an empty object, if `pgo` does not have a component with membership degree 1.
 #'
 #' @references
-#'
-#' [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
+#' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Underlying concepts and formal definitions of Spatial Plateau Algebra are introduced in:
+#' 
+#' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#'
-#' library(sf)
-#'
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' pcp1 <- create_component("POINT(0 0)", 0.3)
+#' pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+#' pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+#' pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+#' pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
 #' 
-#' cp1 <- create_component(st_multipoint(pts1), 0.3)
-#' cp2 <- create_component(st_multipoint(pts2), 0.6)
-#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' # Creating a plateau point object
+#' ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+#' ppoint
 #' 
-#' pp <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' pp
+#' # Getting its core
+#' spa_core(ppoint)
 #' 
-#' pp_core <- spa_core(pp)
-#' pp_core
-#'
-#' #Creating a pgeometry object without core
-#' pp2 <- create_pgeometry(list(cp1, cp2), "PLATEAUPOINT")
-#' pp2
-#' 
-#' spa_core(pp2)
-#'
+#' # Getting the core of an empty pgeometry
+#' spa_core(create_empty_pgeometry("PLATEAUREGION"))
 #' @import sf
 #' @export
 spa_core <- function(pgo) {
@@ -441,7 +438,7 @@ spa_core <- function(pgo) {
 
 #' @title Return a crisp spatial object formed by geometric parts of a `pgeometry` object
 #'
-#' @description This function yields a crisp spatial object (as an `sfg` object) formed by the geometric parts of the components of the `pgeometry` given as input that satisfy a filter condition based on their membership degrees
+#' @description These functions yield a crisp spatial object (as an `sfg` object) formed by the geometric parts of the components of the `pgeometry` given as input that satisfy a filter condition based on their membership degrees.
 #'
 #' @usage
 #'
@@ -457,13 +454,13 @@ spa_core <- function(pgo) {
 #'
 #' @details
 #'
-#' Given a spatial plateau object as input, these operations return a crisp spatial object formed by the geometric parts of the components of the input that satisfy a filter 
-#' condition based on their membership degrees. The filter condition of each operations is detailed as follows:
+#' Given a spatial plateau object as input, these functions return a crisp spatial object formed by the geometric parts of the components of the input that satisfy a filter 
+#' condition based on their membership degrees. The filter condition of each function is detailed as follows:
 #' 
-#' - `spa_alpha_cut` selects all components that have membership degrees greater than or equal to a given value in \[0, 1\] indicated by the parameter `alpha`. 
-#' - `spa_strict_alpha_cut` picks a subset of components that have membership values greater than the parameter `alpha` (a value in \]0, 1\]). 
-#' - `spa_range` generalizes these two operations and allows one to pick all components that have membership degrees belonging to a given open or closed interval. 
-#' The parameters `lside_closed` and `rside_closed`, respectively, determine whether the left and right side (parameters `lvalue` and `rvalue`) of the interval is open (`false`) or closed (`true`). 
+#' - `spa_alpha_cut()` selects all components that have membership degrees greater than or equal to a given value in \[0, 1\] indicated by the parameter `alpha`. 
+#' - `spa_strict_alpha_cut()` picks a subset of components that have membership values greater than the parameter `alpha` (a value in \]0, 1\]). 
+#' - `spa_range()` generalizes these two operations and allows one to pick all components that have membership degrees belonging to a given open or closed interval. 
+#' The parameters `lside_closed` and `rside_closed`, respectively, determine whether the left and right side (parameters `lvalue` and `rvalue`) of the interval is open (`FALSE`) or closed (`TRUE`). 
 #' For example, to represent the right open interval \[0.5, 0.8\[, the following parameter values should be given: `lvalue = 0.5, rvalue = 0.8, lside_closed = TRUE, rside_closed = FALSE`.
 #'
 #' @return
@@ -475,26 +472,22 @@ spa_core <- function(pgo) {
 #' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
 #'
 #' @examples
-#' library(sf)
-#'
-#' pts1 <- rbind(c(1, 2), c(3, 2))
-#' pts2 <- rbind(c(1, 1), c(2, 3), c(2, 1))
-#' pts3 <- rbind(c(2, 2), c(3, 3))
+#' pcp1 <- create_component("POINT(0 0)", 0.3)
+#' pcp2 <- create_component("MULTIPOINT((2 2), (2 4), (2 0))", 0.5)
+#' pcp3 <- create_component("MULTIPOINT((1 1), (3 1), (1 3), (3 3))", 0.9)
+#' pcp4 <- create_component("MULTIPOINT((1 2), (2 1), (3 2))", 1)
+#' pcp5 <- create_component("MULTIPOINT((0 0.5), (2 3))", 0.7)
+#' pcp6 <- create_component("MULTIPOINT((0 1), (3 3.5))", 0.85)
+#' pcp7 <- create_component("MULTIPOINT((1 0), (4 2))", 0.4)
 #' 
-#' cp1 <- create_component(st_multipoint(pts1), 0.3)
-#' cp2 <- create_component(st_multipoint(pts2), 0.6)
-#' cp3 <- create_component(st_multipoint(pts3), 1.0)
+#' # Creating a plateau point object
+#' ppoint <- create_pgeometry(list(pcp1, pcp2, pcp3, pcp4, pcp5), "PLATEAUPOINT")
+#' ppoint
 #' 
-#' ppoint <- create_pgeometry(list(cp1, cp2, cp3), "PLATEAUPOINT")
-#' 
-#' pp_alpha_cut <- spa_alpha_cut(ppoint, 0.6)
-#' pp_alpha_cut
-#' 
-#' pp_strict_alpha_cut <- spa_strict_alpha_cut(ppoint, 0.6)
-#' pp_strict_alpha_cut
-#' 
-#' pp_range <- spa_range(ppoint, 0.4, 0.8)
-#' pp_range
+#' # Processing the alpha-cut, strict alpha-cut, and range
+#' spa_alpha_cut(ppoint, 0.7)
+#' spa_strict_alpha_cut(ppoint, 0.7)
+#' spa_range(ppoint, 0.4, 0.8)
 #' @import sf
 #' @export
 spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = TRUE) {
@@ -550,7 +543,7 @@ spa_range <- function(pgo, lvalue, rvalue, lside_closed = TRUE, rside_closed = T
 #' 
 #' spa_alpha_cut(pgo, alpha) 
 #' 
-#' @param alpha A numeric value. For `spa_alpha_cut`, it must be in \[0, 1\]. For `spa_strict_alpha_cut`, it must be in \]0, 1\].
+#' @param alpha A numeric value. For `spa_alpha_cut()`, it must be in \[0, 1\]. For `spa_strict_alpha_cut()`, it must be in \]0, 1\].
 #' 
 #' @import sf
 #' @export
@@ -576,27 +569,29 @@ spa_strict_alpha_cut <- function(pgo, alpha) {
   spa_range(pgo, alpha, 1, FALSE, TRUE)
 }
 
-#' @title Capturing the fuzzy boundary of a plateau region object
+#' @title Capture the fuzzy boundary of a plateau region object
 #'
-#' @description This function yields a specific part of the fuzzy boundary of a plateau region object.
+#' @description `spa_boundary_pregion()` yields a specific part of the fuzzy boundary of a plateau region object. This function is deprecated; use `spa_boundary()`.
 #'
 #' @usage
 #'
 #' spa_boundary_pregion(pregion, bound_part = "region")
 #'
-#' @param pregion A `pgeometry` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pregion A `pregion` object. It throws an error if a different type is given.
 #' @param bound_part A character value that indicates the part of the fuzzy boundary to be returned. It can be `"region"` or `"line"`. See below for more details.
 #'
 #' @details
 #'
-#' It employs the definition of _fuzzy boundary_ of a fuzzy region object in the context of spatial plateau algebra (as defined in the references). 
+#' The `spa_boundary_pregion()` function employs the definition of _fuzzy boundary_ of a fuzzy region object in the context of Spatial Plateau Algebra. 
 #' The _fuzzy boundary_ of a fuzzy region object `A` has a heterogeneous nature since it consists of two parts:
 #' - a fuzzy line object that corresponds to the boundary of the core of `A`.
 #' - a fuzzy region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
 #' 
-#' This means that the function `spa_boundary_pregion` can yield one specific part of the fuzzy boundary of a plateau region object (the argument `pgeometry`).
-#' If `boundary = "line"`, then the function returns the boundary plateau line of `pgeometry` (i.e., returns a `pgeometry` object of the type `PLATEAULINE`).
-#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pgeometry` (i.e., returns a `pgeometry` object of the type `PLATEAUREGION`).
+#' This means that `spa_boundary_pregion()` can yield one specific part of the fuzzy boundary of a plateau region object.
+#' If `boundary = "line"`, then the function returns the boundary plateau line of `pregion` (i.e., returns a `pline` object).
+#' Else if `boundary = "region"` (the default value), then the function returns the boundary plateau region of `pregion` (i.e., returns a `pregion` object).
+#' 
+#' This function is deprecated; use `spa_boundary()`.
 #' 
 #' @return
 #'
@@ -604,13 +599,16 @@ spa_strict_alpha_cut <- function(pgo, alpha) {
 #'
 #' @references
 #'
+#' Concepts of fuzzy boundary of plateau region objects are introduced in:
+#' 
 #' - [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
 #' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
-#'
 #' \dontrun{
 #' library(tibble)
+#' library(sf)
+#' library(ggplot2)
 #' 
 #' # defining two different types of membership functions
 #' trap_mf <- function(a, b, c, d) {
@@ -625,33 +623,34 @@ spa_strict_alpha_cut <- function(pgo, alpha) {
 #'   }
 #' }
 #' 
-#' set.seed(123)
-#' 
-#' # some random points to create pgeometry objects by using the function spa_creator
-#' tbl = tibble(x = runif(10, min= 0, max = 30), 
+#' set.seed(7)
+#' tbl = tibble(x = runif(10, min = 0, max = 30), 
 #'              y = runif(10, min = 0, max = 50), 
 #'              z = runif(10, min = 0, max = 100))
-#'
-#' classes <- c("category-1", "category-2")
-#' mf1 <- trap_mf(0, 5, 20, 35)
-#' mf2 <- trim_mf(20, 80, 100)
+#' classes <- c("cold", "hot")
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trim_mf(35, 50, 100)
 #' 
-#' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
-#' pregions$pgeometry[[1]]
-#' pregions$pgeometry[[2]]
+#' # Getting the convex hull on the points to clip plateau region objects during their constructions
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 #' 
-#' # these functions are now deprecated, use `spa_boundary`
+#' # Using the standard fuzzification policy based on fuzzy sets
+#' pregions <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+#' plot(pregions$pgeometry[[1]]) + ggtitle("Cold")
+#' plot(pregions$pgeometry[[2]]) + ggtitle("Hot")
+#' 
+#' # these functions are now deprecated, use `spa_boundary()`
 #' 
 #' # capturing and showing the boundary plateau line of each pgeometry object previously created
 #' (spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
 #' (spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
-#' # the last boundary is empty because there is no core! 
+#' # this part of the boundary is empty because there is no core! 
 #' 
 #' # capturing and showing the boundary plateau region (this is the default behavior)
 #' (spa_boundary_pregion(pregions$pgeometry[[1]]))
 #' (spa_boundary_pregion(pregions$pgeometry[[2]]))
 #' }
-#'
 #' @import methods sf
 #' @export
 spa_boundary_pregion <- function(pregion, bound_part = "region") {
@@ -665,8 +664,8 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
   if(bound_part == "line") {
     bpl <- create_empty_pgeometry("PLATEAULINE")
     last_comp <- pregion@component[[length(pregion@component)]]
-    if(last_comp[[1]]@md == 1) {
-      boundary_component <- st_boundary(last_comp[[1]]@obj)
+    if(last_comp@md == 1) {
+      boundary_component <- st_boundary(last_comp@obj)
       comp_line <- new("component", obj = boundary_component, md=1)
       bpl <- spa_add_component(bpl, comp_line)
     }
@@ -674,7 +673,7 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
   } else if(bound_part == "region") {
     last_comp <- pregion@component[[length(pregion@component)]]
     n_comps <- spa_ncomp(pregion)
-    if(last_comp[[1]]@md == 1 && n_comps > 1) {
+    if(last_comp@md == 1 && n_comps > 1) {
       bpr <- create_empty_pgeometry("PLATEAUREGION")
       bpr <- spa_add_component(bpr, pregion@component[1:n_comps-1])
     } else {
@@ -686,37 +685,42 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
   }
 }
 
-#' @title Capturing the fuzzy boundary of a spatial plateau object
+#' @title Capture the fuzzy boundary of a spatial plateau object
 #'
-#' @description This function yields the fuzzy boundary of a plateau region object.
+#' @description `spa_boundary()` yields the fuzzy boundary of a homogeneous spatial plateau object.
 #'
 #' @usage
 #'
 #' spa_boundary(pgo)
 #'
-#' @param pgo A `pgeometry` object of type `PLATEAUPOINT`, `PLATEAULINE`, or `PLATEAUREGION`.
+#' @param pgo A `pgeometry` object of type `ppoint`, `pline`, or `pregion`.
 #'
 #' @details
 #'
-#' It employs the definition of _fuzzy boundary_ of a fuzzy region object in the context of spatial plateau algebra (as defined in the references). 
-#' The _fuzzy boundary_ of a fuzzy region object `A` has a heterogeneous nature since it consists of two parts:
-#' - a fuzzy line object that corresponds to the boundary of the core of `A`.
-#' - a fuzzy region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
+#' The `spa_boundary()` function employs the definition of _fuzzy boundary_ in the context of Spatial Plateau Algebra. 
+#' The _fuzzy boundary_ of a fuzzy spatial object has a heterogeneous nature. For instance, the fuzzy boundary of a plateau region object consists of two parts:
+#' - a plateau line object that corresponds to the boundary of the core of `A`.
+#' - a plateau region object that comprises all points of `A` with a membership degree greater than 0 and less than 1.
 #' 
-#' This means that the function `spa_boundary` can yield these two parts of the fuzzy boundary of a plateau region object (the argument `pgeometry`):
-#' the boundary plateau line and the boundary plateau region (i.e., returns a `pgeometry` object of the type `PLATEAUCOMPOSITION` with these two plateau objects).
+#' This means that `spa_boundary()` returns a `pcomposition` object.
 #' 
 #' @return
 #'
-#' A `pcomposition` object that represents a fuzzy boundary of `pgeometry` object given as input.
+#' A `pcomposition` object that represents a fuzzy boundary of the `pgeometry` object given as input.
 #'
 #' @references
-#'
+#' 
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' 
+#' Concepts and formal definitions of fuzzy boundary are introduced in:
+#' 
 #' - [Carniel, A. C.; Schneider, M. A Conceptual Model of Fuzzy Topological Relationships for Fuzzy Regions. In Proceedings of the 2016 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2016), pp. 2271-2278, 2016.](https://ieeexplore.ieee.org/document/7737976)
 #' - [Carniel, A. C.; Schneider, M. Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types. In Proceedings of the 2018 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2018), pp. 1-8, 2018.](https://ieeexplore.ieee.org/document/8491565)
 #'
 #' @examples
 #' library(tibble)
+#' library(sf)
+#' library(ggplot2)
 #' 
 #' # defining two different types of membership functions
 #' trap_mf <- function(a, b, c, d) {
@@ -725,31 +729,32 @@ spa_boundary_pregion <- function(pregion, bound_part = "region") {
 #'   }
 #' }
 #' 
-#' trim_mf <- function(a, b, c) {
-#'   function(x) {
-#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
-#'   }
+#' set.seed(7)
+#' tbl = tibble(x = runif(20, min = 0, max = 30), 
+#'              y = runif(20, min = 0, max = 50), 
+#'              z = runif(20, min = 0, max = 100))
+#' classes <- c("cold", "hot")
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trap_mf(20, 50, 100, 100)
+#' 
+#' # Getting the convex hull on the points to clip plateau region objects during their constructions
+#' pts <- st_as_sf(tbl, coords = c(1, 2))
+#' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
+#' 
+#' # Using the standard fuzzification policy based on fuzzy sets
+#' pregions <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+#' \dontrun{
+#' pregions
+#' plot(pregions$pgeometry[[1]]) + ggtitle("Cold")
+#' plot(pregions$pgeometry[[2]]) + ggtitle("Hot")
 #' }
-#' 
-#' set.seed(123)
-#' 
-#' # some random points to create pgeometry objects by using the function spa_creator
-#' tbl = tibble(x = runif(10, min= 0, max = 30), 
-#'              y = runif(10, min = 0, max = 50), 
-#'              z = runif(10, min = 0, max = 100))
-#'
-#' classes <- c("category-1", "category-2")
-#' mf1 <- trap_mf(0, 5, 20, 35)
-#' mf2 <- trim_mf(20, 80, 100)
-#' 
-#' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2))
-#' pregions$pgeometry[[1]]
-#' pregions$pgeometry[[2]]
-#' 
 #' # capturing and showing the boundary of each pgeometry object previously created
-#' (spa_boundary(pregions$pgeometry[[1]])) 
-#' (spa_boundary(pregions$pgeometry[[2]]))
-#'
+#' boundary_cold <- spa_boundary(pregions$pgeometry[[1]])
+#' boundary_hot <- spa_boundary(pregions$pgeometry[[2]])
+#' \dontrun{
+#' plot(boundary_cold) + ggtitle("Boundary (Cold)")
+#' plot(boundary_hot) + ggtitle("Boundary (Hot)")
+#' }
 #' @import methods sf
 #' @export
 spa_boundary <- function(pgo) {
@@ -787,26 +792,26 @@ spa_boundary <- function(pgo) {
   }
 }
 
-#' @title Capturing the frontier of a plateau region object
+#' @title Capture the frontier of a plateau region object
 #'
-#' @description This function extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
+#' @description `spa_contour()` extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
 #'
 #' @usage
 #'
 #' spa_contour(pregion)
 #'
-#' @param pregion A `pgeometry` object of the type `PLATEAUREGION`. It throws an error if a different type is given.
+#' @param pregion A `pregion` object. It throws an error if a different type is given.
 #'
 #' @details
 #'
-#' It employs the definition of _fuzzy frontier_ of a fuzzy region object in the context of spatial plateau algebra (as defined in the references). 
+#' The `spa_contour()` function implements the definition of _fuzzy frontier_ of a fuzzy region object in the context of Spatial Plateau Algebra. 
 #' The _fuzzy frontier_ of a fuzzy region object `A` collects all single points of `A`, preserving its membership degrees, that are not in the interior of its support.
 #' 
-#' IMPORTANT NOTE: Fuzzy frontier is different from fuzzy boundary (see `spa_boundary_region`).
+#' Note that fuzzy frontier is different from fuzzy boundary (see `spa_boundary()`).
 #' 
 #' @return
 #'
-#' A `pgeometry` object of the type `PLATEAULINE` that represents the contour (i.e. frontier) of a plateau region object given as input.
+#' A `pline` object that represents the contour (i.e. frontier) of a plateau region object given as input.
 #'
 #' @references
 #'
@@ -816,6 +821,7 @@ spa_boundary <- function(pgo) {
 #' @examples
 #' library(tibble)
 #' library(sf)
+#' library(ggplot2)
 #' 
 #' # defining two different types of membership functions
 #' trap_mf <- function(a, b, c, d) {
@@ -824,39 +830,32 @@ spa_boundary <- function(pgo) {
 #'   }
 #' }
 #' 
-#' trim_mf <- function(a, b, c) {
-#'   function(x) {
-#'     pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
-#'   }
-#' }
+#' set.seed(7)
+#' tbl = tibble(x = runif(20, min = 0, max = 30), 
+#'              y = runif(20, min = 0, max = 50), 
+#'              z = runif(20, min = 0, max = 100))
+#' classes <- c("cold", "hot")
+#' cold_mf <- trap_mf(0, 10, 20, 35)
+#' hot_mf <- trap_mf(20, 50, 100, 100)
 #' 
-#' set.seed(123)
-#' 
-#' # some random points to create pgeometry objects by using the function spa_creator
-#' tbl = tibble(x = runif(10, min= 0, max = 30), 
-#'              y = runif(10, min = 0, max = 50), 
-#'              z = runif(10, min = 0, max = 100))
-#'
-#' classes <- c("category-1", "category-2")
-#' mf1 <- trap_mf(0, 5, 20, 35)
-#' mf2 <- trim_mf(35, 80, 100)
-#' 
-#' #getting the convex hull on the points to clipping the construction of plateau region objects
+#' # Getting the convex hull on the points to clip plateau region objects during their constructions
 #' pts <- st_as_sf(tbl, coords = c(1, 2))
 #' ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 #' 
-#' pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2), base_poly = ch)
-#' 
+#' # Using the standard fuzzification policy based on fuzzy sets
+#' pregions <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+#' pregions
+#' \dontrun{
+#' plot(pregions$pgeometry[[1]]) + ggtitle("Cold")
+#' plot(pregions$pgeometry[[2]]) + ggtitle("Hot")
+#' }
 #' # capturing and showing the frontier of each pgeometry object previously created
-#' frontier_pregion1 <- spa_contour(pregions$pgeometry[[1]]) 
-#' frontier_pregion2 <- spa_contour(pregions$pgeometry[[2]])
-#' 
-#' plot(pregions$pgeometry[[1]])
-#' plot(frontier_pregion1)
-#' 
-#' plot(pregions$pgeometry[[2]])
-#' plot(frontier_pregion2)
-#'
+#' cold_contour <- spa_contour(pregions$pgeometry[[1]])
+#' hot_contour <- spa_contour(pregions$pgeometry[[2]])
+#' \dontrun{
+#' plot(cold_contour) + ggtitle("Frontier (Cold)")
+#' plot(hot_contour) + ggtitle("Frontier (Hot)")
+#' }
 #' @import sf
 #' @export
 spa_contour <- function(pregion) {

@@ -2,33 +2,34 @@
 % Please edit documentation in R/fsi_module.R
 \name{fsi_eval}
 \alias{fsi_eval}
-\title{Evaluating an FSI model for a given point location}
+\title{Evaluate a point inference query}
 \usage{
 fsi_eval(fsi, point, ...)
 }
 \arguments{
-\item{fsi}{An FSI model built with the function \code{fsi_create} and populated by the functions \code{fsi_add_fsa}, \code{fsi_add_cs}, and \code{fsi_add_rules}.}
+\item{fsi}{An FSI model built with the \code{fsi_create()} and populated by \code{fsi_add_fsa()}, \code{fsi_add_cs()}, and \code{fsi_add_rules()}.}
 
-\item{point}{An \code{sfg} object of geometry type \code{point}, which is created through the function \code{st_point} of the sf package.}
+\item{point}{An \code{sfg} object of the type \code{POINT}.}
 
-\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Informs the \code{fsi_eval} how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: \code{discret_by} is 0.5 and \code{discret_length} is NULL.}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> Informs the \code{fsi_eval} how the elements of the resulting fuzzy set should be discretized if the user does not want the default configuration (see below). Default values: \code{discret_by} is 0.5 and \code{discret_length} is \code{NULL}.}
 }
 \value{
-A numeric value that belongs to the domain of the consequent (i.e., as specified by \code{fsi_add_cs}) and represents the result of the reasoning process in a particular point location.
+A numeric value that belongs to the domain of the consequent of the FSI model and represents the result of a point inference query
 }
 \description{
-This function executes the reasoning process of a fuzzy spatial inference (FSI) model
-for a given point location (i.e., \code{sfg} object of the type \code{POINT}).
+\code{fsi_eval()} evaluates a point inference query.
+Considering an FSI model, it answers the following question: what is the inferred value for a given single point location?
 }
 \details{
-This function evaluates an FSI model populated with its fuzzy spatial antecedent, consequent, and fuzzy rules set on a specific point location. This evaluation is based on the algorithm specified by \href{https://ieeexplore.ieee.org/document/8015707}{FIFUS}.
+The \code{fsi_eval()} function evaluates a point inference query by using an FSI model populated with its fuzzy spatial antecedent, consequent, and fuzzy rules set.
+This evaluation is based on the algorithm specified by the references below.
 
-The default behavior of the function \code{fsi_eval} in the parameter \code{...} is to consider a discrete interval of values with an increment of 0.5 between lower and upper values for the consequent domain (i.e., defined at \code{fsi_add_cs} function with the parameter \code{bounds}).
+The default behavior of \code{fsi_eval()} in the parameter \code{...} is to consider a discrete interval of values with an increment of 0.5 between lower and upper values for the consequent domain (i.e., defined by \code{fsi_add_cs()} with the parameter \code{bounds}).
 
 The user can modify the default behavior by using one of the following two ways:
 \itemize{
 \item define a value for the parameter \code{discret_by} by changing the incremental value.
-\item define a desired length for the sequence of values domain of the consequent \code{discret_length}.
+\item define a desired length for the sequence of values domain of the consequent by using the parameter \code{discret_length}.
 }
 }
 \examples{
@@ -37,35 +38,45 @@ library(sf)
 # Creating the FSI model from an example
 fsi <- visitation()
 
-# Creating a vector of fuzzy rules; 
-## note that we make use of the linguistic variables and linguistic values previously defined:
+# Creating a vector of fuzzy rules
+## note that we make use of the linguistic variables and linguistic values previously defined
 rules <- c(
-  "IF accommodation review is reasonable AND food safety is low 
+ "IF accommodation review is reasonable AND 
+    food safety is low 
   THEN visiting experience is awful",
- "IF accommodation price is expensive AND accommodation review is reasonable 
-   THEN visiting experience is awful",
- "IF accommodation price is affordable AND accommodation review is good AND food safety is medium 
-   THEN visiting experience is average",
- "IF accommodation price is affordable AND accommodation review is excellent 
-                                                                AND food safety is high 
-   THEN visiting experience is great",
- "IF accommodation price is cut-rate AND accommodation review is excellent AND food safety is high 
-   THEN visiting experience is great")
+ "IF accommodation price is expensive AND 
+    accommodation review is reasonable 
+  THEN visiting experience is awful",
+ "IF accommodation price is affordable AND 
+    accommodation review is good AND 
+    food safety is medium 
+  THEN visiting experience is average",
+ "IF accommodation price is affordable AND 
+    accommodation review is excellent AND 
+    food safety is high 
+  THEN visiting experience is great",
+ "IF accommodation price is cut-rate AND 
+    accommodation review is excellent AND 
+    food safety is high 
+  THEN visiting experience is great")
 
-# Adding these rules to the FSI model previously instantiated:
+# Adding these rules to the FSI model previously instantiated
 fsi <- fsi_add_rules(fsi, rules)
 
-# Using the default configuration:
-res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)))
-
-# Change the default discretization by modifying the default step value:
-res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_by=0.8)
-
-# Change the default discretization by choosing the quantity of values 
-## between the lower and upper values for the consequent domain:
-res <- fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_length=200)
-
+# Evaluating a point inference query
+fsi_eval(fsi, st_point(c(-74.0, 40.7)))
+\dontrun{
+# Changing the default discretization
+fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_by = 0.8)
+fsi_eval(fsi, st_point(c(-74.0, 40.7)), discret_length = 200)
+}
 }
 \references{
-\href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
+\href{https://doi.org/10.1145/3474717.3484255}{Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.}
+
+Underlying concepts and definitions on the evaluation of point inference queries are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/9882658}{Carniel, A. C.; Galdino, F.; Schneider, M. Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models. In Proceedings of the 2022 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2022), pp. 1-8, 2022.}
+\item \href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
+}
 }

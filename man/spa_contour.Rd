@@ -2,28 +2,29 @@
 % Please edit documentation in R/general_operations.R
 \name{spa_contour}
 \alias{spa_contour}
-\title{Capturing the frontier of a plateau region object}
+\title{Capture the frontier of a plateau region object}
 \usage{
 spa_contour(pregion)
 }
 \arguments{
-\item{pregion}{A \code{pgeometry} object of the type \code{PLATEAUREGION}. It throws an error if a different type is given.}
+\item{pregion}{A \code{pregion} object. It throws an error if a different type is given.}
 }
 \value{
-A \code{pgeometry} object of the type \code{PLATEAULINE} that represents the contour (i.e. frontier) of a plateau region object given as input.
+A \code{pline} object that represents the contour (i.e. frontier) of a plateau region object given as input.
 }
 \description{
-This function extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
+\code{spa_contour()} extracts the frontier (i.e., linear boundary) of a plateau region object by maintaining its membership degrees.
 }
 \details{
-It employs the definition of \emph{fuzzy frontier} of a fuzzy region object in the context of spatial plateau algebra (as defined in the references).
+The \code{spa_contour()} function implements the definition of \emph{fuzzy frontier} of a fuzzy region object in the context of Spatial Plateau Algebra.
 The \emph{fuzzy frontier} of a fuzzy region object \code{A} collects all single points of \code{A}, preserving its membership degrees, that are not in the interior of its support.
 
-IMPORTANT NOTE: Fuzzy frontier is different from fuzzy boundary (see \code{spa_boundary_region}).
+Note that fuzzy frontier is different from fuzzy boundary (see \code{spa_boundary()}).
 }
 \examples{
 library(tibble)
 library(sf)
+library(ggplot2)
 
 # defining two different types of membership functions
 trap_mf <- function(a, b, c, d) {
@@ -32,39 +33,32 @@ trap_mf <- function(a, b, c, d) {
   }
 }
 
-trim_mf <- function(a, b, c) {
-  function(x) {
-    pmax(pmin((x - a)/(b - a), (c - x)/(c - b), na.rm = TRUE), 0)
-  }
-}
+set.seed(7)
+tbl = tibble(x = runif(20, min = 0, max = 30), 
+             y = runif(20, min = 0, max = 50), 
+             z = runif(20, min = 0, max = 100))
+classes <- c("cold", "hot")
+cold_mf <- trap_mf(0, 10, 20, 35)
+hot_mf <- trap_mf(20, 50, 100, 100)
 
-set.seed(123)
-
-# some random points to create pgeometry objects by using the function spa_creator
-tbl = tibble(x = runif(10, min= 0, max = 30), 
-             y = runif(10, min = 0, max = 50), 
-             z = runif(10, min = 0, max = 100))
-
-classes <- c("category-1", "category-2")
-mf1 <- trap_mf(0, 5, 20, 35)
-mf2 <- trim_mf(35, 80, 100)
-
-#getting the convex hull on the points to clipping the construction of plateau region objects
+# Getting the convex hull on the points to clip plateau region objects during their constructions
 pts <- st_as_sf(tbl, coords = c(1, 2))
 ch <- st_convex_hull(do.call(c, st_geometry(pts)))
 
-pregions <- spa_creator(tbl, classes = classes, mfs = c(mf1, mf2), base_poly = ch)
-
+# Using the standard fuzzification policy based on fuzzy sets
+pregions <- spa_creator(tbl, classes = classes, mfs = c(cold_mf, hot_mf), base_poly = ch)
+pregions
+\dontrun{
+plot(pregions$pgeometry[[1]]) + ggtitle("Cold")
+plot(pregions$pgeometry[[2]]) + ggtitle("Hot")
+}
 # capturing and showing the frontier of each pgeometry object previously created
-frontier_pregion1 <- spa_contour(pregions$pgeometry[[1]]) 
-frontier_pregion2 <- spa_contour(pregions$pgeometry[[2]])
-
-plot(pregions$pgeometry[[1]])
-plot(frontier_pregion1)
-
-plot(pregions$pgeometry[[2]])
-plot(frontier_pregion2)
-
+cold_contour <- spa_contour(pregions$pgeometry[[1]])
+hot_contour <- spa_contour(pregions$pgeometry[[2]])
+\dontrun{
+plot(cold_contour) + ggtitle("Frontier (Cold)")
+plot(hot_contour) + ggtitle("Frontier (Hot)")
+}
 }
 \references{
 \itemize{

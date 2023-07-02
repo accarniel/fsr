@@ -2,12 +2,12 @@
 % Please edit documentation in R/fsi_module.R
 \name{fsi_add_fsa}
 \alias{fsi_add_fsa}
-\title{Adding an antecedent to an FSI model}
+\title{Add an antecedent to an FSI model}
 \usage{
 fsi_add_fsa(fsi, lvar, tbl)
 }
 \arguments{
-\item{fsi}{The FSI model instantiated with the \code{fsi_create} function.}
+\item{fsi}{The FSI model instantiated with the \code{fsi_create()} function.}
 
 \item{lvar}{A character value that represents a linguistic variable of the antecedent.}
 
@@ -17,13 +17,13 @@ fsi_add_fsa(fsi, lvar, tbl)
 An FSI model populated with a fuzzy spatial antecedent.
 }
 \description{
-This function adds a fuzzy spatial antecedent to a fuzzy spatial inference (FSI) model.
-A fuzzy spatial antecedent corresponds to a layer of fuzzy spatial objects that describe the different characteristics of the problem.
+\code{fsi_add_fsa()} adds a fuzzy spatial antecedent to a fuzzy spatial inference (FSI) model.
+A fuzzy spatial antecedent corresponds to a layer of fuzzy spatial objects (i.e., spatial plateau objects) that describe the different characteristics of the problem.
 The antecedent has a linguistic variable and its fuzzy spatial objects have linguistic values so that they are used in the IF part of fuzzy rules.
 }
 \details{
-The fuzzy spatial antecedent added by the \code{fsi_add_fsa} function is composed of a linguistic variable and its corresponding \code{pgeometry} objects annotated by linguistic values.
-The format of the \code{tbl} parameter is the same as the output of the function \code{spa_creator}, allowing the user to directly provides plateau region objects as input when designing FSI models.
+The \code{fsi_add_fsa()} function adds a fuzzy spatial antecedent composed of a linguistic variable and its corresponding \code{pgeometry} objects annotated by linguistic values.
+The format of \code{tbl} is the same as the output of the function \code{spa_creator()}, allowing users to directly provide plateau region objects as input when designing FSI models.
 }
 \examples{
 library(tibble)
@@ -40,27 +40,32 @@ trim_mf <- function(a, b, c) {
   }
 }
 
-# Create spatial plateau objects for the linguistic variable accomodation_price
+# Creating spatial plateau objects for the linguistic variable "accommodation price"
 lvals_accom_price <- c("cut-rate", "affordable", "expensive")
 cut_rate_mf <- trap_mf(0, 0, 10, 48)
 affordable_mf <- trap_mf(10, 48, 80, 115)
 expensive_mf <- trap_mf(80, 115, 10000, 10000)
 
-# Example of dataset
-accom_price <- tibble(
-                      `longitude` = c(-74.0, -74.0, -74.0), 
-                      `latitude` = c(40.8, 40.7, 40.7),
-                      `price` = c(150, 76, 60)
-)
+# Example of point dataset
+accom_price <- tibble(longitude = c(-74.0, -74.0, -74.0), 
+                      latitude = c(40.8, 40.75, 40.7),
+                      price = c(150, 76, 60))
  
 accom_price_layer <- spa_creator(accom_price, classes = lvals_accom_price, 
                          mfs = c(cut_rate_mf, affordable_mf, expensive_mf))
                          
-# Create the fsi_model:
+# Creating the FSI model
 fsi <- fsi_create("To visit or not to visit, that is the question", 
                   default_conseq = trim_mf(10, 30, 60))
 
-# Add the fuzzy spatial antecedent to the fsi_model:
-fsi <- fsi_add_fsa(fsi, "accommodation price", accom_price_layer)
+# Adding the fuzzy spatial antecedent to the FSI model
+fsi <- fsi_add_fsa(fsi, "accommodation price", accom_price_layer) 
+}
+\references{
+\href{https://doi.org/10.1145/3474717.3484255}{Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.}
 
+Underlying concepts and formal definitions of FSI models are introduced in:
+\itemize{
+\item \href{https://ieeexplore.ieee.org/document/8015707}{Carniel, A. C.; Schneider, M. Fuzzy inference on fuzzy spatial objects (FIFUS) for spatial decision support systems. In Proceedings of the 2017 IEEE International Conference on Fuzzy Systems (FUZZ-IEEE 2017), pp. 1-6, 2017.}
+}
 }
