@@ -1,0 +1,79 @@
+addmf                   Insert a membership function.
+addrule                 Inserts a rule
+addvar                  Insert a variable
+anfis.L1.eval           The evaluator for nodes in Layer 1
+anfis.L2.eval           The evaluator for nodes in Layer 2
+anfis.L2.which          L2.which
+anfis.L3.eval           The evaluator for nodes in Layer 3
+anfis.L4.eval           The evaluator for nodes in Layer 4
+anfis.L4.mf.eval        The evaluator for membership functions of nodes
+                        in Layer 1
+anfis.L5.eval           The evaluator for nodes in Layer 5
+anfis.LI.eval           The evaluator for nodes in Layer I
+anfis.builder           ANFIS model builder
+anfis.dE.dO1            anfis.dE.dO1
+anfis.dE.dO2            anfis.dE.dO2
+anfis.dE.dO3            anfis.dE.dO3
+anfis.dE.dO4            anfis.dE.dO4
+anfis.dE.dO5            anfis.dE.dO5
+anfis.dE.dP1            anfis.dE.dP1
+anfis.dE.dP1.gbellmf    anfis.dE.dP1.gbellmf
+anfis.dE.dP1.it2gbellmf
+                        anfis.dE.dP1.it2gbellmf
+anfis.dE.dP4            anfis.dE.dP4
+anfis.dMF.dP.gbellmf    anfis.dMF.dP.gbellmf
+anfis.dO2.dO1           anfis.dO2.dO1
+anfis.dO3.dO2           anfis.dO3.dO2
+anfis.dO4.dO3           anfis.dO4.dO3
+anfis.dO5.dO4           anfis.dO5.dO4
+anfis.eval              ANFIS evaluator
+anfis.optimise          ANFIS optimiser
+anfis.plotmf            Plot membership functions for an ANFIS object
+anfis.tipper            Produces an example fis object which can be
+                        used for ANFIS.
+cmp.firing              Plot firing strength with different inference
+                        method
+convertfis              Convert a fis
+defuzz                  Defuzzify a set of values.
+evalfis                 Evaluate a Fuzzy Inference System (fis)
+evalmf                  Evaluate fuzzy membership function
+evalmftype              Evaluate fuzzy membership function with
+                        membership function type and parameters
+fis.builder             TSK FIS builder
+fuzzy.firing            Fuzzy rule firing
+fuzzy.optimise          Fuzzy optimisation
+fuzzy.t                 Fuzzy t-norm/t-conorm operation
+fuzzy.tconorm           Fuzzy t-conorm
+fuzzy.tnorm             Fuzzy tnorm
+fuzzyr.accuracy         Fuzzy Accuracy
+fuzzyr.match.fun        fuzzyr.match.fun
+gbell.fuzzification     Generalised bell fuzzification
+gbellmf                 Generalised bell membership function
+genmf                   Fuzzy membership function generator
+gensurf                 Produce a graphical evaluated fuzzy inference
+                        system.
+it2tipper               Produces an example it2fis object for
+                        Waiter-Tipping.
+km.da                   km.da
+linearmf                Linear membership function
+newfis                  Create a fis using newfis function
+plotmf                  Plots a 2D graph of all membership functions in
+                        a variable.
+readfis                 Read a fis object from a .fis file.
+showGUI                 Show a Graphic User Interface of fis object
+showfis                 Show a fis object.
+showrule                Showing rule from fis object
+singleton.fuzzification
+                        Singleton Fuzzification
+singletonmf             Singleton membership function
+tipper                  Produces an example fis object for
+                        Waiter-Tipping.
+tipper.ns               Produces an example non-singleton fis object
+                        for Waiter-Tipping.
+tipper.tsk              Produces an example fis object (TSK type),
+                        which can also be optimised by ANFIS.
+tipperGUI               Graphic User Interface for Waiter-Tipping
+tipperGUI2              Graphic User Interface for Waiter-Tipping
+                        (another style)
+writefis                Write a fis object to a .fis file.
+x.fuzzification         Fuzzification

@@ -1,0 +1,15 @@
+Package: pso
+Version: 1.0.4
+Date: 2022-04-12
+Title: Particle Swarm Optimization
+Author: Claus Bendtsen <papyrus.bendtsen@gmail.com>.
+Maintainer: Claus Bendtsen <papyrus.bendtsen@gmail.com>
+Depends: R (>= 2.10.0), methods
+Suggests: numDeriv, stats
+Description: Provides an implementation of particle swarm optimisation consistent with the standard PSO 2007/2011 by Maurice Clerc. Additionally a number of ancillary routines are provided for easy testing and graphics.
+License: LGPL-3
+NeedsCompilation: no
+Packaged: 2022-04-12 12:56:40 UTC; kwzm106
+Repository: CRAN
+Date/Publication: 2022-04-12 16:10:06 UTC
+Built: R 4.1.3; ; 2023-07-03 21:41:12 UTC; unix

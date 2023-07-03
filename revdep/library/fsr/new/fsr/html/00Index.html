@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: Handling Fuzzy Spatial Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+<h1> Handling Fuzzy Spatial Data
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;fsr&rsquo; version 1.0.2.9000</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="fsr_eval_modes.html">alpha_eval</a></td>
+<td>Evaluate a membership degree</td></tr>
+<tr><td style="width: 25%;"><a href="PWKT.html">as.character-method</a></td>
+<td>Return PWKT representation of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="as_tibble.pgeometry.html">as.data.frame.pgeometry</a></td>
+<td>Convert a 'pgeometry' object into tabular data ('data.frame' or 'tibble')</td></tr>
+<tr><td style="width: 25%;"><a href="as_tibble.pgeometry.html">as_tibble.pgeometry</a></td>
+<td>Convert a 'pgeometry' object into tabular data ('data.frame' or 'tibble')</td></tr>
+<tr><td style="width: 25%;"><a href="component-class.html">component-class</a></td>
+<td>An S4 Class for representing a component of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_components.html">component_from_sfg</a></td>
+<td>Create a component</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_components.html">create_component</a></td>
+<td>Create a component</td></tr>
+<tr><td style="width: 25%;"><a href="create_empty_pgeometry.html">create_empty_pgeometry</a></td>
+<td>Create an empty 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="create_pgeometry.html">create_pgeometry</a></td>
+<td>Create a 'pgeometry' object with components</td></tr>
+<tr><td style="width: 25%;"><a href="PWKT.html">format.pgeometry</a></td>
+<td>Return PWKT representation of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="fsi_add_cs.html">fsi_add_cs</a></td>
+<td>Add the consequent to an FSI model</td></tr>
+<tr><td style="width: 25%;"><a href="fsi_add_fsa.html">fsi_add_fsa</a></td>
+<td>Add an antecedent to an FSI model</td></tr>
+<tr><td style="width: 25%;"><a href="fsi_add_rules.html">fsi_add_rules</a></td>
+<td>Add fuzzy rules to an FSI model</td></tr>
+<tr><td style="width: 25%;"><a href="fsi_create.html">fsi_create</a></td>
+<td>Create an empty fuzzy spatial inference model</td></tr>
+<tr><td style="width: 25%;"><a href="fsi_eval.html">fsi_eval</a></td>
+<td>Evaluate a point inference query</td></tr>
+<tr><td style="width: 25%;"><a href="fsi_qw_eval.html">fsi_qw_eval</a></td>
+<td>Evaluate region inference methods</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_components.html">fsr_components</a></td>
+<td>Create a component</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_diff_operators.html">fsr_diff_operators</a></td>
+<td>Compute fuzzy difference operators</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_eval_modes.html">fsr_eval_modes</a></td>
+<td>Evaluate a membership degree</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_filter_operations.html">fsr_filter_operations</a></td>
+<td>Return a crisp spatial object formed by geometric parts of a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_geometric_operations.html">fsr_geometric_operations</a></td>
+<td>Compute fuzzy geometric set operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_numerical_operations.html">fsr_numerical_operations</a></td>
+<td>Compute fuzzy numerical operations</td></tr>
+<tr><td style="width: 25%;"><a href="plot.html">fsr_plot</a></td>
+<td>Graphically visualize 'pgeometry' objects</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">fsr_topological_relationships</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_diff_operators.html">f_abs_diff</a></td>
+<td>Compute fuzzy difference operators</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_diff_operators.html">f_bound_diff</a></td>
+<td>Compute fuzzy difference operators</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_diff_operators.html">f_diff</a></td>
+<td>Compute fuzzy difference operators</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_diff_operators.html">f_symm_diff</a></td>
+<td>Compute fuzzy difference operators</td></tr>
+<tr><td style="width: 25%;"><a href="pcollection-class.html">pcollection-class</a></td>
+<td>An S4 Class for representing plateau collections (subclass of 'pgeometry')</td></tr>
+<tr><td style="width: 25%;"><a href="pcollection_to_pcomposition.html">pcollection_to_pcomposition</a></td>
+<td>Convert a plateau collection object into a plateau composition object</td></tr>
+<tr><td style="width: 25%;"><a href="pcomposition-class.html">pcomposition-class</a></td>
+<td>An S4 Class for representing plateau compositions (subclass of 'pgeometry')</td></tr>
+<tr><td style="width: 25%;"><a href="pgeometry-class.html">pgeometry-class</a></td>
+<td>An S4 Class for representing spatial plateau data types</td></tr>
+<tr><td style="width: 25%;"><a href="pline-class.html">pline-class</a></td>
+<td>An S4 Class for representing plateau lines (subclass of 'pgeometry')</td></tr>
+<tr><td style="width: 25%;"><a href="plot.html">plot</a></td>
+<td>Graphically visualize 'pgeometry' objects</td></tr>
+<tr><td style="width: 25%;"><a href="plot.html">plot-method</a></td>
+<td>Graphically visualize 'pgeometry' objects</td></tr>
+<tr><td style="width: 25%;"><a href="ppoint-class.html">ppoint-class</a></td>
+<td>An S4 Class for representing plateau points (subclass of 'pgeometry')</td></tr>
+<tr><td style="width: 25%;"><a href="pregion-class.html">pregion-class</a></td>
+<td>An S4 Class for representing plateau regions (subclass of 'pgeometry')</td></tr>
+<tr><td style="width: 25%;"><a href="PWKT.html">PWKT</a></td>
+<td>Return PWKT representation of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="PWKT.html">show-method</a></td>
+<td>Return PWKT representation of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_eval_modes.html">soft_alpha_eval</a></td>
+<td>Evaluate a membership degree</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_eval_modes.html">soft_eval</a></td>
+<td>Evaluate a membership degree</td></tr>
+<tr><td style="width: 25%;"><a href="spa_add_component.html">spa_add_component</a></td>
+<td>Add components to a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_filter_operations.html">spa_alpha_cut</a></td>
+<td>Return a crisp spatial object formed by geometric parts of a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_numerical_operations.html">spa_area</a></td>
+<td>Compute fuzzy numerical operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_numerical_operations.html">spa_avg_degree</a></td>
+<td>Compute fuzzy numerical operations</td></tr>
+<tr><td style="width: 25%;"><a href="spa_boundary.html">spa_boundary</a></td>
+<td>Capture the fuzzy boundary of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_boundary_pregion.html">spa_boundary_pregion</a></td>
+<td>Capture the fuzzy boundary of a plateau region object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_geometric_operations.html">spa_common_points</a></td>
+<td>Compute fuzzy geometric set operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">spa_contains</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="spa_contour.html">spa_contour</a></td>
+<td>Capture the frontier of a plateau region object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_core.html">spa_core</a></td>
+<td>Get the core of a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_creator.html">spa_creator</a></td>
+<td>Build 'pgeometry' objects from a point dataset</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_geometric_operations.html">spa_difference</a></td>
+<td>Compute fuzzy geometric set operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">spa_disjoint</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">spa_equal</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="spa_eval.html">spa_eval</a></td>
+<td>Evaluate the membership degree of a point in a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_exact_equal.html">spa_exact_equal</a></td>
+<td>Check two spatial plateau objects for exact equality</td></tr>
+<tr><td style="width: 25%;"><a href="spa_exact_inside.html">spa_exact_inside</a></td>
+<td>Check two spatial plateau objects for exact containment</td></tr>
+<tr><td style="width: 25%;"><a href="spa_flatten.html">spa_flatten</a></td>
+<td>Flatten a plateau collection object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_get_type.html">spa_get_type</a></td>
+<td>Get the type of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">spa_inside</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_geometric_operations.html">spa_intersection</a></td>
+<td>Compute fuzzy geometric set operations</td></tr>
+<tr><td style="width: 25%;"><a href="spa_is_empty.html">spa_is_empty</a></td>
+<td>Check if a 'pgeometry' object is empty</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_numerical_operations.html">spa_length</a></td>
+<td>Compute fuzzy numerical operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">spa_meet</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_numerical_operations.html">spa_ncomp</a></td>
+<td>Compute fuzzy numerical operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_topological_relationships.html">spa_overlap</a></td>
+<td>Compute fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_numerical_operations.html">spa_perimeter</a></td>
+<td>Compute fuzzy numerical operations</td></tr>
+<tr><td style="width: 25%;"><a href="PWKT.html">spa_pwkt</a></td>
+<td>Return PWKT representation of a spatial plateau object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_filter_operations.html">spa_range</a></td>
+<td>Return a crisp spatial object formed by geometric parts of a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_set_classification.html">spa_set_classification</a></td>
+<td>Set a new classification for fuzzy topological relationships</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_filter_operations.html">spa_strict_alpha_cut</a></td>
+<td>Return a crisp spatial object formed by geometric parts of a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="spa_support.html">spa_support</a></td>
+<td>Get the support of a 'pgeometry' object</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_geometric_operations.html">spa_union</a></td>
+<td>Compute fuzzy geometric set operations</td></tr>
+<tr><td style="width: 25%;"><a href="fsr_eval_modes.html">strict_eval</a></td>
+<td>Evaluate a membership degree</td></tr>
+<tr><td style="width: 25%;"><a href="visitation.html">visitation</a></td>
+<td>Visitation: An example of FSI model</td></tr>
+</table>
+</div></body></html>

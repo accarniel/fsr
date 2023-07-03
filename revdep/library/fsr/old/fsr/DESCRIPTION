@@ -1,0 +1,38 @@
+Package: fsr
+Type: Package
+Title: Handling Fuzzy Spatial Data
+Version: 1.0.2
+Authors@R: c(
+    person("Anderson", "Carniel", email = "accarniel@ufscar.br", role = c("rth", "aut", "cre"), comment = c(ORCID = "0000-0002-8297-9894")),
+    person("Felippe", "Galdino", email = "ocfgaldino@gmail.com", role = c("rtm", "aut"), , comment = c(ORCID = "0000-0003-2594-9733")),
+    person("Juliana", "Philippsen", email = "striederjp@gmail.com", role = c("rtm", "aut")),
+    person("Markus", "Schneider", email = "mschneid@cise.ufl.edu", role = c("rth")))
+URL: https://accarniel.github.io/fsr/, https://github.com/accarniel/fsr
+BugReports: https://github.com/accarniel/fsr/issues
+Depends: R (>= 3.6.0)
+Imports: rlang (>= 0.4.11), methods (>= 2.0.0), sf (>= 0.9.4), FuzzyR
+        (>= 2.3.0), dplyr (>= 1.0.6), ggplot2 (>= 3.3.5), stringr (>=
+        1.4.0), tibble (>= 3.0.1), pso (>= 1.0.3), e1071 (>= 1.7.3),
+        utils (>= 3.6.3), lwgeom (>= 0.2.6)
+Description: Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
+    It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
+    It implements underlying concepts defined in the following research papers: 
+    (i) "Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types" <doi:10.1109/FUZZ-IEEE.2018.8491565>; 
+    (ii) "A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets" <doi:10.1109/FUZZ-IEEE.2019.8858878>; 
+    (iii) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" <doi:10.1109/FUZZ-IEEE.2017.8015707>.
+License: GPL-3
+RoxygenNote: 7.2.0
+NeedsCompilation: no
+Encoding: UTF-8
+Collate: 'fsr_base.R' 'builder_functions.R' 'fsi_functions.R'
+        'utility_functions.R' 'spa_functions.R'
+Packaged: 2022-07-05 02:14:05 UTC; anderson
+Author: Anderson Carniel [rth, aut, cre]
+    (<https://orcid.org/0000-0002-8297-9894>),
+  Felippe Galdino [rtm, aut] (<https://orcid.org/0000-0003-2594-9733>),
+  Juliana Philippsen [rtm, aut],
+  Markus Schneider [rth]
+Maintainer: Anderson Carniel <accarniel@ufscar.br>
+Repository: CRAN
+Date/Publication: 2022-07-05 02:50:02 UTC
+Built: R 4.1.3; ; 2023-07-03 21:53:35 UTC; unix
