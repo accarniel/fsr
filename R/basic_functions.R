@@ -313,7 +313,6 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
 #' 
 #' @examples
-#' \dontrun{
 #' library(sf)
 #' 
 #' pts <- rbind(c(0, 2), c(4, 2))
@@ -349,7 +348,7 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' plot(pr)
 #' plot(pcm)
 #' plot(pcl)
-#' 
+#' \dontrun{
 #' # Custom colors
 #' fsr_plot(pr, low = "green", high = "blue")
 #' 
@@ -510,7 +509,7 @@ setMethod("plot", signature(x = "pgeometry", y = "missing"), function(x, y, ...)
 #'
 #' @references
 #' 
-#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](\doi{10.1111/tgis.13044})
 #' 
 #' @examples
 #' # first way: providing sfg objects

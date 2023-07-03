@@ -646,7 +646,6 @@ spa_strict_alpha_cut <- function(pgo, alpha) {
 #' (spa_boundary_pregion(pregions$pgeometry[[1]], bound_part = "line")) 
 #' (spa_boundary_pregion(pregions$pgeometry[[2]], bound_part = "line"))
 #' # this part of the boundary is empty because there is no core! 
-#' 
 #' # capturing and showing the boundary plateau region (this is the default behavior)
 #' (spa_boundary_pregion(pregions$pgeometry[[1]]))
 #' (spa_boundary_pregion(pregions$pgeometry[[2]]))

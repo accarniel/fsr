@@ -842,7 +842,7 @@ spa_common_points <- function(pline1, pline2, itype = "min"){
 #' The following fuzzy difference operators are available:
 #' - `f_diff()`: The standard _fuzzy set difference_ operator defined as the intersection of `x` and the complement of `y`, that is, `min(x, 1 - y)`.
 #' - `f_bound_diff()`: The _fuzzy bounded difference_ operator defined as `x` minus `y` with upper bound equal to 0, that is, `max(0, x - y)`.
-#' - `f_symm_diff()`: The _fuzzy symmetric difference_ operator defined as the union Defineof the difference of `x` and `y` and the difference of `y` and `x`, that is, `max(f_diff(x, y), f_diff(y, x))`.
+#' - `f_symm_diff()`: The _fuzzy symmetric difference_ operator defined as the union of the difference of `x` and `y` and the difference of `y` and `x`, that is, `max(f_diff(x, y), f_diff(y, x))`.
 #' - `f_abs_diff()`: The _fuzzy absolute difference_ operator defined as the absolute difference of `x` and `y`, that is, `abs(x - y)`.
 #' 
 #' The name of these functions can be used in the parameter `dtype` of the `spa_difference()` function.

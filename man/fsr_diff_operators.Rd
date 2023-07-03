@@ -35,7 +35,7 @@ The following fuzzy difference operators are available:
 \itemize{
 \item \code{f_diff()}: The standard \emph{fuzzy set difference} operator defined as the intersection of \code{x} and the complement of \code{y}, that is, \code{min(x, 1 - y)}.
 \item \code{f_bound_diff()}: The \emph{fuzzy bounded difference} operator defined as \code{x} minus \code{y} with upper bound equal to 0, that is, \code{max(0, x - y)}.
-\item \code{f_symm_diff()}: The \emph{fuzzy symmetric difference} operator defined as the union Defineof the difference of \code{x} and \code{y} and the difference of \code{y} and \code{x}, that is, \code{max(f_diff(x, y), f_diff(y, x))}.
+\item \code{f_symm_diff()}: The \emph{fuzzy symmetric difference} operator defined as the union of the difference of \code{x} and \code{y} and the difference of \code{y} and \code{x}, that is, \code{max(f_diff(x, y), f_diff(y, x))}.
 \item \code{f_abs_diff()}: The \emph{fuzzy absolute difference} operator defined as the absolute difference of \code{x} and \code{y}, that is, \code{abs(x - y)}.
 }
 

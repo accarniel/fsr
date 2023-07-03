@@ -56,7 +56,6 @@ can also be included in the visualization if the parameter \code{add_base_poly} 
 Since the returned value is a \code{ggplot} object, it can be further be customized (see examples below).
 }
 \examples{
-\dontrun{
 library(sf)
 
 pts <- rbind(c(0, 2), c(4, 2))
@@ -92,7 +91,7 @@ plot(pl)
 plot(pr)
 plot(pcm)
 plot(pcl)
-
+\dontrun{
 # Custom colors
 fsr_plot(pr, low = "green", high = "blue")
 

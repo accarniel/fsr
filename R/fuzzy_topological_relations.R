@@ -563,7 +563,7 @@ pkg_env$ftopological_mfs <- c(trap_mf(0, 0, 0.03, 0.08),
 #' 
 #' # Showing results for spa_overlap() by considering default list of classes
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
-#'
+#' }
 #' # Changing the default classification 
 #' trap_mf <- function(a, b, c, d) {
 #'   function(x) {
@@ -577,7 +577,7 @@ pkg_env$ftopological_mfs <- c(trap_mf(0, 0, 0.03, 0.08),
 #' completely <- trap_mf(0.6, 0.8, 1, 1)
 #' 
 #' spa_set_classification(classes, c(superficially, moderately, completely))
-#' 
+#' \dontrun{
 #' # Now the fuzzy topological relationships will use the new classification
 #' spa_overlap(pregions$pgeometry[[1]], pregions$pgeometry[[2]], ret = "list")
 #' }
