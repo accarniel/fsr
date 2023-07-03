@@ -62,5 +62,5 @@ spa_strict_alpha_cut(ppoint, 0.7)
 spa_range(ppoint, 0.4, 0.8)
 }
 \references{
-\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+\href{https://onlinelibrary.wiley.com/doi/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
 }

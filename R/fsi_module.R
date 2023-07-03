@@ -33,7 +33,7 @@
 #'
 #' @references 
 #' 
-#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and formal definitions of FSI models are introduced in:
 #' 
@@ -85,7 +85,7 @@ fsi_create <- function(name, and_method = "min",
 #' 
 #' @references 
 #' 
-#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and formal definitions of FSI models are introduced in:
 #' 
@@ -169,7 +169,7 @@ fsi_add_fsa <- function(fsi, lvar, tbl) {
 #' 
 #' @references 
 #' 
-#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and formal definitions of FSI models are introduced in:
 #' 
@@ -315,7 +315,7 @@ get_consequent <- function(user_rule) {
 #' 
 #' @references 
 #' 
-#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and formal definitions of FSI models are introduced in:
 #' 
@@ -397,7 +397,7 @@ fsi_add_rules <- function(fsi, rules, weights = rep(1, length(rules))) {
 #' 
 #' @references
 #' 
-#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and definitions on the evaluation of point inference queries are introduced in:
 #' 
@@ -728,7 +728,7 @@ fsi_qwi_pso <- function(fsi, qw, target_mf, max_depth = 2, maxit = 50, populatio
 #' 
 #' @references
 #' 
-#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and definitions on the evaluation of region inference methods are explained in:
 #' 
@@ -861,7 +861,7 @@ fsi_qw_eval <- function(fsi, qw, approach = "discretization", ...) {
 #' 
 #' This function is based on the running example introduced in:
 #' 
-#' - [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://doi.org/10.1145/3474717.3484255)
+#' - [Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (AM SIGSPATIAL 2021), pp. 526-535, 2021.](https://dl.acm.org/doi/10.1145/3474717.3484255)
 #' 
 #' Underlying concepts and formal definitions of FIFUS are discussed in:
 #' 

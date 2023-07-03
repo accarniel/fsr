@@ -65,7 +65,7 @@ plot(boundary_hot) + ggtitle("Boundary (Hot)")
 }
 }
 \references{
-\href{https://doi.org/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
+\href{https://onlinelibrary.wiley.com/doi/10.1111/tgis.13044}{Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.}
 
 Concepts and formal definitions of fuzzy boundary are introduced in:
 \itemize{

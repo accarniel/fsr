@@ -84,7 +84,7 @@ is_pgeometry <- function(type) {
 #' 
 #' The formal definition of PWKT is given in:
 #' 
-#' - [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' - [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://onlinelibrary.wiley.com/doi/10.1111/tgis.13044)
 #' 
 #' Underlying concepts and formal definitions of spatial plateau data types are explained in detail in:
 #' 
@@ -310,7 +310,7 @@ as.data.frame.pgeometry <- function(x, ...) {
 #' 
 #' @references
 #' 
-#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://onlinelibrary.wiley.com/doi/10.1111/tgis.13044)
 #' 
 #' @examples
 #' library(sf)
@@ -509,7 +509,7 @@ setMethod("plot", signature(x = "pgeometry", y = "missing"), function(x, y, ...)
 #'
 #' @references
 #' 
-#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](\doi{10.1111/tgis.13044})
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://onlinelibrary.wiley.com/doi/10.1111/tgis.13044)
 #' 
 #' @examples
 #' # first way: providing sfg objects
@@ -732,7 +732,7 @@ create_empty_pgeometry <- function(type) {
 #' 
 #' @references
 #' 
-#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://doi.org/10.1111/tgis.13044)
+#' [Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.](https://onlinelibrary.wiley.com/doi/10.1111/tgis.13044)
 #' 
 #' Underlying concepts and formal definitions of spatial plateau data types are explained in detail in:
 #' 
