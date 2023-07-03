@@ -1,5 +1,5 @@
 package,old,new,delta
-fsr,1.0.2,1.0.2.9000,*
+fsr,1.0.2,2.0.0,*
 base64enc,0.1-3,NA,*
 bslib,0.5.0,NA,*
 cachem,1.0.8,NA,*
