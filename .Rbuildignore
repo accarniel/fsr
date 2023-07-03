@@ -1,0 +1,13 @@
+.gitignore
+LICENSE.md
+cran-comments.md
+^CRAN-RELEASE$
+.RData
+^revdep$
+^\.github$
+^CRAN-SUBMISSION$
+^.*\.Rproj$
+^\.Rproj\.user$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
