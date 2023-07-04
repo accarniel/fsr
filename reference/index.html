@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fsr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,12 +58,12 @@
           
           <code><a href="PWKT.html">spa_pwkt()</a></code> <code><a href="PWKT.html">format(<i>&lt;pgeometry&gt;</i>)</a></code> <code><a href="PWKT.html">show(<i>&lt;pgeometry&gt;</i>)</a></code> <code><a href="PWKT.html">as.character(<i>&lt;pgeometry&gt;</i>)</a></code> 
         </dt>
-        <dd>The PWKT of a spatial plateau object</dd>
+        <dd>Return PWKT representation of a spatial plateau object</dd>
       </dl><dl><dt>
           
-          <code><a href="as_tibble.pgeometry.html">as.data.frame(<i>&lt;pgeometry&gt;</i>)</a></code> <code><a href="as_tibble.pgeometry.html">as_tibble(<i>&lt;pgeometry&gt;</i>)</a></code> 
+          <code><a href="as_tibble.pgeometry.html">as_tibble(<i>&lt;pgeometry&gt;</i>)</a></code> <code><a href="as_tibble.pgeometry.html">as.data.frame(<i>&lt;pgeometry&gt;</i>)</a></code> 
         </dt>
-        <dd>Converting a <code>pgeometry</code> object into tabular data</dd>
+        <dd>Convert a <code>pgeometry</code> object into tabular data (<code>data.frame</code> or <code>tibble</code>)</dd>
       </dl><dl><dt>
           
           <code><a href="component-class.html">component-class</a></code> 
@@ -73,137 +73,187 @@
           
           <code><a href="create_empty_pgeometry.html">create_empty_pgeometry()</a></code> 
         </dt>
-        <dd>Creation of an empty <code>pgeometry</code> object</dd>
+        <dd>Create an empty <code>pgeometry</code> object</dd>
       </dl><dl><dt>
           
           <code><a href="create_pgeometry.html">create_pgeometry()</a></code> 
         </dt>
-        <dd>Creation of a <code>pgeometry</code> object with components</dd>
+        <dd>Create a <code>pgeometry</code> object with components</dd>
       </dl><dl><dt>
           
           <code><a href="fsi_add_cs.html">fsi_add_cs()</a></code> 
         </dt>
-        <dd>Adding the consequent to an FSI model</dd>
+        <dd>Add the consequent to an FSI model</dd>
       </dl><dl><dt>
           
           <code><a href="fsi_add_fsa.html">fsi_add_fsa()</a></code> 
         </dt>
-        <dd>Adding an antecedent to an FSI model</dd>
+        <dd>Add an antecedent to an FSI model</dd>
       </dl><dl><dt>
           
           <code><a href="fsi_add_rules.html">fsi_add_rules()</a></code> 
         </dt>
-        <dd>Adding fuzzy rules to an FSI model</dd>
+        <dd>Add fuzzy rules to an FSI model</dd>
       </dl><dl><dt>
           
           <code><a href="fsi_create.html">fsi_create()</a></code> 
         </dt>
-        <dd>Creation of an empty fuzzy spatial inference model</dd>
+        <dd>Create an empty fuzzy spatial inference model</dd>
       </dl><dl><dt>
           
           <code><a href="fsi_eval.html">fsi_eval()</a></code> 
         </dt>
-        <dd>Evaluating an FSI model for a given point location</dd>
+        <dd>Evaluate a point inference query</dd>
       </dl><dl><dt>
           
           <code><a href="fsi_qw_eval.html">fsi_qw_eval()</a></code> 
         </dt>
-        <dd>Evaluating a query window inference</dd>
+        <dd>Evaluate region inference methods</dd>
       </dl><dl><dt>
           
           <code><a href="fsr_components.html">create_component()</a></code> <code><a href="fsr_components.html">component_from_sfg()</a></code> 
         </dt>
-        <dd>Creation of a component</dd>
+        <dd>Create a component</dd>
       </dl><dl><dt>
           
           <code><a href="fsr_diff_operators.html">f_diff()</a></code> <code><a href="fsr_diff_operators.html">f_bound_diff()</a></code> <code><a href="fsr_diff_operators.html">f_symm_diff()</a></code> <code><a href="fsr_diff_operators.html">f_abs_diff()</a></code> 
         </dt>
-        <dd>Fuzzy difference operators</dd>
+        <dd>Compute fuzzy difference operators</dd>
       </dl><dl><dt>
           
           <code><a href="fsr_eval_modes.html">soft_eval()</a></code> <code><a href="fsr_eval_modes.html">strict_eval()</a></code> <code><a href="fsr_eval_modes.html">alpha_eval()</a></code> <code><a href="fsr_eval_modes.html">soft_alpha_eval()</a></code> 
         </dt>
-        <dd>Evaluation modes</dd>
+        <dd>Evaluate a membership degree</dd>
+      </dl><dl><dt>
+          
+          <code><a href="fsr_filter_operations.html">spa_range()</a></code> <code><a href="fsr_filter_operations.html">spa_alpha_cut()</a></code> <code><a href="fsr_filter_operations.html">spa_strict_alpha_cut()</a></code> 
+        </dt>
+        <dd>Return a crisp spatial object formed by geometric parts of a <code>pgeometry</code> object</dd>
       </dl><dl><dt>
           
           <code><a href="fsr_geometric_operations.html">spa_intersection()</a></code> <code><a href="fsr_geometric_operations.html">spa_union()</a></code> <code><a href="fsr_geometric_operations.html">spa_difference()</a></code> <code><a href="fsr_geometric_operations.html">spa_common_points()</a></code> 
         </dt>
-        <dd>Fuzzy geometric set operations</dd>
-      </dl><dl><dt>
-          
-          <code><a href="fsr_is_empty.html">fsr_is_empty()</a></code> 
-        </dt>
-        <dd>Checking whether a <code>pgeometry</code> object is empty</dd>
+        <dd>Compute fuzzy geometric set operations</dd>
       </dl><dl><dt>
           
           <code><a href="fsr_numerical_operations.html">spa_avg_degree()</a></code> <code><a href="fsr_numerical_operations.html">spa_ncomp()</a></code> <code><a href="fsr_numerical_operations.html">spa_area()</a></code> <code><a href="fsr_numerical_operations.html">spa_perimeter()</a></code> <code><a href="fsr_numerical_operations.html">spa_length()</a></code> 
         </dt>
-        <dd>Fuzzy numerical operations</dd>
+        <dd>Compute fuzzy numerical operations</dd>
       </dl><dl><dt>
           
           <code><a href="fsr_topological_relationships.html">spa_overlap()</a></code> <code><a href="fsr_topological_relationships.html">spa_meet()</a></code> <code><a href="fsr_topological_relationships.html">spa_disjoint()</a></code> <code><a href="fsr_topological_relationships.html">spa_equal()</a></code> <code><a href="fsr_topological_relationships.html">spa_inside()</a></code> <code><a href="fsr_topological_relationships.html">spa_contains()</a></code> 
         </dt>
-        <dd>Fuzzy topological relationships</dd>
+        <dd>Compute fuzzy topological relationships</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pcollection-class.html">pcollection-class</a></code> 
+        </dt>
+        <dd>An S4 Class for representing plateau collections (subclass of <code>pgeometry</code>)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pcollection_to_pcomposition.html">pcollection_to_pcomposition()</a></code> 
+        </dt>
+        <dd>Convert a plateau collection object into a plateau composition object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pcomposition-class.html">pcomposition-class</a></code> 
+        </dt>
+        <dd>An S4 Class for representing plateau compositions (subclass of <code>pgeometry</code>)</dd>
       </dl><dl><dt>
           
           <code><a href="pgeometry-class.html">pgeometry-class</a></code> 
         </dt>
-        <dd>An S4 Class for representing a spatial plateau object</dd>
+        <dd>An S4 Class for representing spatial plateau data types</dd>
       </dl><dl><dt>
           
-          <code><a href="plot.html">plot(<i>&lt;pgeometry&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="plot.html">fsr_plot()</a></code> 
+          <code><a href="pline-class.html">pline-class</a></code> 
         </dt>
-        <dd>Visualization of <code>pgeometry</code> objects</dd>
+        <dd>An S4 Class for representing plateau lines (subclass of <code>pgeometry</code>)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot.html">fsr_plot()</a></code> <code><a href="plot.html">plot(<i>&lt;pgeometry&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> 
+        </dt>
+        <dd>Graphically visualize <code>pgeometry</code> objects</dd>
+      </dl><dl><dt>
+          
+          <code><a href="ppoint-class.html">ppoint-class</a></code> 
+        </dt>
+        <dd>An S4 Class for representing plateau points (subclass of <code>pgeometry</code>)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pregion-class.html">pregion-class</a></code> 
+        </dt>
+        <dd>An S4 Class for representing plateau regions (subclass of <code>pgeometry</code>)</dd>
       </dl><dl><dt>
           
           <code><a href="spa_add_component.html">spa_add_component()</a></code> 
         </dt>
-        <dd>Adding components to a <code>pgeometry</code> object</dd>
+        <dd>Add components to a <code>pgeometry</code> object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="spa_boundary.html">spa_boundary()</a></code> 
+        </dt>
+        <dd>Capture the fuzzy boundary of a spatial plateau object</dd>
       </dl><dl><dt>
           
           <code><a href="spa_boundary_pregion.html">spa_boundary_pregion()</a></code> 
         </dt>
-        <dd>Capturing the fuzzy boundary of a plateau region object</dd>
+        <dd>Capture the fuzzy boundary of a plateau region object</dd>
       </dl><dl><dt>
           
           <code><a href="spa_contour.html">spa_contour()</a></code> 
         </dt>
-        <dd>Capturing the frontier of a plateau region object</dd>
+        <dd>Capture the frontier of a plateau region object</dd>
       </dl><dl><dt>
           
           <code><a href="spa_core.html">spa_core()</a></code> 
         </dt>
-        <dd>Capturing the core of a <code>pgeometry</code> object</dd>
+        <dd>Get the core of a <code>pgeometry</code> object</dd>
       </dl><dl><dt>
           
           <code><a href="spa_creator.html">spa_creator()</a></code> 
         </dt>
-        <dd>Building <code>pgeometry</code> objects from a point dataset</dd>
+        <dd>Build <code>pgeometry</code> objects from a point dataset</dd>
       </dl><dl><dt>
           
           <code><a href="spa_eval.html">spa_eval()</a></code> 
         </dt>
-        <dd>Capturing the membership degree of a point</dd>
+        <dd>Evaluate the membership degree of a point in a <code>pgeometry</code> object</dd>
       </dl><dl><dt>
           
           <code><a href="spa_exact_equal.html">spa_exact_equal()</a></code> 
         </dt>
-        <dd>Check exact equality</dd>
+        <dd>Check two spatial plateau objects for exact equality</dd>
       </dl><dl><dt>
           
           <code><a href="spa_exact_inside.html">spa_exact_inside()</a></code> 
         </dt>
-        <dd>Check exact containment</dd>
+        <dd>Check two spatial plateau objects for exact containment</dd>
+      </dl><dl><dt>
+          
+          <code><a href="spa_flatten.html">spa_flatten()</a></code> 
+        </dt>
+        <dd>Flatten a plateau collection object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="spa_get_type.html">spa_get_type()</a></code> 
+        </dt>
+        <dd>Get the type of a spatial plateau object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="spa_is_empty.html">spa_is_empty()</a></code> 
+        </dt>
+        <dd>Check if a <code>pgeometry</code> object is empty</dd>
       </dl><dl><dt>
           
           <code><a href="spa_set_classification.html">spa_set_classification()</a></code> 
         </dt>
-        <dd>Setting a new classification for fuzzy topological relationships</dd>
+        <dd>Set a new classification for fuzzy topological relationships</dd>
       </dl><dl><dt>
           
           <code><a href="spa_support.html">spa_support()</a></code> 
         </dt>
-        <dd>Capturing the support of a <code>pgeometry</code> object</dd>
+        <dd>Get the support of a <code>pgeometry</code> object</dd>
       </dl><dl><dt>
           
           <code><a href="visitation.html">visitation()</a></code> 
@@ -214,7 +264,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anderson Carniel, Felippe Galdino, Juliana Philippsen.</p>
+  <p></p><p>Developed by Anderson Carniel.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fsr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,44 +45,84 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.0.2" id="fsr-102">fsr 1.0.2<a class="anchor" aria-label="anchor" href="#fsr-102"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.0.0" id="fsr-200">fsr 2.0.0<a class="anchor" aria-label="anchor" href="#fsr-200"></a></h2><p class="text-muted">CRAN release: 2023-07-04</p>
+<div class="section level3">
+<h3 id="major-changes-2-0-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-2-0-0"></a></h3>
+<ul><li>Defined a new hierarchical structure for defining the spatial plateau data types:
+<ul><li>Added two new spatial plateau data types: <code>pcollection</code> and <code>pcomposition</code>.</li>
+<li>Redefined the class named <code>pgeometry</code>.</li>
+<li>Defined three spatial plateau data types that are subclasses of <code>pgeometry</code>: <code>ppoint</code>, <code>pline</code>, and <code>pregion</code>.</li>
+<li>Specified validity methods for all classes according to the rules of the Spatial Plateau Algebra.</li>
+<li>These modifications are based on the pull requests performed by Pedro V. A. B. de Venâncio, who is added as a contributor of the package <code>fsr</code> in the current version (<a href="https://github.com/accarniel/fsr/pull/26" class="external-link">#26 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a> and <a href="https://github.com/accarniel/fsr/pull/27" class="external-link">#27 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+</ul></li>
+<li>Added <code><a href="../reference/spa_get_type.html">spa_get_type()</a></code> (based on the pull request <a href="https://github.com/accarniel/fsr/pull/27" class="external-link">#27 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Updated and improved functions that create <code>pgeometry</code> objects: <code><a href="../reference/create_pgeometry.html">create_pgeometry()</a></code> and <code><a href="../reference/create_empty_pgeometry.html">create_empty_pgeometry()</a></code> (<a href="https://github.com/accarniel/fsr/pull/27" class="external-link">#27 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Improved the creation of components by redesigning <code><a href="../reference/fsr_components.html">create_component()</a></code>. <code><a href="../reference/fsr_components.html">component_from_sfg()</a></code> is deprecated (it will be removed in the next version of the package).</li>
+<li>Enhanced <code><a href="../reference/plot.html">fsr_plot()</a></code> and added the support for <code>pcollection</code> and <code>pcomposition</code> objects.</li>
+<li>Added two new external functions that handle <code>pcollection</code> objects: <code><a href="../reference/spa_flatten.html">spa_flatten()</a></code> and <code><a href="../reference/pcollection_to_pcomposition.html">pcollection_to_pcomposition()</a></code> (based on the pull request <a href="https://github.com/accarniel/fsr/pull/31" class="external-link">#31 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>). They are also used by fuzzy geometric set operations on <code>pcollection</code> objects.</li>
+<li>Enhanced fuzzy geometric set operations, which can now handle different data types as input (based on the pull request <a href="https://github.com/accarniel/fsr/pull/31" class="external-link">#31 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Deprecated <code><a href="../reference/fsr_geometric_operations.html">spa_common_points()</a></code> - use <code><a href="../reference/fsr_geometric_operations.html">spa_intersection()</a></code> to get the common points of two plateau line objects.</li>
+<li>Deprecated <code><a href="../reference/spa_boundary_pregion.html">spa_boundary_pregion()</a></code> - use <code>spa_boundary</code> to get the boundary of a spatial plateau object.</li>
+<li>Enhanced general operations (e.g., <code><a href="../reference/spa_core.html">spa_core()</a></code>, <code><a href="../reference/spa_boundary.html">spa_boundary()</a></code>) to deal with the new spatial plateau data types (based on the pull request <a href="https://github.com/accarniel/fsr/pull/31" class="external-link">#31 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Added three new general operations: <code><a href="../reference/fsr_filter_operations.html">spa_alpha_cut()</a></code>, <code><a href="../reference/fsr_filter_operations.html">spa_strict_alpha_cut()</a></code>, and <code><a href="../reference/fsr_filter_operations.html">spa_range()</a></code>.</li>
+<li>Removed the dependency of packages <code>FuzzyR</code> and <code>utils</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-changes-2-0-0">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-2-0-0"></a></h3>
+<ul><li>Better organization of the source code by creating more R scripts and rearranging the functions and classes in them.</li>
+<li>Updated <code><a href="../reference/PWKT.html">format.pgeometry()</a></code> to include a parameter that determines the maximum number of characters that are shown.</li>
+<li>Updated <code><a href="../reference/PWKT.html">spa_pwkt()</a></code> to deal with the new classes (based on the pull request <a href="https://github.com/accarniel/fsr/pull/26" class="external-link">#26 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Updated <code><a href="../reference/spa_is_empty.html">spa_is_empty()</a></code> to deal with the new classes (based on the pull request <a href="https://github.com/accarniel/fsr/pull/26" class="external-link">#26 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Updated <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble()</a></code> to deal with the new classes.</li>
+<li>Extended fuzzy numerical operations to deal with the new classes (based on the pull request <a href="https://github.com/accarniel/fsr/pull/30" class="external-link">#30 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Updated fuzzy topological relationships due to the changes in other operators (based on the pull request <a href="https://github.com/accarniel/fsr/pull/31" class="external-link">#31 - </a><a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>).</li>
+<li>Minor changes in functions of the construction module to use improved operations when manipulating spatial plateau objects.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="change-in-the-list-of-authors-2-0-0">Change in the list of authors<a class="anchor" aria-label="anchor" href="#change-in-the-list-of-authors-2-0-0"></a></h3>
+<ul><li>Added Pedro Vinícius Almeida Borges de Venâncio (<a href="https://github.com/pedbrgs" class="external-link">@pedbrgs</a>) as a contributor to the <code>fsr</code>.</li>
+<li>We are grateful for the contributions of Felippe Galdino (<a href="https://github.com/ocfgaldino" class="external-link">@ocfgaldino</a>) and Juliana Strieder Philippsen (<a href="https://github.com/JulianaStrieder" class="external-link">@JulianaStrieder</a>) in the first version of the package (1.0.0, 1.0.1, and 1.0.2). Their participation in the package was concluded; thus, they were removed from the list of authors in this version of the package, which includes several changes, improvements, and new methods.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.2" id="fsr-102">fsr 1.0.2<a class="anchor" aria-label="anchor" href="#fsr-102"></a></h2><p class="text-muted">CRAN release: 2022-07-05</p>
 <div class="section level3">
 <h3 id="minor-changes-1-0-2">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-1-0-2"></a></h3>
-<ul><li>Add the parameter <code>dTolerance</code> in the function <code>spa_creator</code>. This parameter is employed by the package <code>sf</code> when computing the Voronoi diagram and Delaunay triangulation in the corresponding construction policies.</li>
+<ul><li>Added the parameter <code>d_tolerance</code> in the <code><a href="../reference/spa_creator.html">spa_creator()</a></code> function. This parameter is employed by the package <code>sf</code> when computing the Voronoi diagram and Delaunay triangulation in the corresponding construction policies.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-2"></a></h3>
-<ul><li>Fix the fuzzy numerical operations when dealing with empty objects</li>
-<li>Fix the <code>spa_core</code> to return an empty crisp spatial object when the input has not a core</li>
-<li>Fix some if statements and calculations in the fuzzy topological relationships</li>
-<li>Fix the clipping operation in the <code>spa_creator</code> when using the construction policies based on the Voronoi diagram and Delaunay triangulation</li>
+<ul><li>Fixed the fuzzy numerical operations when dealing with empty objects.</li>
+<li>Fixed <code><a href="../reference/spa_core.html">spa_core()</a></code> to return an empty crisp spatial object when the input has not a core.</li>
+<li>Fixed some if statements and calculations in the fuzzy topological relationships.</li>
+<li>Fixed the clipping operation in <code><a href="../reference/spa_creator.html">spa_creator()</a></code> when using the construction policies based on the Voronoi diagram and Delaunay triangulation.</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.1" id="fsr-101">fsr 1.0.1<a class="anchor" aria-label="anchor" href="#fsr-101"></a></h2><p class="text-muted">CRAN release: 2022-01-25</p>
 <div class="section level3">
 <h3 id="major-changes-1-0-1">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-1-0-1"></a></h3>
-<ul><li>Add a new construction policy in the <code>spa_creator</code> function based on the convex hull (an improved implementation from the issue <a href="https://github.com/accarniel/fsr/issues/29" class="external-link">#29</a>)</li>
+<ul><li>Added a new construction policy in the <code><a href="../reference/spa_creator.html">spa_creator()</a></code> function based on the convex hull (an improved implementation from the issue <a href="https://github.com/accarniel/fsr/issues/29" class="external-link">#29</a>).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-changes-1-0-1">Minor changes<a class="anchor" aria-label="anchor" href="#minor-changes-1-0-1"></a></h3>
-<ul><li>Add the publication that describes the <a href="https://dl.acm.org/doi/abs/10.1145/3474717.3484255" class="external-link">fsr package</a> into CITATION</li>
-<li>Add an optional parameter in the function <code>spa_creator</code> named <code>digits</code> (an improved update based on the pull request <a href="https://github.com/accarniel/fsr/pull/28" class="external-link">#2, </a><a href="https://github.com/leticiabohnert" class="external-link">@leticiabohnert</a>)</li>
+<ul><li>Added the publication that describes the <a href="https://dl.acm.org/doi/abs/10.1145/3474717.3484255" class="external-link">fsr package</a> into <code>CITATION</code>.</li>
+<li>Added an optional parameter in <code><a href="../reference/spa_creator.html">spa_creator()</a></code> named <code>digits</code> (an improved update based on the pull request <a href="https://github.com/accarniel/fsr/pull/28" class="external-link">#28 - </a><a href="https://github.com/leticiabohnert" class="external-link">@leticiabohnert</a>).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-1"></a></h3>
-<ul><li>Fix <code>spa_add_component</code> for checking a specific condition</li>
-<li>Fix the management of CRS when plotting spatial plateau objects (function <code>fsr_plot</code>)</li>
-<li>Fix the management of geometry collections resulting from some geometric computations of the spatial plateau geometric set operations (internal function <code>append_valid_comps</code>)</li>
+<ul><li>Fixed <code><a href="../reference/spa_add_component.html">spa_add_component()</a></code> for checking a specific condition.</li>
+<li>Fixed the management of CRS when plotting spatial plateau objects (<code><a href="../reference/plot.html">fsr_plot()</a></code>).</li>
+<li>Fixed the management of geometry collections resulting from some geometric computations of the spatial plateau geometric set operations.</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="fsr-100">fsr 1.0.0<a class="anchor" aria-label="anchor" href="#fsr-100"></a></h2><p class="text-muted">CRAN release: 2021-09-16</p>
 <ul><li>This is the first release of <em>fsr</em> that consists of the following modules:
-<ul><li>Fuzzy Spatial Inference Module (e.g., functions to create a fuzzy spatial inference model and functions to evaluate it)</li>
-<li>Fuzzy Spatial Data Handling Module (e.g., fuzzy numerical operations, fuzzy geometric set operations, and fuzzy topological predicates)</li>
-<li>Construction Module (e.g., <code>spa_creator</code>)</li>
-<li>Basic Module (e.g., S4 classes and basic functions)</li>
+<ul><li>Fuzzy Spatial Inference Module (e.g., functions to create a fuzzy spatial inference model and functions to evaluate it).</li>
+<li>Fuzzy Spatial Data Handling Module (e.g., fuzzy numerical operations, fuzzy geometric set operations, and fuzzy topological predicates).</li>
+<li>Construction Module (e.g., <code><a href="../reference/spa_creator.html">spa_creator()</a></code>).</li>
+<li>Basic Module (e.g., S4 classes and basic functions).</li>
 </ul></li>
 </ul></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -90,7 +130,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anderson Carniel, Felippe Galdino, Juliana Philippsen.</p>
+  <p></p><p>Developed by Anderson Carniel.</p>
 </div>
 
 <div class="pkgdown-footer-right">

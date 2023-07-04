@@ -7,10 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content='Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
     It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
-    It implements underlying concepts defined in the following research papers: 
+    It mainly implements underlying concepts defined in the following research papers: 
     (i) "Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types" &lt;doi:10.1109/FUZZ-IEEE.2018.8491565&gt;; 
     (ii) "A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets" &lt;doi:10.1109/FUZZ-IEEE.2019.8858878&gt;; 
-    (iii) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" &lt;doi:10.1109/FUZZ-IEEE.2017.8015707&gt;.'>
+    (iii) "Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions" &lt;doi:10.1109/FUZZ48607.2020.9177620&gt;;
+    (iv) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" &lt;doi:10.1109/FUZZ-IEEE.2017.8015707&gt;;
+    (v) "Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models" &lt;doi:10.1109/FUZZ-IEEE55066.2022.9882658&gt;.'>
 <title>Handling Fuzzy Spatial Data • fsr</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
@@ -19,10 +21,12 @@
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Handling Fuzzy Spatial Data">
 <meta property="og:description" content='Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
     It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
-    It implements underlying concepts defined in the following research papers: 
+    It mainly implements underlying concepts defined in the following research papers: 
     (i) "Spatial Plateau Algebra: An Executable Type System for Fuzzy Spatial Data Types" &lt;doi:10.1109/FUZZ-IEEE.2018.8491565&gt;; 
     (ii) "A Systematic Approach to Creating Fuzzy Region Objects from Real Spatial Data Sets" &lt;doi:10.1109/FUZZ-IEEE.2019.8858878&gt;; 
-    (iii) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" &lt;doi:10.1109/FUZZ-IEEE.2017.8015707&gt;.'>
+    (iii) "Spatial Data Types for Heterogeneously Structured Fuzzy Spatial Collections and Compositions" &lt;doi:10.1109/FUZZ48607.2020.9177620&gt;;
+    (iv) "Fuzzy Inference on Fuzzy Spatial Objects (FIFUS) for Spatial Decision Support Systems" &lt;doi:10.1109/FUZZ-IEEE.2017.8015707&gt;;
+    (v) "Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models" &lt;doi:10.1109/FUZZ-IEEE55066.2022.9882658&gt;.'>
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -36,7 +40,7 @@
     
     <a class="navbar-brand me-2" href="index.html">fsr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +75,8 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="the-package-fsr-handling-fuzzy-spatial-data-in-r">The Package <em>fsr</em>: Handling Fuzzy Spatial Data in R<a class="anchor" aria-label="anchor" href="#the-package-fsr-handling-fuzzy-spatial-data-in-r"></a>
+<div class="page-header"><h1 id="fsr-handling-fuzzy-spatial-data-in-r">
+<em>fsr</em>: Handling Fuzzy Spatial Data in R<a class="anchor" aria-label="anchor" href="#fsr-handling-fuzzy-spatial-data-in-r"></a>
 </h1></div>
 
 <div class="section level2">
@@ -80,19 +85,28 @@
 <p>Many spatial objects (i.e., geographical objects) in reality may have inexact locations, vague boundaries, and/or blurred interiors, and hence cannot be adequately represented by well-known (crisp) spatial objects (e.g., those objects available in spatial libraries like GEOS and GDAL). Fuzzy set theory and fuzzy logic are powerful approaches to deal with spatial fuzziness.</p>
 <p>Unfortunately, spatial fuzziness has so far not found its way into <em>spatial data science projects</em> due to a lack of complete implementations of software packages that can handle fuzzy spatial objects. Motivated by this lack of support, the <em>fsr</em> package has the following advantages:</p>
 <ul>
-<li>It is an implementation of the <a href="https://ieeexplore.ieee.org/document/7737976" class="external-link">fuzzy spatial data types, operations, and predicates</a> of the <a href="https://ieeexplore.ieee.org/document/8491565" class="external-link">Spatial Plateau Algebra (SPA)</a>.</li>
+<li>It is an implementation of the <a href="https://ieeexplore.ieee.org/document/7737976" class="external-link">fuzzy spatial data types, operations, and predicates</a>, including <a href="https://ieeexplore.ieee.org/document/9177620" class="external-link">heterogeneous fuzzy spatial data types</a>, based on the <a href="https://ieeexplore.ieee.org/document/8491565" class="external-link">Spatial Plateau Algebra (SPA)</a>.</li>
 <li>It offers the <a href="https://ieeexplore.ieee.org/document/8858878" class="external-link">construction of fuzzy spatial objects as spatial plateau objects</a> from real spatial datasets.</li>
 <li>It has families of functions that permit users to conduct exploratory (spatial) data analysis by issuing geometric operations and topological predicates on fuzzy spatial objects.</li>
-<li>It provides methods for designing <a href="https://ieeexplore.ieee.org/document/8015707" class="external-link">fuzzy spatial inference models</a> to discover new findings from fuzzy spatial objects.</li>
-<li>It deploys algorithms to determine and only evaluate a subset of points that really contributes to finding the final but approximated answer to a user’s query window inference.</li>
+<li>It allows the design and creation of <a href="https://ieeexplore.ieee.org/document/8015707" class="external-link">fuzzy spatial inference (FSI) models</a> to discover new findings from fuzzy spatial objects.</li>
+<li>It provides evaluation methods to process different types of <a href="https://ieeexplore.ieee.org/document/9882658" class="external-link">spatial inference queries by using FSI models</a>.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p>To cite this package in publications use:</p>
+<p>To cite <em>fsr</em> in publications use:</p>
 <ul>
-<li><a href="https://dl.acm.org/doi/10.1145/3474717.3484255?cid=99658676659" class="external-link">Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (ACM SIGSPATIAL 2021), pp. 526-535, 2021.</a></li>
+<li>To refer to its second version:
+<ul>
+<li><a href="https://doi.org/10.1111/tgis.13044" class="external-link">Carniel, A. C.; Venâncio, P. V. A. B; Schneider, M. fsr: An R package for fuzzy spatial data handling. Transactions in GIS, vol. 27, no. 3, pp. 900-927, 2023.</a></li>
+</ul>
+</li>
+<li>To refer to its first version and the implementation of fuzzy spatial inference models:
+<ul>
+<li><a href="https://doi.org/10.1145/3474717.3484255" class="external-link">Carniel, A. C.; Galdino, F.; Philippsen, J. S.; Schneider, M. Handling Fuzzy Spatial Data in R Using the fsr Package. In Proceedings of the 29th International Conference on Advances in Geographic Information Systems (ACM SIGSPATIAL 2021), pp. 526-535, 2021.</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section level2">
@@ -110,7 +124,7 @@
 <div class="section level2">
 <h2 id="contributing-and-contact">Contributing and Contact<a class="anchor" aria-label="anchor" href="#contributing-and-contact"></a>
 </h2>
-<p>The project welcomes contributions from three different perspectives. You can contribute to <em>fsr</em> by making Issues or Pull Requests on this GitHub Repository. Alternatively, contact Anderson Carniel by sending an email to <a href="mailto:accarniel@ufscar.br" class="email">accarniel@ufscar.br</a>. When a Pull Request or email is sent, Anderson Carniel will check it as soon as possible.</p>
+<p>The project welcomes contributions. You can contribute to <em>fsr</em> by making Issues or Pull Requests on this GitHub Repository. Alternatively, you can contact Anderson Carniel. When a Pull Request or email is sent, Anderson Carniel will check it as soon as possible.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -141,9 +155,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Anderson Carniel <br><small class="roles"> Research team head, author, maintainer </small> <a href="https://orcid.org/0000-0002-8297-9894" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Felippe Galdino <br><small class="roles"> Research team member, author </small> <a href="https://orcid.org/0000-0003-2594-9733" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Juliana Philippsen <br><small class="roles"> Research team member, author </small>  </li>
+<li>Anderson Carniel <br><small class="roles"> Research team head, author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-8297-9894" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
@@ -152,7 +164,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://cran.r-project.org/package=fsr" class="external-link"><img src="https://www.r-pkg.org/badges/version/fsr" alt="CRAN"></a></li>
-<li><a href="https://cran.r-project.org/web/checks/check_results_fsr.html" class="external-link"><img src="https://cranchecks.info/badges/worst/fsr" alt="CRAN checks"></a></li>
+<li><a href="https://cran.r-project.org/web/checks/check_results_fsr.html" class="external-link"><img src="https://badges.cranchecks.info/worst/fsr.svg" alt="CRAN checks"></a></li>
 <li><a href="https://cran.r-project.org/package=fsr" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/fsr" alt="Downloads"></a></li>
 <li><a href="https://cran.r-project.org/package=fsr" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/fsr" alt="Total Downloads"></a></li>
 </ul>
@@ -164,7 +176,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Anderson Carniel, Felippe Galdino, Juliana Philippsen.</p>
+<p>Developed by Anderson Carniel.</p>
 </div>
 
 <div class="pkgdown-footer-right">

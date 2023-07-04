@@ -58,10 +58,10 @@
     <loc>https://accarniel.github.io/fsr/reference/fsr_eval_modes.html</loc>
   </url>
   <url>
-    <loc>https://accarniel.github.io/fsr/reference/fsr_geometric_operations.html</loc>
+    <loc>https://accarniel.github.io/fsr/reference/fsr_filter_operations.html</loc>
   </url>
   <url>
-    <loc>https://accarniel.github.io/fsr/reference/fsr_is_empty.html</loc>
+    <loc>https://accarniel.github.io/fsr/reference/fsr_geometric_operations.html</loc>
   </url>
   <url>
     <loc>https://accarniel.github.io/fsr/reference/fsr_numerical_operations.html</loc>
@@ -73,16 +73,37 @@
     <loc>https://accarniel.github.io/fsr/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://accarniel.github.io/fsr/reference/pcollection-class.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/pcollection_to_pcomposition.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/pcomposition-class.html</loc>
+  </url>
+  <url>
     <loc>https://accarniel.github.io/fsr/reference/pgeometry-class.html</loc>
   </url>
   <url>
+    <loc>https://accarniel.github.io/fsr/reference/pline-class.html</loc>
+  </url>
+  <url>
     <loc>https://accarniel.github.io/fsr/reference/plot.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/ppoint-class.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/pregion-class.html</loc>
   </url>
   <url>
     <loc>https://accarniel.github.io/fsr/reference/reexports.html</loc>
   </url>
   <url>
     <loc>https://accarniel.github.io/fsr/reference/spa_add_component.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/spa_boundary.html</loc>
   </url>
   <url>
     <loc>https://accarniel.github.io/fsr/reference/spa_boundary_pregion.html</loc>
@@ -104,6 +125,15 @@
   </url>
   <url>
     <loc>https://accarniel.github.io/fsr/reference/spa_exact_inside.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/spa_flatten.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/spa_get_type.html</loc>
+  </url>
+  <url>
+    <loc>https://accarniel.github.io/fsr/reference/spa_is_empty.html</loc>
   </url>
   <url>
     <loc>https://accarniel.github.io/fsr/reference/spa_set_classification.html</loc>
