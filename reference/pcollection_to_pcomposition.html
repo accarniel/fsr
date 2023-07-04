@@ -116,11 +116,13 @@ aggregating all spatial plateau objects by type.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "PLATEAUCOLLECTION (PLATEAULINE ((LINESTRING (1 3, 1 2, 2 0.5), 0.5), (LINESTRING (1 1.5, 2 1.2), 1)), PLATEAUREGION ((POLYGON ((0 0, 1 4, 2 2, 0 0)), 0.4), (POLYGON ((2 0.5, 4 1, 4 0, 2 0.5)), 0.8)), PLATEAUCOMPOSITION (PLATEAUPOINT ((MULTIPOINT ((1 0), (2 3)), 0.4), (MULTIPOINT ((0 1), (3 3)), 0.85)), PLATEAULINE ((LINESTRING (-1 1, 2 2), 0.9)), PLATEAUREGION EMPTY), PLATEAUCOLLECTION (PLATEAUPOINT ((POINT (0 0), 0.3), (MULTIPOINT ((2 2), (2 4), (2 0)), 0.5), (MULTIPOINT ((1 1), (3 1), (1 3), (3 3)), 0.9)), PLATEAUPOINT ((MULTIPOINT ((0 0), (2 3)), 0.7), (MULTIPOINT ((10 10), (9 8), (7 7)), 1)), PLATEAUPOINT ((MULTIPOINT ((0 0), (2 3)), 0.7), (MULTIPOINT ((10 10), (9 8), (7 7)), 1)), PLATEAULINE ((LINESTRING (0 0, 1 1.5), 0.2), (LINESTRING (2 1.2, 3 1.6, 4 4), 0.7))))"</span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pcol2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pcollection_to_pcomposition-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">converted_pcomp</span> <span class="op">&lt;-</span> <span class="fu">pcollection_to_pcomposition</span><span class="op">(</span><span class="va">pcol2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">converted_pcomp</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "PLATEAUCOMPOSITION (PLATEAUPOINT ((POINT (1 0), 0.4), (MULTIPOINT ((2 0), (2 4)), 0.5), (POINT (2 3), 0.7), (POINT (0 1), 0.85), (MULTIPOINT ((3 1), (3 3)), 0.9), (MULTIPOINT ((7 7), (9 8), (10 10)), 1)), PLATEAULINE ((LINESTRING (1.4 1.4, 2 0.5), 0.5), (LINESTRING (2 1.2, 3 1.6, 4 4), 0.7), (LINESTRING (-1 1, 0.3636364 1.454545), 0.9), (LINESTRING (1.384615 1.384615, 2 1.2), 1)), PLATEAUREGION ((POLYGON ((0 0, 0.3636364 1.454545, 1 4, 2 2, 1.4 1.4, 1.384615 1.384615, 0 0)), 0.4), (POLYGON ((2 0.5, 4 1, 4 0, 2 0.5)), 0.8)))"</span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">converted_pcomp</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="pcollection_to_pcomposition-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

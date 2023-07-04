@@ -88,7 +88,7 @@ Else if <code>boundary = "region"</code> (the default value), then the function 
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></span>
@@ -121,18 +121,36 @@ Else if <code>boundary = "region"</code> (the default value), then the function 
 <span class="r-in"><span><span class="co"># Using the standard fuzzification policy based on fuzzy sets</span></span></span>
 <span class="r-in"><span><span class="va">pregions</span> <span class="op">&lt;-</span> <span class="fu"><a href="spa_creator.html">spa_creator</a></span><span class="op">(</span><span class="va">tbl</span>, classes <span class="op">=</span> <span class="va">classes</span>, mfs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cold_mf</span>, <span class="va">hot_mf</span><span class="op">)</span>, base_poly <span class="op">=</span> <span class="va">ch</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Cold"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="spa_boundary_pregion-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Hot"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="spa_boundary_pregion-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># these functions are now deprecated, use `spa_boundary()`</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># capturing and showing the boundary plateau line of each pgeometry object previously created</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">spa_boundary_pregion</span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, bound_part <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span><span class="op">)</span> </span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'spa_boundary_pregion' is deprecated.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use 'spa_boundary' instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See help("Deprecated")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "PLATEAULINE EMPTY"</span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">spa_boundary_pregion</span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, bound_part <span class="op">=</span> <span class="st">"line"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'spa_boundary_pregion' is deprecated.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use 'spa_boundary' instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See help("Deprecated")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "PLATEAULINE EMPTY"</span>
 <span class="r-in"><span><span class="co"># this part of the boundary is empty because there is no core! </span></span></span>
 <span class="r-in"><span><span class="co"># capturing and showing the boundary plateau region (this is the default behavior)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">spa_boundary_pregion</span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'spa_boundary_pregion' is deprecated.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use 'spa_boundary' instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See help("Deprecated")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "PLATEAUREGION ((POLYGON ((2.823489 14.29299, 7.237678 16.13045, 19.62547 10.77187, 14.66711 2.780492, 10.23901 3.496961, 2.823489 14.29299)), 0.365178430763384), (POLYGON ((14.66711 2.780492, 19.62547 10.77187, 21.99614 12.81395, 28.05141 4.595828, 25.53715 1.021713, 14.66711 2.780492)), 0.656457394361496))"</span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">spa_boundary_pregion</span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'spa_boundary_pregion' is deprecated.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use 'spa_boundary' instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See help("Deprecated")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "PLATEAUREGION ((POLYGON ((4.223299 43.96373, 8.578564 43.34816, 12.47967 36.91792, 3.159718 31.00388, 3.470933 38.6406, 4.223299 43.96373)), 0.00659261224791408), (POLYGON ((3.054677 28.42634, 14.00831 22.52261, 7.237678 16.13045, 2.823489 14.29299, 2.482768 14.39259, 3.054677 28.42634)), 0.0225217118859291), (POLYGON ((8.578564 43.34816, 4.223299 43.96373, 4.975665 49.28685, 8.578564 43.34816)), 0.057951174210757), (POLYGON ((24.18653 17.62137, 21.99614 12.81395, 19.62547 10.77187, 7.237678 16.13045, 14.00831 22.52261, 20.12681 24.31306, 24.18653 17.62137)), 0.0814723167568445), (POLYGON ((2.482768 14.39259, 2.823489 14.29299, 10.23901 3.496961, 2.09246 4.815077, 2.482768 14.39259)), 0.187957359477878), (POLYGON ((29.41458 4.511317, 28.05141 4.595828, 21.99614 12.81395, 24.18653 17.62137, 29.66728 8.587404, 29.41458 4.511317)), 0.72110211616382), (POLYGON ((20.12681 24.31306, 14.00831 22.52261, 3.054677 28.42634, 3.159718 31.00388, 12.47967 36.91792, 20.12681 24.31306)), 0.745922483038157), (POLYGON ((25.53715 1.021713, 28.05141 4.595828, 29.41458 4.511317, 29.16188 0.43523, 25.53715 1.021713)), 0.936500272403161))"</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -85,7 +85,7 @@ The length of these parameters must to be equal.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -103,11 +103,22 @@ The length of these parameters must to be equal.</p>
 <span class="r-in"><span><span class="va">pregions</span> <span class="op">&lt;-</span> <span class="fu"><a href="spa_creator.html">spa_creator</a></span><span class="op">(</span><span class="va">tbl</span>, base_poly <span class="op">=</span> <span class="va">ch</span>, fuzz_policy <span class="op">=</span> <span class="st">"fcp"</span>, k <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="spa_set_classification-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="spa_set_classification-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Showing results for spa_overlap() by considering default list of classes</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fsr_topological_relationships.html">spa_overlap</a></span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, ret <span class="op">=</span> <span class="st">"list"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $superficially</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1976317</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $moderately</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $completely</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># Changing the default classification </span></span></span>
 <span class="r-in"><span><span class="va">trap_mf</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span>, <span class="va">d</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -121,10 +132,19 @@ The length of these parameters must to be equal.</p>
 <span class="r-in"><span><span class="va">completely</span> <span class="op">&lt;-</span> <span class="fu">trap_mf</span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.8</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">spa_set_classification</span><span class="op">(</span><span class="va">classes</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">superficially</span>, <span class="va">moderately</span>, <span class="va">completely</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># Now the fuzzy topological relationships will use the new classification</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fsr_topological_relationships.html">spa_overlap</a></span><span class="op">(</span><span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">pregions</span><span class="op">$</span><span class="va">pgeometry</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, ret <span class="op">=</span> <span class="st">"list"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $superficially</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1976317</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $moderately</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $completely</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

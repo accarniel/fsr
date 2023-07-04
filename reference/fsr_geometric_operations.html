@@ -186,46 +186,55 @@ For this, the following steps should be performed:</p><ol><li><p>Implement your 
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_ppoint1</span>, <span class="va">plot_ppoint2</span>, <span class="va">plot_inter</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fsr_geometric_operations-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># varying the t-norm </span></span></span>
 <span class="r-in"><span><span class="va">ppoints_intersec</span> <span class="op">&lt;-</span> <span class="fu">spa_intersection</span><span class="op">(</span><span class="va">ppoint1</span>, <span class="va">ppoint2</span>, itype <span class="op">=</span> <span class="st">"prod"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_inter</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">ppoints_intersec</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Intersection (prod)"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_ppoint1</span>, <span class="va">plot_ppoint2</span>, <span class="va">plot_inter</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">plines_intersec</span> <span class="op">&lt;-</span> <span class="fu">spa_intersection</span><span class="op">(</span><span class="va">pline1</span>, <span class="va">pline2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_inter</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">plines_intersec</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Intersection"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_pline1</span>, <span class="va">plot_pline2</span>, <span class="va">plot_inter</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">pregion_pline_intersec</span> <span class="op">&lt;-</span> <span class="fu">spa_intersection</span><span class="op">(</span><span class="va">pline1</span>, <span class="va">pregion</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_inter</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregion_pline_intersec</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Intersection"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_pline1</span>, <span class="va">plot_pregion</span>, <span class="va">plot_inter</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Computing the union</span></span></span>
 <span class="r-in"><span><span class="va">ppoints_union</span> <span class="op">&lt;-</span> <span class="fu">spa_union</span><span class="op">(</span><span class="va">ppoint1</span>, <span class="va">ppoint2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_union</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">ppoints_union</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Union"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_ppoint1</span>, <span class="va">plot_ppoint2</span>, <span class="va">plot_union</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">plines_union</span> <span class="op">&lt;-</span> <span class="fu">spa_union</span><span class="op">(</span><span class="va">pline1</span>, <span class="va">pline2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_union</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">plines_union</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Union"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_pline1</span>, <span class="va">plot_pline2</span>, <span class="va">plot_union</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">pregion_pline_union</span> <span class="op">&lt;-</span> <span class="fu">spa_union</span><span class="op">(</span><span class="va">pline1</span>, <span class="va">pregion</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_union</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregion_pline_union</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Union"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_pline1</span>, <span class="va">plot_pregion</span>, <span class="va">plot_union</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Computing the difference</span></span></span>
 <span class="r-in"><span><span class="va">ppoints_diff</span> <span class="op">&lt;-</span> <span class="fu">spa_difference</span><span class="op">(</span><span class="va">ppoint1</span>, <span class="va">ppoint2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">ppoints_diff</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Difference"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_ppoint1</span>, <span class="va">plot_ppoint2</span>, <span class="va">plot_diff</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-8.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">plines_diff</span> <span class="op">&lt;-</span> <span class="fu">spa_difference</span><span class="op">(</span><span class="va">pline1</span>, <span class="va">pline2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">plines_diff</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Difference"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_pline1</span>, <span class="va">plot_pline2</span>, <span class="va">plot_diff</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-9.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">pregion_pline_diff</span> <span class="op">&lt;-</span> <span class="fu">spa_difference</span><span class="op">(</span><span class="va">pline1</span>, <span class="va">pregion</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plot_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">pregion_pline_diff</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Difference"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">combine_plots</span><span class="op">(</span><span class="va">plot_pline1</span>, <span class="va">plot_pregion</span>, <span class="va">plot_diff</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-plt img"><img src="fsr_geometric_operations-10.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
