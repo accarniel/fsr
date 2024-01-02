@@ -2,7 +2,7 @@
 
 ## Minor change
 
-- Replaced `lwgeom::st_perimeter()` by `sf::st_perimeter()` (available in version 1.0.15). The package `lwgeom` now is under `Suggests:` (fix [#33](https://github.com/accarniel/fsr/issues/33)).
+- Replaced `lwgeom::st_perimeter()` by `sf::st_perimeter()` (available in version 1.0.15). The package `lwgeom` is now under `Suggests` field (fix [#33](https://github.com/accarniel/fsr/issues/33)).
 
 # fsr 2.0.0
 
