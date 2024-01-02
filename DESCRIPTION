@@ -12,14 +12,14 @@ BugReports: https://github.com/accarniel/fsr/issues
 Depends: R (>= 3.6.0)
 Imports: rlang (>= 0.4.11),
          methods (>= 2.0.0),
-         sf (>= 0.9.4), 
+         sf (>= 1.0.15), 
          dplyr (>= 1.0.6),
          ggplot2 (>= 3.3.5),
 	       stringr (>= 1.4.0),
 	       tibble (>= 3.0.1),
          pso (>= 1.0.3),
-         e1071 (>= 1.7.3),
-         lwgeom (>= 0.2.6)
+         e1071 (>= 1.7.3)
+Suggests: lwgeom (>= 0.2.6)
 Description: Support for fuzzy spatial objects, their operations, and fuzzy spatial inference models based on Spatial Plateau Algebra. 
     It employs fuzzy set theory and fuzzy logic as foundation to deal with spatial fuzziness. 
     It mainly implements underlying concepts defined in the following research papers: 
@@ -30,7 +30,7 @@ Description: Support for fuzzy spatial objects, their operations, and fuzzy spat
     (v) "Evaluating Region Inference Methods by Using Fuzzy Spatial Inference Models" <doi:10.1109/FUZZ-IEEE55066.2022.9882658>.
 License: GPL-3
 LazyData: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: no
 Encoding: UTF-8

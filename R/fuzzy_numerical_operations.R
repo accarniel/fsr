@@ -173,7 +173,7 @@ spa_area <- function(pgo) {
 #' 
 #' @param pgo A `pgeometry` object of the type `PLATEAUREGION`, `PLATEAUCOMPOSITION`, or `PLATEAUCOLLECTION`. It throws a warning if a different type is given.
 #'  
-#' @import sf lwgeom
+#' @import sf
 #' @export
 spa_perimeter <- function(pgo) {
   type <- spa_get_type(pgo)
@@ -184,9 +184,7 @@ spa_perimeter <- function(pgo) {
     if(type == "PLATEAUREGION") {
       perimeter_comp <- function(comp) {
         md_comp <- comp@md
-        temp <- st_sfc(comp@obj)
-        st_set_crs(temp, 4326)
-        perimeter_obj <- st_perimeter(temp)
+        perimeter_obj <- st_perimeter(comp@obj)
         perimeter_obj * md_comp
       }
       comps_perimeter <- sapply(pgo@component, perimeter_comp)
